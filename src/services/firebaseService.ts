@@ -117,11 +117,13 @@ export const firebaseService = {
   async saveCustomerProfile(profile: { id: string; phone: string; name: string }) {
     try {
       const clean = normalizePhone(profile.phone)
+      const deterministicId = `c_${clean.slice(-10)}`
+      const docId = profile.id || deterministicId
       await setDoc(
-        doc(firestore, USERS, profile.id),
+        doc(firestore, USERS, docId),
         {
-          id: profile.id,
-          uid: profile.id,
+          id: docId,
+          uid: docId,
           phone: clean,
           phoneE164: toE164Bd(profile.phone),
           name: profile.name || "",

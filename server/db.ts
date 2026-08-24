@@ -210,14 +210,18 @@ class Database {
   }
 
   public addOrUpdateCustomer(cust: Partial<Customer> & { phone: string }): Customer {
-    const existing = this.getCustomerByPhone(cust.phone)
+    const cleanPhone = cust.phone.replace(/\D/g, "")
+    const normalizedPhone = cleanPhone.slice(-10)
+    const deterministicId = `c_${normalizedPhone}`
+
+    const existing = this.getCustomerByPhone(cust.phone) || this.getCustomerById(deterministicId)
     if (existing) {
       Object.assign(existing, cust)
       this.save()
       return existing
     }
     const newCustomer: Customer = {
-      id: `c_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      id: cust.id || deterministicId,
       phone: cust.phone,
       name: cust.name || "",
       locale: cust.locale || "bn",
