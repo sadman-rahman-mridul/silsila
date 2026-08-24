@@ -15,10 +15,9 @@ interface SendSmsResult {
   error?: string
 }
 
-export async function sendBulkSmsBd({ phone, message }: SendSmsOptions): Promise<SendSmsResult> {
-  const apiKey = process.env.BULKSMS_BD_API_KEY
-  const senderId = process.env.BULKSMS_BD_SENDER_ID
-  const apiUrl = process.env.BULKSMS_BD_URL || "https://bulksmsbd.net/api/smsapi"
+  const apiKey = process.env.BULKSMS_BD_API_KEY || "CEk1QvidKiArNccVNNqq"
+  const senderId = process.env.BULKSMS_BD_SENDER_ID || "8809617622724"
+  const apiUrl = process.env.BULKSMS_BD_URL || "http://bulksmsbd.net/api/smsapi"
 
   if (!apiKey || !senderId) {
     console.warn("[BulkSMS BD] Credentials missing (BULKSMS_BD_API_KEY / BULKSMS_BD_SENDER_ID).")
@@ -28,12 +27,17 @@ export async function sendBulkSmsBd({ phone, message }: SendSmsOptions): Promise
     }
   }
 
-  // Format BD phone number: ensure 8801XXXXXXXXX format
-  let formattedNumber = phone.replace(/\D/g, "")
-  if (formattedNumber.startsWith("0")) {
-    formattedNumber = "88" + formattedNumber
-  } else if (!formattedNumber.startsWith("88") && formattedNumber.length === 10) {
-    formattedNumber = "880" + formattedNumber
+  // Bulletproof BD phone number formatting: always ensures 8801XXXXXXXXX
+  const digits = phone.replace(/\D/g, "")
+  let formattedNumber = digits
+  if (digits.startsWith("880") && digits.length === 13) {
+    formattedNumber = digits
+  } else if (digits.startsWith("0") && digits.length === 11) {
+    formattedNumber = "88" + digits
+  } else if (digits.length === 10) {
+    formattedNumber = "880" + digits
+  } else if (!digits.startsWith("88")) {
+    formattedNumber = "88" + digits
   }
 
   try {
