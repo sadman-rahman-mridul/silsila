@@ -1,0 +1,118 @@
+{
+  "version": 2,
+  "sponsors": [],
+  "merchants": [
+    {
+      "id": "m_1787609159419_588",
+      "name": "HelloHi Cafe",
+      "nameEn": "HelloHi Cafe",
+      "category": "ক্যাফে",
+      "area": "Bashundhara Gate",
+      "clusterId": "",
+      "logoInitials": "HC",
+      "logoBg": "#D8EDDF",
+      "logoColor": "#1B4332",
+      "verified": false,
+      "address": "Beside JFP",
+      "hours": "",
+      "isOpen": true,
+      "phone": "1681742043",
+      "ownerPhone": "1681742043",
+      "ownerName": "Sadman",
+      "lat": 0,
+      "lng": 0,
+      "geofenceM": 200,
+      "planTier": "free",
+      "status": "active",
+      "onboarded": true,
+      "createdAt": "2026-08-24T22:05:59.419Z",
+      "password": "123456"
+    }
+  ],
+  "staff": [],
+  "customers": [
+    {
+      "id": "c_1787610505680_170",
+      "phone": "01681742043",
+      "name": "Sadman",
+      "locale": "bn",
+      "consentGiven": true,
+      "consentTimestamp": "2026-08-24T22:28:25.680Z",
+      "createdAt": "2026-08-24T22:28:25.680Z",
+      "totalStamps": 0,
+      "totalVisits": 0,
+      "cardsCompleted": 0
+    },
+    {
+      "id": "c_1787611721976_273",
+      "phone": "1681742043",
+      "name": "Sadman",
+      "locale": "bn",
+      "consentGiven": true,
+      "consentTimestamp": "2026-08-24T22:48:41.976Z",
+      "createdAt": "2026-08-24T22:48:41.976Z",
+      "totalStamps": 1,
+      "totalVisits": 1,
+      "cardsCompleted": 0,
+      "password": "123456"
+    }
+  ],
+  "rewardPrograms": [
+    {
+      "id": "rp_1787609216684",
+      "merchantId": "m_1787609159419_588",
+      "sponsorId": null,
+      "target": 3,
+      "rewardText": "100 TK Voucher",
+      "expiryDays": 18,
+      "active": true,
+      "createdAt": "2026-08-24T22:06:56.684Z"
+    }
+  ],
+  "cards": [
+    {
+      "id": "cc_1787611926174_797",
+      "customerId": "c_1787611721976_273",
+      "merchantId": "m_1787609159419_588",
+      "programId": "rp_1787609216684",
+      "stamps": 1,
+      "cycleNo": 1,
+      "streakCount": 1,
+      "graceUsed": false,
+      "lastVisit": "এইমাত্র",
+      "lastVisitTimestamp": 1787612545639,
+      "voucherReady": false,
+      "createdAt": "2026-08-24T22:52:06.174Z"
+    }
+  ],
+  "pendingApprovals": [
+    {
+      "id": "pa_1787612338500_48",
+      "merchantId": "m_1787609159419_588",
+      "customerId": "c_1787611721976_273",
+      "customerName": "Sadman",
+      "customerPhone": "1681742043",
+      "distanceMeters": -1,
+      "createdAt": "2026-08-24T22:58:58.500Z",
+      "createdTimestamp": 1787612338500,
+      "expiresAt": "2026-08-24T23:08:58.500Z",
+      "resolution": "approved",
+      "resolvedBy": "staff_owner",
+      "resolvedAt": "2026-08-24T23:02:25.639Z"
+    }
+  ],
+  "stamps": [
+    {
+      "id": "st_1787612545639_399",
+      "cardId": "cc_1787611926174_797",
+      "merchantId": "m_1787609159419_588",
+      "customerId": "c_1787611721976_273",
+      "staffId": "staff_owner",
+      "approvalId": "pa_1787612338500_48",
+      "createdAt": "2026-08-24T23:02:25.639Z",
+      "timestamp": 1787612545639
+    }
+  ],
+  "vouchers": [],
+  "fraudSignals": []
+}

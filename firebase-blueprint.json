@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered customer or merchant staff",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "phone": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "merchant_staff", "merchant_owner", "admin"] },
+        "merchantId": { "type": "string" },
+        "consentPDPA": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["phone"]
+    },
+    "Merchant": {
+      "title": "Merchant",
+      "description": "Stores and cafe branches participating in Silsila",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "area": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "geofenceRadiusMeters": { "type": "number" },
+        "logoInitials": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "Card": {
+      "title": "Card",
+      "description": "Customer loyalty stamp card for a merchant",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "merchantId": { "type": "string" },
+        "merchantName": { "type": "string" },
+        "stamps": { "type": "number" },
+        "target": { "type": "number" },
+        "rewardText": { "type": "string" },
+        "lastStampedAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["customerId", "merchantId"]
+    },
+    "Stamp": {
+      "title": "Stamp",
+      "description": "Stamp transaction event",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "cardId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "merchantId": { "type": "string" },
+        "stampedAt": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "scanDistanceMeters": { "type": "number" }
+      },
+      "required": ["cardId", "merchantId"]
+    },
+    "Voucher": {
+      "title": "Voucher",
+      "description": "Claimable voucher earned upon card completion",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "customerId": { "type": "string" },
+        "merchantId": { "type": "string" },
+        "merchantName": { "type": "string" },
+        "rewardText": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "redeemed", "expired"] },
+        "expiresAt": { "type": "string" },
+        "redeemedAt": { "type": "string" }
+      },
+      "required": ["code", "customerId", "merchantId", "status"]
+    }
+  },
+  "firestore": {
+    "collections": {
+      "users": { "entity": "User" },
+      "merchants": { "entity": "Merchant" },
+      "cards": { "entity": "Card" },
+      "stamps": { "entity": "Stamp" },
+      "vouchers": { "entity": "Voucher" }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Merchants Collection (Public Read, Public/Auth Write)
+    match /merchants/{merchantId} {
+      allow read, write: if true;
+    }
+
+    // Cards Collection (Customer Loyalty Cards)
+    match /cards/{cardId} {
+      allow read, write: if true;
+    }
+
+    // Stamps Collection
+    match /stamps/{stampId} {
+      allow read, write: if true;
+    }
+
+    // Vouchers Collection
+    match /vouchers/{voucherId} {
+      allow read, write: if true;
+    }
+
+    // Pending Approvals (For counter staff validation)
+    match /pendingApprovals/{approvalId} {
+      allow read, write: if true;
+    }
+  }
+}

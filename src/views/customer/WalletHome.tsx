@@ -1,0 +1,328 @@
+import { useState, useEffect } from "react"
+import { api, type CustomerCard } from "../../services/api"
+import { useAuth } from "../../context/AuthContext"
+import { firebaseService } from "../../services/firebaseService"
+import StampGrid from "../../components/StampGrid"
+import { FireIcon, GiftIcon } from "../../components/Icons"
+
+interface WalletHomeProps {
+  onSelectCard: (merchantId: string) => void
+  onExploreClick?: () => void
+}
+
+export default function WalletHome({ onSelectCard, onExploreClick }: WalletHomeProps) {
+  const { user, profile } = useAuth()
+  const [cards, setCards] = useState<CustomerCard[]>([])
+  const [availableMerchants, setAvailableMerchants] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<"all" | "active" | "claim">("all")
+
+  const [error, setError] = useState<string | null>(null)
+
+  const customerId = profile?.id || user?.uid || null
+  const displayName = profile?.name || user?.displayName || "সম্মানিত গ্রাহক"
+
+  useEffect(() => {
+    loadCards()
+    loadAvailableMerchants()
+
+    if (!customerId) return
+
+    // Real-time card updates for this customer.
+    const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
+      if (firestoreCards.length > 0) {
+        setCards(firestoreCards)
+        setLoading(false)
+      }
+    })
+
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe()
+    }
+  }, [customerId])
+
+  async function loadAvailableMerchants() {
+    try {
+      const merchants = await api.getMerchants()
+      setAvailableMerchants(merchants || [])
+    } catch {
+      // ignore
+    }
+  }
+
+  async function loadCards() {
+    if (!customerId) {
+      setLoading(false)
+      return
+    }
+    try {
+      setLoading(true)
+      setError(null)
+      const data = await api.getCustomerCards(customerId)
+      setCards(data)
+      data.forEach((c) => firebaseService.syncCardToFirestore(c))
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const totalStamps = cards.reduce((acc, c) => acc + (c.stamps || 0), 0)
+  const completedCardsCount = cards.filter((c) => c.voucherReady || (c.cycleNo && c.cycleNo > 1)).length
+  const maxStreak = Math.max(0, ...cards.map((c) => c.streakCount || 0))
+
+  const filteredCards = cards.filter((card) => {
+    if (filter === "claim") return card.voucherReady
+    if (filter === "active") return !card.voucherReady
+    return true
+  })
+
+  return (
+    <div className="flex flex-col h-full bg-[#F7F5F0]">
+      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
+        <div className="flex items-center justify-between mb-1">
+          <div>
+            <p className="text-[#52B788] text-sm font-medium">স্বাগতম,</p>
+            <h1 className="font-display text-2xl font-bold text-white">{displayName}</h1>
+          </div>
+          <div className="relative">
+            <button
+              onClick={loadCards}
+              title="রিফ্রেশ করুন"
+              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+            >
+              <span className="text-base">🔄</span>
+            </button>
+            {cards.some((c) => c.voucherReady) && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse">
+                {cards.filter((c) => c.voucherReady).length}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 bg-white/10 rounded-2xl p-4 flex items-center justify-around text-center">
+          <div>
+            <p className="font-display font-black text-white text-2xl leading-none">{totalStamps}</p>
+            <p className="text-white/60 text-xs mt-1">মোট সিল</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="font-display font-black text-white text-2xl leading-none">{completedCardsCount}</p>
+            <p className="text-white/60 text-xs mt-1">কার্ড সম্পন্ন</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none flex items-center justify-center gap-0.5">
+              <FireIcon size={20} className="text-[#F59E0B]" />
+              {maxStreak}
+            </p>
+            <p className="text-white/60 text-xs mt-1">সপ্তাহের সিলসিলা</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24">
+        {/* Filter Tabs (PRD E4a.10) */}
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-display font-semibold text-[#1A1916] text-lg">আমার কার্ডগুলো</h2>
+          <div className="flex gap-1 bg-[#EAE7E0] p-1 rounded-xl">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                filter === "all" ? "bg-white text-[#1B4332] shadow-sm" : "text-[#6B6158]"
+              }`}
+            >
+              সব ({cards.length})
+            </button>
+            <button
+              onClick={() => setFilter("claim")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                filter === "claim" ? "bg-[#F59E0B] text-[#1B4332] shadow-sm" : "text-[#6B6158]"
+              }`}
+            >
+              দাবিযোগ্য ({cards.filter((c) => c.voucherReady).length})
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-[#6B6158] text-sm">
+            <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
+            <p>কার্ড লোড হচ্ছে...</p>
+          </div>
+        ) : filteredCards.length > 0 ? (
+          <div className="space-y-3">
+            {filteredCards.map((card) => {
+              const merchant = card.merchant || {
+                name: card.rewardText ? "লয়্যালটি স্টোর" : "মার্চেন্ট কার্ড",
+                category: "দোকান",
+                area: "ঢাকা",
+                logoInitials: "সিল",
+                logoBg: "#D8EDDF",
+                logoColor: "#1B4332",
+                verified: false,
+              }
+              const target = card.target || 5
+              const remaining = Math.max(0, target - card.stamps)
+              const isNearComplete = remaining === 1
+              const pct = Math.min(100, (card.stamps / target) * 100)
+
+              return (
+                <button
+                  key={card.id}
+                  onClick={() => onSelectCard(card.merchantId)}
+                  className={[
+                    "w-full text-left rounded-2xl overflow-hidden card-shadow transition-all active:scale-[0.99] cursor-pointer hover:shadow-md",
+                    card.voucherReady ? "bg-[#1B4332]" : "bg-white",
+                  ].join(" ")}
+                >
+                  {card.voucherReady && (
+                    <div className="bg-[#F59E0B] px-4 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <GiftIcon size={14} className="text-[#1B4332]" />
+                        <span className="text-[#1B4332] text-xs font-bold">পুরস্কার প্রস্তুত! এখনই দাবি করুন</span>
+                      </div>
+                      <span className="text-[10px] font-black bg-[#1B4332] text-[#F59E0B] px-2 py-0.5 rounded-full">
+                        কোড দেখুন
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center font-display font-bold text-sm flex-shrink-0 shadow-xs"
+                        style={{ background: merchant.logoBg || "#D8EDDF", color: merchant.logoColor || "#1B4332" }}
+                      >
+                        {merchant.logoInitials || "সিল"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className={`font-display font-bold text-base truncate ${card.voucherReady ? "text-white" : "text-[#1A1916]"}`}>
+                            {merchant.name}
+                          </p>
+                          {merchant.verified && (
+                            <span className="text-[#52B788] flex-shrink-0">✓</span>
+                          )}
+                        </div>
+                        <p className={`text-xs mt-0.5 ${card.voucherReady ? "text-white/60" : "text-[#6B6158]"}`}>
+                          {merchant.category} · {merchant.area}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className={`font-display font-black text-lg leading-none ${card.voucherReady ? "text-[#F59E0B]" : "text-[#1B4332]"}`}>
+                          {card.stamps}<span className={`text-sm font-medium ${card.voucherReady ? "text-white/50" : "text-[#B0A99E]"}`}>/{target}</span>
+                        </p>
+                        <p className={`text-xs mt-0.5 ${card.voucherReady ? "text-white/60" : "text-[#B0A99E]"}`}>সিল</p>
+                      </div>
+                    </div>
+
+                    <StampGrid filled={card.stamps} total={target} size="sm" />
+
+                    <div
+                      className="mt-3 pt-3 border-t border-dashed flex items-center justify-between"
+                      style={{ borderColor: card.voucherReady ? "rgba(255,255,255,0.15)" : "#E9E5DC" }}
+                    >
+                      <p className={`text-xs ${card.voucherReady ? "text-white/70" : "text-[#6B6158]"}`}>
+                        {card.voucherReady ? (
+                          <span className="font-medium">{card.rewardText || "১টি বিশেষ উপহার"}</span>
+                        ) : isNearComplete ? (
+                          <span className="text-[#F59E0B] font-semibold flex items-center gap-1">
+                            <FireIcon size={12} className="inline" />
+                            আর মাত্র ১টি সিল বাকি!
+                          </span>
+                        ) : (
+                          <>আর <span className="font-bold text-[#1B4332]">{remaining}টি</span> সিলে: {(card.rewardText || "উপহার").slice(0, 22)}...</>
+                        )}
+                      </p>
+                      <p className={`text-xs ${card.voucherReady ? "text-white/50" : "text-[#B0A99E]"}`}>
+                        {card.lastVisit}
+                      </p>
+                    </div>
+
+                    {!card.voucherReady && (
+                      <div className="mt-2 h-1 rounded-full bg-[#F0EDE6] overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-[#1B4332] transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          /* When 0 cards scanned yet, show available restaurants & cafes */
+          <div className="space-y-4">
+            <div className="bg-white rounded-3xl p-5 card-shadow text-center border border-[#E9E5DC]">
+              <span className="text-4xl mb-2 block">🔖</span>
+              <p className="font-display font-bold text-[#1A1916] text-lg">উপলব্ধ ক্যাফে ও রেস্তোরাঁ</p>
+              <p className="text-[#6B6158] text-xs leading-relaxed mt-1">
+                নিচের যেকোনো দোকানে ক্লিক করে স্ট্যাম্প কার্ড দেখুন ও সিল সংগ্রহ করুন
+              </p>
+            </div>
+
+            {availableMerchants.length > 0 && (
+              <div className="space-y-3">
+                {availableMerchants.map((merchant) => (
+                  <button
+                    key={merchant.id}
+                    onClick={() => onSelectCard(merchant.id)}
+                    className="w-full text-left bg-white rounded-2xl overflow-hidden card-shadow p-4 transition-all active:scale-[0.99] hover:shadow-md border border-[#E9E5DC] cursor-pointer group"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-black text-base flex-shrink-0 shadow-xs"
+                        style={{
+                          background: merchant.logoBg || "#D8EDDF",
+                          color: merchant.logoColor || "#1B4332",
+                        }}
+                      >
+                        {merchant.logoInitials || merchant.name?.slice(0, 2) || "দোকান"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-display font-bold text-base text-[#1A1916] group-hover:text-[#1B4332] transition-colors truncate">
+                            {merchant.name}
+                          </p>
+                          {merchant.verified && (
+                            <span className="text-[#52B788] text-xs font-bold">✓</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#6B6158] mt-0.5">
+                          {merchant.category} · {merchant.area || "ঢাকা"}
+                        </p>
+                      </div>
+                      <span className="text-[#1B4332] font-black text-xs bg-[#D8EDDF] px-2.5 py-1 rounded-full flex-shrink-0">
+                        কার্ড খুলুন →
+                      </span>
+                    </div>
+
+                    <StampGrid filled={0} total={5} size="sm" />
+
+                    <div className="mt-3 pt-2.5 border-t border-dashed border-[#E9E5DC] flex items-center justify-between text-xs text-[#6B6158]">
+                      <span>🎁 অর্ডারে ফ্রি উপহার রিওয়ার্ড পান</span>
+                      <span className="text-[#1B4332] font-bold">স্ট্যাম্প কার্ড দেখুন</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6 p-4 rounded-2xl border-2 border-dashed border-[#E9E5DC] flex items-center gap-3 text-[#B0A99E]">
+          <span className="text-2xl">🏪</span>
+          <div>
+            <p className="text-sm font-medium text-[#6B6158]">একটি অ্যাকাউন্ট, সব দোকান</p>
+            <p className="text-xs mt-0.5">যেকোনো সিলসিলা দোকানে একই অ্যাকাউন্টেই সিল জমবে</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

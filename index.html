@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silsila - Loyalty & Rewards</title>
+    <script>
+      (function() {
+        try {
+          var currentFetch = window.fetch;
+          if (typeof currentFetch === 'function') {
+            var _boundFetch = currentFetch.bind(window);
+            Object.defineProperty(window, 'fetch', {
+              get: function() {
+                return _boundFetch;
+              },
+              set: function(newFetch) {
+                _boundFetch = newFetch;
+              },
+              configurable: true,
+              enumerable: true
+            });
+          }
+        } catch (e) {
+          console.warn('Fetch setter shim note:', e);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="recaptcha-container"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

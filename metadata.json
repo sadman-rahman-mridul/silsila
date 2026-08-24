@@ -1,0 +1,11 @@
+{
+  "name": "Silsila",
+  "description": "Customer loyalty stamps, digital wallet, merchant dashboard, rewards management, and marketing platform.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
