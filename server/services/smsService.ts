@@ -15,6 +15,7 @@ interface SendSmsResult {
   error?: string
 }
 
+export async function sendBulkSmsBd({ phone, message }: SendSmsOptions): Promise<SendSmsResult> {
   const apiKey = process.env.BULKSMS_BD_API_KEY || "CEk1QvidKiArNccVNNqq"
   const senderId = process.env.BULKSMS_BD_SENDER_ID || "8809617622724"
   const apiUrl = process.env.BULKSMS_BD_URL || "http://bulksmsbd.net/api/smsapi"
