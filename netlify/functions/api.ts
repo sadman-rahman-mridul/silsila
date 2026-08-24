@@ -47,4 +47,11 @@ app.use("/api", router)
 app.use("/.netlify/functions/api", router)
 app.use("/", router)
 
+// Global Error Handler for Serverless stability
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error("[Netlify API Error]:", err)
+  res.status(err.status || 500).json({ error: err.message || "সার্ভারে সমস্যা হয়েছে। আবার চেষ্টা করুন।" })
+})
+
 export const handler = serverless(app)
+

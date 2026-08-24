@@ -14,8 +14,19 @@ import type {
   Sponsor
 } from "./types.js"
 
-const DATA_DIR = path.join(process.cwd(), "data")
+const IS_SERVERLESS = Boolean(
+  process.env.NETLIFY ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT ||
+  process.env.VERCEL
+)
+
+const DATA_DIR = IS_SERVERLESS
+  ? path.join("/tmp", "silsila_data")
+  : path.join(process.cwd(), "data")
+
 const DB_FILE = path.join(DATA_DIR, "silsila_db.json")
+const SEED_FILE = path.join(process.cwd(), "data", "silsila_db.json")
 
 // Helper function to calculate Haversine distance in meters
 export function calculateDistanceMeters(
@@ -67,28 +78,32 @@ class Database {
   }
 
   private ensureDirectory() {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true })
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true })
+      }
+    } catch (err) {
+      // ignore read-only error in serverless
     }
   }
 
   private load(): DatabaseSchema {
     try {
-      if (fs.existsSync(DB_FILE)) {
-        const raw = fs.readFileSync(DB_FILE, "utf-8")
+      const fileToRead = fs.existsSync(DB_FILE)
+        ? DB_FILE
+        : fs.existsSync(SEED_FILE)
+        ? SEED_FILE
+        : null
+
+      if (fileToRead) {
+        const raw = fs.readFileSync(fileToRead, "utf-8")
         const parsed = JSON.parse(raw) as DatabaseSchema
-        // Older database files were shipped pre-populated with demo merchants,
-        // customers and stamps. Any file below the current schema version is
-        // discarded so no console ever renders seeded data.
-        if (parsed.version === SCHEMA_VERSION) {
+        if (parsed && typeof parsed === "object" && parsed.merchants) {
           return parsed
         }
-        console.warn(
-          `[Silsila DB] Discarding legacy database (version ${parsed.version ?? "none"}) that contained seed data.`
-        )
       }
     } catch (err) {
-      console.error("Error reading database file, starting from an empty database:", err)
+      console.warn("Could not read database file, starting fresh in-memory:", err)
     }
     const initial = getInitialData()
     this.saveDirect(initial)
@@ -100,7 +115,7 @@ class Database {
       this.ensureDirectory()
       fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8")
     } catch (err) {
-      console.error("Error saving database file:", err)
+      // In serverless / read-only environment, keep in memory
     }
   }
 
