@@ -1,7 +1,27 @@
 import express from "express"
 import cors from "cors"
 import path from "node:path"
+import fs from "node:fs"
 import { createServer as createViteServer } from "vite"
+
+// Load .env variables
+if (fs.existsSync(".env")) {
+  try {
+    if (typeof (process as any).loadEnvFile === "function") {
+      ;(process as any).loadEnvFile(".env")
+    } else {
+      const envContent = fs.readFileSync(".env", "utf-8")
+      envContent.split("\n").forEach((line) => {
+        const [k, ...v] = line.split("=")
+        if (k && v.length > 0 && !process.env[k.trim()]) {
+          process.env[k.trim()] = v.join("=").trim().replace(/^["']|["']$/g, "")
+        }
+      })
+    }
+  } catch (err) {
+    console.warn("Could not load .env:", err)
+  }
+}
 
 import authRoutes from "./server/routes/auth.js"
 import merchantRoutes from "./server/routes/merchants.js"

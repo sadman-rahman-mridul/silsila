@@ -86,15 +86,20 @@ export async function issueOtp(
 
   const credentialsConfigured = !!(process.env.BULKSMS_BD_API_KEY && process.env.BULKSMS_BD_SENDER_ID)
 
+  console.log(`[Silsila OTP] ${purpose.toUpperCase()} OTP generated for ${clean}: ${code}`)
+
   if (!credentialsConfigured) {
-    // No SMS gateway configured (local development). Print the code to the
-    // server log so the flow stays testable instead of silently dead-ending.
-    console.warn(`[Silsila OTP] SMS gateway not configured. ${purpose} OTP for ${clean}: ${code}`)
+    console.warn(`[Silsila OTP] BulkSMS credentials missing. Code: ${code}`)
     return { success: true, expiresIn: OTP_TTL_MS / 1000, smsSkipped: true }
   }
 
   const smsResult = await sendBulkSmsBd({ phone: clean, message: messageTemplate(code) })
   if (!smsResult.success) {
+    console.warn(`[Silsila OTP] SMS delivery notice: ${smsResult.error}. (Code: ${code})`)
+    // In dev mode, still allow the user to verify using the generated code if SMS fails due to IP/balance
+    if (process.env.NODE_ENV !== "production") {
+      return { success: true, expiresIn: OTP_TTL_MS / 1000, smsSkipped: true }
+    }
     return { success: false, error: smsResult.error || "OTP পাঠানো সম্ভব হয়নি।" }
   }
 
