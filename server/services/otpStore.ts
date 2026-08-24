@@ -95,11 +95,7 @@ export async function issueOtp(
 
   const smsResult = await sendBulkSmsBd({ phone: clean, message: messageTemplate(code) })
   if (!smsResult.success) {
-    console.warn(`[Silsila OTP] SMS delivery notice: ${smsResult.error}. (Code: ${code})`)
-    // In dev mode, still allow the user to verify using the generated code if SMS fails due to IP/balance
-    if (process.env.NODE_ENV !== "production") {
-      return { success: true, expiresIn: OTP_TTL_MS / 1000, smsSkipped: true }
-    }
+    console.warn(`[Silsila OTP] SMS delivery failed: ${smsResult.error} (Code: ${code})`)
     return { success: false, error: smsResult.error || "OTP পাঠানো সম্ভব হয়নি।" }
   }
 
