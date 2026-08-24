@@ -40,10 +40,13 @@ export default function Landing({ onEnter }: LandingProps) {
     setPassword("")
     setIsExistingAccount(false)
     setExistingUserName(null)
+    setCachedAccount(null)
     setOtp(["", "", "", "", "", ""])
     setShowNameModal(false)
     setStep("phone")
   }
+
+  const [cachedAccount, setCachedAccount] = useState<any>(null)
 
   // STEP 2 -> STEP 3: Verify if phone exists
   async function handlePhoneNext() {
@@ -64,8 +67,9 @@ export default function Landing({ onEnter }: LandingProps) {
     try {
       // 1. Check local backend
       const lookup = await api.lookupPhone(clean, role).catch(() => null)
-      // 2. Check Firestore
+      // 2. Check Cloud Firestore (works across all serverless restarts)
       const fbAccount = await firebaseService.findAccountByPhone(clean, role).catch(() => null)
+      setCachedAccount(fbAccount)
 
       const exists = !!lookup?.exists || !!lookup?.isExistingUser || !!fbAccount
       const name =
@@ -108,24 +112,53 @@ export default function Landing({ onEnter }: LandingProps) {
     setInfoMsg(null)
 
     try {
-      const res = await api.loginWithPassword(phone, password.trim(), role)
+      // 1. Check with API
+      const res = await api.loginWithPassword(phone, password.trim(), role).catch(() => null)
 
-      if (res.success && res.token) {
+      if (res && res.success && res.token) {
         const storedName =
           role === "merchant" ? res.merchant?.ownerName : res.customer?.name
         await finalizeLogin(res, storedName || existingUserName || (role === "merchant" ? "মার্চেন্ট" : "কাস্টমার"))
         return
       }
 
-      if (res.noPasswordSet) {
+      // 2. Direct Firestore authentication (seamless persistence on Netlify / cloud)
+      if (cachedAccount) {
+        if (cachedAccount.password && cachedAccount.password === password.trim()) {
+          const storedName =
+            role === "merchant" ? cachedAccount.ownerName || cachedAccount.name : cachedAccount.name
+          const resObj = {
+            success: true,
+            role,
+            token: `token_${role}_${cachedAccount.id}`,
+            customer: role === "customer" ? cachedAccount : undefined,
+            merchant: role === "merchant" ? cachedAccount : undefined,
+            merchants: role === "merchant" ? [cachedAccount] : undefined,
+          }
+          await finalizeLogin(resObj, storedName || "ব্যবহারকারী")
+          return
+        } else if (cachedAccount.password && cachedAccount.password !== password.trim()) {
+          setError("ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
+          return
+        } else if (!cachedAccount.password) {
+          await handleSendOtp(
+            "আপনার অ্যাকাউন্টে পূর্বে পাসওয়ার্ড সেট করা ছিল না। লগইন করতে আপনার ফোনে OTP কোড পাঠানো হয়েছে।"
+          )
+          return
+        }
+      }
+
+      if (res && res.noPasswordSet) {
         await handleSendOtp(
           "আপনার অ্যাকাউন্টে পূর্বে পাসওয়ার্ড সেট করা ছিল না। লগইন করতে আপনার ফোনে OTP কোড পাঠানো হয়েছে।"
         )
         return
       }
 
-      if (res.message) {
+      if (res && res.message) {
         setError(res.message)
+      } else {
+        setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
       }
     } catch (err: any) {
       console.error("Password login error:", err)
@@ -296,6 +329,7 @@ export default function Landing({ onEnter }: LandingProps) {
         ownerPhone: phone,
         ownerName: finalName,
         name: merchant.name || "",
+        password: password.trim() || merchant.password || undefined,
         onboarded: !!merchant.onboarded,
         createdAt: merchant.createdAt,
       })
@@ -306,18 +340,21 @@ export default function Landing({ onEnter }: LandingProps) {
     }
 
     const customer = res.customer
+    const digits10 = phone.replace(/\D/g, "").slice(-10)
+    const custId = customer?.id || `c_${digits10}`
     const profile: UserProfile = {
-      id: customer?.id || "",
+      id: custId,
       phone,
       name: finalName,
       role: "customer",
-      createdAt: customer?.createdAt,
+      createdAt: customer?.createdAt || new Date().toISOString(),
     }
 
     await firebaseService.saveCustomerProfile({
       id: profile.id,
       phone,
       name: finalName,
+      password: password.trim() || customer?.password || undefined,
     })
 
     setSessionProfile(profile, res.token)

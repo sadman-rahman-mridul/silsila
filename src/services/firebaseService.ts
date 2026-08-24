@@ -79,24 +79,40 @@ export const firebaseService = {
    * the requested role. Merchants are looked up by `ownerPhone`.
    */
   async findAccountByPhone(phone: string, role: AccountRole) {
-    const clean = normalizePhone(phone)
-    const formatted = toE164Bd(phone)
-    if (!clean) return null
+    const rawClean = normalizePhone(phone)
+    if (!rawClean) return null
+    const digits10 = rawClean.slice(-10)
+    const possibleValues = [
+      digits10,
+      `0${digits10}`,
+      `880${digits10}`,
+      `+880${digits10}`,
+    ]
 
     try {
       if (role === "merchant") {
         const merchantsCol = collection(firestore, MERCHANTS)
-        for (const value of [clean, formatted]) {
+        for (const value of possibleValues) {
           const snap = await getDocs(query(merchantsCol, where("ownerPhone", "==", value)))
           if (!snap.empty) {
             return { id: snap.docs[0].id, ...(snap.docs[0].data() as any) }
+          }
+          const snapPhone = await getDocs(query(merchantsCol, where("phone", "==", value)))
+          if (!snapPhone.empty) {
+            return { id: snapPhone.docs[0].id, ...(snapPhone.docs[0].data() as any) }
           }
         }
         return null
       }
 
+      // Customer check: first check direct docId `c_${digits10}`
+      const directDoc = await getDoc(doc(firestore, USERS, `c_${digits10}`)).catch(() => null)
+      if (directDoc && directDoc.exists()) {
+        return { id: directDoc.id, ...(directDoc.data() as any) }
+      }
+
       const usersCol = collection(firestore, USERS)
-      for (const value of [clean, formatted]) {
+      for (const value of possibleValues) {
         const snap = await getDocs(query(usersCol, where("phone", "==", value)))
         if (!snap.empty) {
           return { id: snap.docs[0].id, ...(snap.docs[0].data() as any) }
@@ -114,19 +130,21 @@ export const firebaseService = {
   // ----------------------------------------------------
 
   /** Write a customer profile to `users`. Creates no loyalty cards. */
-  async saveCustomerProfile(profile: { id: string; phone: string; name: string }) {
+  async saveCustomerProfile(profile: { id: string; phone: string; name: string; password?: string }) {
     try {
       const clean = normalizePhone(profile.phone)
-      const deterministicId = `c_${clean.slice(-10)}`
-      const docId = profile.id || deterministicId
+      const digits10 = clean.slice(-10)
+      const deterministicId = `c_${digits10}`
+      const docId = profile.id && profile.id.startsWith("c_") ? profile.id : deterministicId
       await setDoc(
         doc(firestore, USERS, docId),
         {
           id: docId,
           uid: docId,
-          phone: clean,
-          phoneE164: toE164Bd(profile.phone),
+          phone: digits10,
+          phoneE164: `+880${digits10}`,
           name: profile.name || "",
+          ...(profile.password ? { password: profile.password } : {}),
           role: "customer",
           consentPDPA: true,
           updatedAt: new Date().toISOString(),
@@ -144,14 +162,16 @@ export const firebaseService = {
     ownerPhone: string
     ownerName: string
     name?: string
+    password?: string
     [key: string]: unknown
   }) {
     try {
       const clean = normalizePhone(merchant.ownerPhone)
+      const digits10 = clean.slice(-10)
       const data: Record<string, unknown> = {
         ...merchant,
-        ownerPhone: clean,
-        ownerPhoneE164: toE164Bd(merchant.ownerPhone),
+        ownerPhone: digits10,
+        ownerPhoneE164: `+880${digits10}`,
         role: "merchant",
         updatedAt: new Date().toISOString(),
       }
