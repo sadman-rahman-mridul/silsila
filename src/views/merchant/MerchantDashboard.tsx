@@ -256,11 +256,11 @@ export default function MerchantDashboard({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={loadPrograms}
               title="রিফ্রেশ"
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white cursor-pointer"
+              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95"
             >
               <RefreshIcon size={16} className={loading ? "animate-spin" : ""} />
             </button>
@@ -268,7 +268,7 @@ export default function MerchantDashboard({
               <button
                 onClick={onOpenSettings}
                 title="সেটিংস"
-                className="w-9 h-9 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] flex items-center justify-center hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
+                className="w-9 h-9 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] flex items-center justify-center hover:bg-[#F59E0B]/30 transition-all cursor-pointer active:scale-95"
               >
                 <SettingsIcon size={16} />
               </button>
@@ -277,10 +277,9 @@ export default function MerchantDashboard({
               <button
                 onClick={onLogout}
                 title="লগআউট করুন"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-semibold border border-red-500/30 transition-all cursor-pointer active:scale-95 ml-1"
+                className="w-9 h-9 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center justify-center border border-red-500/30 transition-all cursor-pointer active:scale-95 shadow-sm"
               >
-                <LogOutIcon size={14} />
-                <span>লগআউট</span>
+                <LogOutIcon size={16} />
               </button>
             )}
           </div>

@@ -7,7 +7,7 @@ import MerchantSettings from "./MerchantSettings"
 import AnalyticsPage from "./AnalyticsPage"
 import StaffMode from "./StaffMode"
 import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon } from "../../components/Icons"
-import { type Merchant } from "../../services/api"
+import { type Merchant, generateMerchantSlug } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
 
@@ -15,20 +15,46 @@ type MerchantTab = "home" | "customers" | "rewards" | "marketing" | "settings"
 
 interface MerchantAppProps {
   onBack: () => void
+  initialMerchantId?: string | null
+  initialSubpage?: string | null
 }
 
-export default function MerchantApp({ onBack }: MerchantAppProps) {
+export default function MerchantApp({ onBack, initialMerchantId, initialSubpage }: MerchantAppProps) {
   const { profile } = useAuth()
-  const [tab, setTab] = useState<MerchantTab>("home")
-  const [showAnalytics, setShowAnalytics] = useState(false)
-  const [showStaffMode, setShowStaffMode] = useState(false)
+  const [tab, setTab] = useState<MerchantTab>(() => {
+    if (initialSubpage && ["customers", "rewards", "marketing", "settings"].includes(initialSubpage)) {
+      return initialSubpage as MerchantTab
+    }
+    return "home"
+  })
+  const [showAnalytics, setShowAnalytics] = useState(initialSubpage === "analytics")
+  const [showStaffMode, setShowStaffMode] = useState(initialSubpage === "staff")
 
-  // Never fall back to "m1" — use the authenticated profile's merchant id
+  // Use provided merchantId or fall back to profile
   const [merchantId, setMerchantId] = useState<string>(
-    () => profile?.merchantId || profile?.id || ""
+    () => initialMerchantId || profile?.merchantId || profile?.id || ""
   )
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState<number>(0)
   const [activeMerchant, setActiveMerchant] = useState<Merchant | null>(null)
+
+  useEffect(() => {
+    if (initialMerchantId && initialMerchantId !== merchantId) {
+      setMerchantId(initialMerchantId)
+    }
+    if (initialSubpage) {
+      if (initialSubpage === "analytics") {
+        setShowAnalytics(true)
+        setShowStaffMode(false)
+      } else if (initialSubpage === "staff") {
+        setShowStaffMode(true)
+        setShowAnalytics(false)
+      } else if (["customers", "rewards", "marketing", "settings", "home"].includes(initialSubpage)) {
+        setTab(initialSubpage as MerchantTab)
+        setShowAnalytics(false)
+        setShowStaffMode(false)
+      }
+    }
+  }, [initialMerchantId, initialSubpage])
 
   useEffect(() => {
     if (!merchantId) return
@@ -40,7 +66,9 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
 
     // Live merchant document for header display
     const unsubscribeMerchant = firebaseService.subscribeMerchant(merchantId, (m) => {
-      if (m) setActiveMerchant(m)
+      if (m) {
+        setActiveMerchant(m)
+      }
     })
 
     return () => {
@@ -49,14 +77,47 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
     }
   }, [merchantId])
 
-  // Keep merchantId in sync if profile updates (e.g. after onboarding)
+  // Keep merchantId in sync if profile updates
   useEffect(() => {
-    const id = profile?.merchantId || profile?.id || ""
+    const id = initialMerchantId || profile?.merchantId || profile?.id || ""
     if (id && id !== merchantId) setMerchantId(id)
-  }, [profile?.merchantId, profile?.id])
+  }, [profile?.merchantId, profile?.id, initialMerchantId])
+
+  function updateMerchantUrl(targetView: string, mId = merchantId, m = activeMerchant) {
+    const slug = m ? generateMerchantSlug(m) : mId
+    if (slug) {
+      const sub = targetView === "home" ? "" : `/${targetView}`
+      window.history.replaceState(null, "", `/${slug}${sub}`)
+    }
+  }
+
+  function handleTabChange(nextTab: MerchantTab) {
+    setTab(nextTab)
+    setShowAnalytics(false)
+    setShowStaffMode(false)
+    updateMerchantUrl(nextTab)
+  }
+
+  function handleOpenStaff() {
+    setShowStaffMode(true)
+    setShowAnalytics(false)
+    updateMerchantUrl("staff")
+  }
+
+  function handleOpenAnalytics() {
+    setShowAnalytics(true)
+    setShowStaffMode(false)
+    updateMerchantUrl("analytics")
+  }
+
+  function handleExitSpecialMode() {
+    setShowStaffMode(false)
+    setShowAnalytics(false)
+    updateMerchantUrl(tab)
+  }
 
   if (showStaffMode) {
-    return <StaffMode onExit={() => setShowStaffMode(false)} activeMerchantId={merchantId} />
+    return <StaffMode onExit={handleExitSpecialMode} activeMerchantId={merchantId} />
   }
 
   if (showAnalytics) {
@@ -69,7 +130,7 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
         </div>
         <div className="bg-white border-t border-[#E9E5DC] px-4 py-3">
           <button
-            onClick={() => setShowAnalytics(false)}
+            onClick={handleExitSpecialMode}
             className="w-full py-3 rounded-2xl border border-[#E9E5DC] text-[#6B6158] font-medium text-sm hover:bg-[#F7F5F0] transition-colors cursor-pointer"
           >
             ← ড্যাশবোর্ডে ফিরুন
@@ -103,13 +164,13 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
 
         <div className="flex gap-2">
           <button
-            onClick={() => setShowAnalytics(true)}
+            onClick={handleOpenAnalytics}
             className="px-3 py-1.5 rounded-lg bg-white/10 text-white/70 text-xs font-medium hover:bg-white/20 transition-all cursor-pointer"
           >
             📊 রিপোর্ট
           </button>
           <button
-            onClick={() => setShowStaffMode(true)}
+            onClick={handleOpenStaff}
             className="px-3 py-1.5 rounded-lg bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-medium hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
           >
             👷 স্টাফ মোড
@@ -122,9 +183,12 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
           {tab === "home" && (
             <MerchantDashboard
               merchantId={merchantId}
-              onMerchantChange={setMerchantId}
-              onViewCustomers={() => setTab("customers")}
-              onOpenSettings={() => setTab("settings")}
+              onMerchantChange={(id) => {
+                setMerchantId(id)
+                updateMerchantUrl("home", id)
+              }}
+              onViewCustomers={() => handleTabChange("customers")}
+              onOpenSettings={() => handleTabChange("settings")}
               onLogout={onBack}
             />
           )}
@@ -140,7 +204,10 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
             <MerchantSettings
               onBack={onBack}
               activeMerchantId={merchantId}
-              onMerchantUpdated={(updated) => setActiveMerchant(updated)}
+              onMerchantUpdated={(updated) => {
+                setActiveMerchant(updated)
+                updateMerchantUrl(tab, merchantId, updated)
+              }}
             />
           )}
         </div>
@@ -153,31 +220,31 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
             label="হোম"
             active={tab === "home"}
             badge={pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined}
-            onClick={() => setTab("home")}
+            onClick={() => handleTabChange("home")}
           />
           <MerchantNavBtn
             icon={<UsersIcon size={22} />}
             label="কাস্টমার"
             active={tab === "customers"}
-            onClick={() => setTab("customers")}
+            onClick={() => handleTabChange("customers")}
           />
           <MerchantNavBtn
             icon={<StarIcon size={22} />}
-            label="পুরস্কার"
+            label="রিওয়ার্ড"
             active={tab === "rewards"}
-            onClick={() => setTab("rewards")}
+            onClick={() => handleTabChange("rewards")}
           />
           <MerchantNavBtn
             icon={<MegaphoneIcon size={22} />}
             label="মার্কেটিং"
             active={tab === "marketing"}
-            onClick={() => setTab("marketing")}
+            onClick={() => handleTabChange("marketing")}
           />
           <MerchantNavBtn
             icon={<SettingsIcon size={22} />}
             label="সেটিংস"
             active={tab === "settings"}
-            onClick={() => setTab("settings")}
+            onClick={() => handleTabChange("settings")}
           />
         </div>
       </nav>

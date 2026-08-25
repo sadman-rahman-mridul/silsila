@@ -14,28 +14,48 @@ function MainContent() {
   const { profile, updateSessionProfile, logout } = useAuth()
   const [targetMerchantId, setTargetMerchantId] = useState<string | null>(null)
   const [targetMerchantName, setTargetMerchantName] = useState<string | null>(null)
+  const [targetSubpage, setTargetSubpage] = useState<string | null>(null)
 
-  // 1. Resolve Target Merchant from URL pathname (e.g. /cafedhaka) or query (?m=...)
+  // 1. Resolve Target Merchant & Subpage from dynamic URL (e.g. /cafedhaka/settings, /cafedhaka/card, /explore, /profile)
   useEffect(() => {
-    async function resolveTargetMerchant() {
+    async function resolveDynamicRoute() {
       if (typeof window === "undefined") return
 
       const params = new URLSearchParams(window.location.search)
       const paramM = params.get("m") || params.get("merchantId")
 
       const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
-      const isOps = rawPath.toLowerCase() === "ops" || params.get("view") === "ops"
+      let segments = rawPath.split("/").filter(Boolean)
 
-      if (isOps) {
+      if (rawPath.toLowerCase() === "ops" || params.get("view") === "ops") {
         setView("ops")
         return
       }
 
-      // Ignore standard reserved paths
-      const reservedPaths = ["", "api", "landing", "login", "register", "ops", "admin"]
-      const pathSlug = reservedPaths.includes(rawPath.toLowerCase()) ? null : rawPath
+      // Check if first segment is a 7-digit user phone tag (e.g. /8174204/...) or /u_...
+      if (segments.length > 0 && (/^\d{7}$/.test(segments[0]) || /^u_?\d+$/i.test(segments[0]))) {
+        segments = segments.slice(1)
+      }
 
-      const candidate = paramM || pathSlug
+      // Root paths or standard top-level customer tabs
+      const topLevelTabs = ["home", "explore", "scan", "rewards", "profile"]
+      if (segments.length === 1 && topLevelTabs.includes(segments[0].toLowerCase())) {
+        setTargetSubpage(segments[0].toLowerCase())
+        if (!paramM) return
+      }
+
+      // Ignore technical reserved paths
+      const reservedPaths = ["", "api", "landing", "login", "register", "ops", "admin"]
+      const candidate = paramM || (segments.length > 0 && !reservedPaths.includes(segments[0].toLowerCase()) ? segments[0] : null)
+
+      // Subpage after company slug (e.g. /cafedhaka/settings -> subpage is "settings")
+      if (segments.length > 1) {
+        setTargetSubpage(segments[1].toLowerCase())
+      } else if (segments.length === 1 && !topLevelTabs.includes(segments[0].toLowerCase())) {
+        // e.g. /cafedhaka -> default to card page
+        setTargetSubpage("card")
+      }
+
       if (!candidate) return
 
       try {
@@ -86,12 +106,12 @@ function MainContent() {
           setTargetMerchantId(candidate)
         }
       } catch (err) {
-        console.warn("Could not resolve target merchant:", err)
+        console.warn("Could not resolve dynamic route:", err)
         setTargetMerchantId(candidate)
       }
     }
 
-    resolveTargetMerchant()
+    resolveDynamicRoute()
   }, [])
 
   // 2. Authentication Gate:
@@ -132,6 +152,7 @@ function MainContent() {
       <CustomerApp
         onBack={handleLogoutAndReturn}
         initialMerchantId={targetMerchantId}
+        initialSubpage={targetSubpage}
       />
     )
   }
@@ -148,7 +169,13 @@ function MainContent() {
   }
 
   if (view === "merchant") {
-    return <MerchantApp onBack={handleLogoutAndReturn} />
+    return (
+      <MerchantApp
+        onBack={handleLogoutAndReturn}
+        initialMerchantId={targetMerchantId}
+        initialSubpage={targetSubpage}
+      />
+    )
   }
 
   if (view === "ops") {
