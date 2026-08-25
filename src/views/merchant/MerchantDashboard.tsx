@@ -62,30 +62,27 @@ export default function MerchantDashboard({
     return () => { if (typeof unsub === "function") unsub() }
   }, [merchantId])
 
-  // Subscribe & poll pending approvals
+  // Subscribe & listen for pending approvals in real-time
   useEffect(() => {
     if (!merchantId) return
-    const unsub = firebaseService.subscribePendingApprovals(merchantId, (data) => {
-      if (data && data.length > 0) setApprovals(data)
-    })
+    let unsubscribe: any = null
 
-    async function checkApprovals() {
-      try {
-        const list = await api.getPendingApprovals(merchantId)
-        if (list && Array.isArray(list)) {
-          setApprovals(list.filter((a) => a.resolution === "pending"))
-        }
-      } catch {
-        // ignore
+    async function initApprovalsSubscription() {
+      let targetId = merchantId
+      if (!targetId.startsWith("m_") && !targetId.startsWith("m1")) {
+        const fb = await firebaseService.getMerchantByIdOrSlug(merchantId)
+        if (fb?.id) targetId = fb.id
       }
+
+      unsubscribe = firebaseService.subscribePendingApprovals(targetId, (data) => {
+        setApprovals(data || [])
+      })
     }
 
-    checkApprovals()
-    const interval = setInterval(checkApprovals, 1500)
+    initApprovalsSubscription()
 
     return () => {
-      if (typeof unsub === "function") unsub()
-      clearInterval(interval)
+      if (typeof unsubscribe === "function") unsubscribe()
     }
   }, [merchantId])
 

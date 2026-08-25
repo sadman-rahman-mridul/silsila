@@ -403,15 +403,15 @@ export const firebaseService = {
     try {
       const q = query(
         collection(firestore, "pendingApprovals"),
-        where("merchantId", "==", merchantId),
-        where("resolution", "==", "pending")
+        where("merchantId", "==", merchantId)
       )
       return onSnapshot(
         q,
         (snapshot) => {
-          callback(
-            snapshot.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as PendingApproval[]
-          )
+          const list = snapshot.docs
+            .map((d) => ({ id: d.id, ...(d.data() as any) }))
+            .filter((a) => !a.resolution || a.resolution === "pending") as PendingApproval[]
+          callback(list)
         },
         (err) => console.warn("Approvals Firestore listener warning:", err)
       )
@@ -445,10 +445,50 @@ export const firebaseService = {
 
   async resolveApprovalInFirestore(approvalId: string, resolution: "approved" | "rejected") {
     try {
-      await updateDoc(doc(firestore, "pendingApprovals", approvalId), {
+      const approvalRef = doc(firestore, "pendingApprovals", approvalId)
+      const snap = await getDoc(approvalRef)
+      if (!snap.exists()) return
+
+      const approvalData = snap.data() as any
+      await updateDoc(approvalRef, {
         resolution,
+        status: resolution === "approved" ? "approved" : "rejected",
         resolvedAt: new Date().toISOString(),
       })
+
+      // If approved, update or increment the customer's card in Cloud Firestore
+      if (resolution === "approved" && approvalData?.customerId && approvalData?.merchantId) {
+        const customerId = approvalData.customerId
+        const merchantId = approvalData.merchantId
+        const cardId = `card_${customerId}_${merchantId}`
+        const cardRef = doc(firestore, "cards", cardId)
+        const cardSnap = await getDoc(cardRef)
+
+        const existing = cardSnap.exists() ? (cardSnap.data() as any) : null
+        const currentStamps = Number(existing?.stamps) || 0
+        const target = Number(existing?.target) || 5
+        const newStamps = currentStamps + 1
+        const voucherReady = newStamps >= target
+
+        await setDoc(
+          cardRef,
+          {
+            id: cardId,
+            customerId,
+            merchantId,
+            programId: approvalData.programId || `prog_${merchantId}`,
+            stamps: newStamps,
+            target,
+            rewardText: approvalData.rewardText || existing?.rewardText || "১টি বিশেষ উপহার",
+            voucherReady,
+            cycleNo: existing?.cycleNo || 1,
+            streakCount: (existing?.streakCount || 0) + 1,
+            lastVisit: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        )
+      }
     } catch (err) {
       console.warn("Failed to resolve approval in Firestore:", err)
     }
