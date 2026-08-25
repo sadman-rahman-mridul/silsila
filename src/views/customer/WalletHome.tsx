@@ -44,8 +44,14 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
 
   async function loadAvailableMerchants() {
     try {
-      const merchants = await api.getMerchants()
-      setAvailableMerchants(merchants || [])
+      const [apiList, fbList] = await Promise.all([
+        api.getMerchants().catch(() => []),
+        firebaseService.getMerchants().catch(() => []),
+      ])
+      const map = new Map<string, any>()
+      apiList.forEach((m: any) => map.set(m.id, m))
+      fbList.forEach((m: any) => map.set(m.id, { ...map.get(m.id), ...m }))
+      setAvailableMerchants(Array.from(map.values()))
     } catch {
       // ignore
     }

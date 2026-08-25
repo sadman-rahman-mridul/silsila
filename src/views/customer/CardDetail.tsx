@@ -203,28 +203,48 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
     }
 
     try {
+      const targetId = data?.merchant?.id || merchantId
       const customerName = profile?.name || user?.displayName || "সম্মানিত গ্রাহক"
       const customerPhone = profile?.phone || user?.phoneNumber || ""
 
-      // Send stamp request
+      const pendingId = `appr_${Date.now()}`
+      const fallbackApproval: any = {
+        id: pendingId,
+        merchantId: targetId,
+        merchantName: data?.merchant?.name || "দোকান",
+        customerId,
+        customerName,
+        customerPhone,
+        programId: activeProg?.id || `prog_${targetId}`,
+        rewardText: activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার",
+        timestamp: new Date().toISOString(),
+        status: "waiting",
+        resolution: "pending",
+      }
+
+      // 1. Sync directly to Cloud Firestore (guarantees instant counter popup)
+      await firebaseService.syncPendingApproval(fallbackApproval)
+
+      // 2. Call backend API
       const res = await api.requestStamp({
-        merchantId,
+        merchantId: targetId,
         customerId,
         customerName,
         customerPhone,
         scanLat,
         scanLng,
-      })
+      }).catch(() => ({ pendingApproval: fallbackApproval }))
 
-      const newApprovalId = res.pendingApproval.id
+      const newApprovalId = res?.pendingApproval?.id || pendingId
       setApprovalId(newApprovalId)
       setApprovalStatus("waiting")
       setRequestingSeal(false)
 
-      // Sync to Firestore for real-time dashboard listeners
-      firebaseService.syncPendingApproval(res.pendingApproval)
+      if (res?.pendingApproval) {
+        firebaseService.syncPendingApproval(res.pendingApproval)
+      }
 
-      // 2. Listen to approval status via Firestore & Polling
+      // 3. Listen to approval resolution
       listenForApprovalResolution(newApprovalId)
     } catch (err: any) {
       console.error("Seal request failed:", err)

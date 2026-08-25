@@ -34,14 +34,31 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
     try {
       setLoading(true)
       setError(null)
-      setMerchants(
-        await api.getMerchants({
+      const [apiList, fbList] = await Promise.all([
+        api.getMerchants({
           category: selectedCategory !== "all" ? selectedCategory : undefined,
           search: search || undefined,
           lat: coords?.lat,
           lng: coords?.lng,
-        })
-      )
+        }).catch(() => []),
+        firebaseService.getMerchants().catch(() => []),
+      ])
+
+      const map = new Map<string, any>()
+      apiList.forEach((m: any) => map.set(m.id, m))
+      fbList.forEach((m: any) => {
+        if (selectedCategory !== "all" && m.category !== selectedCategory) return
+        if (search) {
+          const s = search.toLowerCase()
+          const name = (m.name || "").toLowerCase()
+          const nameEn = (m.nameEn || "").toLowerCase()
+          const area = (m.area || "").toLowerCase()
+          if (!name.includes(s) && !nameEn.includes(s) && !area.includes(s)) return
+        }
+        map.set(m.id, { ...map.get(m.id), ...m })
+      })
+
+      setMerchants(Array.from(map.values()))
     } catch (err: any) {
       setError(err.message)
     } finally {
