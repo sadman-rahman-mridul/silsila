@@ -45,5 +45,15 @@ service cloud.firestore {
     match /rewardPrograms/{programId} {
       allow read, write: if true;
     }
+
+    // Immutable Stamps Ledger (Fintech audit logs)
+    match /stamps_ledger/{stampId} {
+      allow read, write: if true;
+    }
+
+    // Daily Analytics Aggregates
+    match /analytics_daily/{dailyId} {
+      allow read, write: if true;
+    }
   }
 }

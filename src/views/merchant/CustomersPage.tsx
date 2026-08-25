@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { api, type MerchantCustomer, type RewardProgram } from "../../services/api"
 import { SearchIcon, ChevronRightIcon, DownloadIcon } from "../../components/Icons"
 import { useAuth } from "../../context/AuthContext"
+import { firebaseService } from "../../services/firebaseService"
 
 type FilterTab = "all" | "active" | "completed" | "at_risk"
 
@@ -42,7 +43,15 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
     try {
       setLoading(true)
       setError(null)
-      setCustomers(await api.getCrmCustomers(merchantId, filter, search))
+      const [apiList, fbList] = await Promise.all([
+        api.getCrmCustomers(merchantId, filter, search).catch(() => []),
+        firebaseService.getMerchantCustomers(merchantId, filter, search).catch(() => []),
+      ])
+
+      const map = new Map<string, any>()
+      apiList.forEach((c: any) => map.set(c.id, c))
+      fbList.forEach((c: any) => map.set(c.id, { ...map.get(c.id), ...c }))
+      setCustomers(Array.from(map.values()))
     } catch (err: any) {
       setError(err.message)
     } finally {

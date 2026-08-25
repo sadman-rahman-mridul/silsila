@@ -1,6 +1,21 @@
 import { initializeApp, getApps, getApp } from "firebase/app"
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult, type User } from "firebase/auth"
-import { getFirestore, collection, doc, getDoc, setDoc, getDocs, onSnapshot, query, where, addDoc, updateDoc } from "firebase/firestore"
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  addDoc,
+  updateDoc,
+  runTransaction,
+  increment,
+  serverTimestamp,
+} from "firebase/firestore"
 import firebaseConfigData from "../../firebase-applet-config.json"
 
 const firebaseConfig = {
@@ -96,4 +111,18 @@ export async function confirmFirebasePhoneOtp(
   return userCredential.user
 }
 
-export { collection, doc, getDoc, setDoc, getDocs, onSnapshot, query, where, addDoc, updateDoc }
+export {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  addDoc,
+  updateDoc,
+  runTransaction,
+  increment,
+  serverTimestamp,
+}

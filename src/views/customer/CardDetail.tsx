@@ -53,7 +53,11 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
     // Live updates for this customer's card at this merchant.
     const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
-      const matchingCard = firestoreCards.find((c) => c.merchantId === merchantId)
+      const cleanM = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+      const matchingCard = firestoreCards.find((c) => {
+        const cId = (c.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+        return c.merchantId === merchantId || cId === cleanM
+      })
       if (!matchingCard) return
       setData((prev) => (prev ? { ...prev, card: { ...prev.card, ...matchingCard } } : prev))
     })
@@ -74,78 +78,67 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       setError(null)
 
       let resolvedMerchantId = merchantId
-
-      // 1. Try local/backend API
-      let res: any = await api.getCardDetail(customerId, merchantId).catch(() => null)
-
-      // 2. Direct Cloud Firestore fallback (works seamlessly on Vercel / serverless restarts)
-      if (!res || !res.merchant) {
-        const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId)
-        if (fbMerchant) {
-          resolvedMerchantId = fbMerchant.id
-          res = await api.getCardDetail(customerId, resolvedMerchantId).catch(() => null)
-
-          if (!res) {
-            const target = fbMerchant.rewardTarget || 5
-            res = {
-              card: {
-                id: `card_${customerId}_${resolvedMerchantId}`,
-                customerId,
-                merchantId: resolvedMerchantId,
-                programId: `prog_${resolvedMerchantId}`,
-                stamps: 0,
-                cycleNo: 1,
-                streakCount: 0,
-                lastVisit: new Date().toISOString(),
-                target,
-                rewardText: fbMerchant.rewardText || "বিনামূল্যে পুরস্কার",
-                voucherReady: false,
-                merchant: fbMerchant,
-              },
-              merchant: fbMerchant,
-              program: {
-                id: `prog_${resolvedMerchantId}`,
-                merchantId: resolvedMerchantId,
-                target,
-                rewardText: fbMerchant.rewardText || "বিনামূল্যে পুরস্কার",
-                expiryDays: 30,
-                active: true,
-              },
-              programs: [],
-              stampsHistory: [],
-            }
-          }
-        }
+      const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId).catch(() => null)
+      if (fbMerchant?.id) {
+        resolvedMerchantId = fbMerchant.id
       }
 
-      if (res && res.merchant) {
-        resolvedMerchantId = res.merchant.id || resolvedMerchantId
-        const fbPrograms = await firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => [])
-        const progMap = new Map<string, any>()
-        if (res.programs) res.programs.forEach((p: any) => progMap.set(p.id, p))
-        if (res.program) progMap.set(res.program.id, res.program)
-        fbPrograms.forEach((p: any) => progMap.set(p.id, p))
-        const mergedProgs = Array.from(progMap.values())
+      // 1. Try local API and Firestore Card
+      const [apiRes, fbCard, fbPrograms] = await Promise.all([
+        api.getCardDetail(customerId, resolvedMerchantId).catch(() => null),
+        firebaseService.getCustomerCard(customerId, resolvedMerchantId).catch(() => null),
+        firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => []),
+      ])
 
-        if (mergedProgs.length === 0) {
-          mergedProgs.push({
-            id: `prog_${resolvedMerchantId}`,
-            merchantId: resolvedMerchantId,
-            target: res.merchant.rewardTarget || 5,
-            rewardText: res.merchant.rewardText || "১টি বিশেষ উপহার",
-            active: true,
-          })
-        }
-        res.programs = mergedProgs
+      const merchant = fbMerchant || apiRes?.merchant || {
+        id: resolvedMerchantId,
+        name: "CafeDhaka",
+        area: "ঢাকা",
+        category: "ক্যাফে",
+      }
 
-        setData(res)
-        if (res.card.voucherReady) {
-          try {
-            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } })
-          } catch {}
-        }
-      } else {
-        setError("এই দোকানের কার্ডের তথ্য খুঁজে পাওয়া যায়নি")
+      const activeProgramsList = fbPrograms.length > 0
+        ? fbPrograms
+        : (apiRes?.programs || [
+            {
+              id: `prog_${resolvedMerchantId}`,
+              merchantId: resolvedMerchantId,
+              target: merchant.rewardTarget || 3,
+              rewardText: merchant.rewardText || "১০০ টাকা ছাড়",
+              active: true,
+            },
+          ])
+
+      const defaultTarget = activeProgramsList[0]?.target || merchant.rewardTarget || 3
+      const defaultReward = activeProgramsList[0]?.rewardText || merchant.rewardText || "১০০ টাকা ছাড়"
+
+      const card = {
+        id: fbCard?.id || apiRes?.card?.id || `card_${customerId}_${resolvedMerchantId}`,
+        customerId,
+        merchantId: resolvedMerchantId,
+        programId: fbCard?.programId || activeProgramsList[0]?.id || `prog_${resolvedMerchantId}`,
+        stamps: fbCard?.stamps ?? apiRes?.card?.stamps ?? 0,
+        cycleNo: fbCard?.cycleNo ?? apiRes?.card?.cycleNo ?? 1,
+        streakCount: fbCard?.streakCount ?? apiRes?.card?.streakCount ?? 0,
+        lastVisit: fbCard?.lastVisit || apiRes?.card?.lastVisit || new Date().toISOString(),
+        target: fbCard?.target || defaultTarget,
+        rewardText: fbCard?.rewardText || defaultReward,
+        voucherReady: fbCard?.voucherReady ?? apiRes?.card?.voucherReady ?? false,
+        merchant,
+      }
+
+      setData({
+        card,
+        merchant,
+        program: activeProgramsList[0],
+        programs: activeProgramsList,
+        stampsHistory: apiRes?.stampsHistory || [],
+      })
+
+      if (card.voucherReady) {
+        try {
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } })
+        } catch {}
       }
     } catch (err: any) {
       console.error("CardDetail load error:", err)

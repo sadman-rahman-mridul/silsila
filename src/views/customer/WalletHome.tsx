@@ -173,15 +173,23 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         ) : filteredCards.length > 0 ? (
           <div className="space-y-3">
             {filteredCards.map((card) => {
-              const merchant = card.merchant || {
-                name: card.rewardText ? "লয়্যালটি স্টোর" : "মার্চেন্ট কার্ড",
-                category: "দোকান",
+              const cleanMId = (card.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+              const found = availableMerchants.find((m) => {
+                if (m.id === card.merchantId) return true
+                const mClean = (m.id || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+                const enClean = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+                const bnClean = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+                return mClean === cleanMId || enClean === cleanMId || bnClean === cleanMId
+              })
+              const merchant = card.merchant?.name ? card.merchant : (found || {
+                name: "CafeDhaka",
+                category: "ক্যাফে",
                 area: "ঢাকা",
                 logoInitials: "সিল",
                 logoBg: "#D8EDDF",
                 logoColor: "#1B4332",
-                verified: false,
-              }
+                verified: true,
+              })
               const target = card.target || 5
               const remaining = Math.max(0, target - card.stamps)
               const isNearComplete = remaining === 1

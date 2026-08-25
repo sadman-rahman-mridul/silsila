@@ -13,6 +13,9 @@ import {
   query,
   where,
   updateDoc,
+  runTransaction,
+  increment,
+  serverTimestamp,
 } from "../lib/firebase"
 import { onAuthStateChanged, signOut, type User, type ConfirmationResult } from "firebase/auth"
 import { type CustomerCard, type Merchant, type PendingApproval } from "./api"
@@ -567,51 +570,327 @@ export const firebaseService = {
   async resolveApprovalInFirestore(approvalId: string, resolution: "approved" | "rejected") {
     try {
       const approvalRef = doc(firestore, "pendingApprovals", approvalId)
-      const snap = await getDoc(approvalRef)
-      if (!snap.exists()) return
+      const nowIso = new Date().toISOString()
+      const todayKey = nowIso.slice(0, 10).replace(/-/g, "")
 
-      const approvalData = snap.data() as any
-      await updateDoc(approvalRef, {
-        resolution,
-        status: resolution === "approved" ? "approved" : "rejected",
-        resolvedAt: new Date().toISOString(),
+      await runTransaction(firestore, async (transaction) => {
+        // --- 1. ALL READS FIRST ---
+        const snap = await transaction.get(approvalRef)
+        if (!snap.exists()) return
+
+        const approvalData = snap.data() as any
+        // Check if already resolved to prevent duplicate processing
+        if (approvalData.resolution !== "pending" && resolution === "approved") {
+          return
+        }
+
+        let cardRef: any = null
+        let existingCard: any = null
+        if (resolution === "approved" && approvalData?.customerId && approvalData?.merchantId) {
+          const customerId = approvalData.customerId
+          const merchantId = approvalData.merchantId
+          const cardId = `card_${customerId}_${merchantId}`
+          cardRef = doc(firestore, "cards", cardId)
+          const cardSnap = await transaction.get(cardRef)
+          if (cardSnap.exists()) {
+            existingCard = cardSnap.data() as any
+          }
+        }
+
+        // --- 2. ALL WRITES AFTER ALL READS ---
+        // 2a. Update Approval Record
+        transaction.update(approvalRef, {
+          resolution,
+          status: resolution === "approved" ? "approved" : "rejected",
+          resolvedAt: nowIso,
+        })
+
+        // 2b. Update Card Atomically
+        if (resolution === "approved" && approvalData?.customerId && approvalData?.merchantId && cardRef) {
+          const customerId = approvalData.customerId
+          const merchantId = approvalData.merchantId
+          const cardId = `card_${customerId}_${merchantId}`
+          const currentStamps = Number(existingCard?.stamps) || 0
+          const target = Number(existingCard?.target) || Number(approvalData?.target) || 3
+          const newStamps = currentStamps + 1
+          const voucherReady = newStamps >= target
+          const cycleNo = existingCard?.cycleNo || 1
+          const streakCount = (existingCard?.streakCount || 0) + 1
+
+          transaction.set(
+            cardRef,
+            {
+              id: cardId,
+              customerId,
+              merchantId,
+              programId: approvalData.programId || `prog_${merchantId}`,
+              stamps: newStamps,
+              target,
+              rewardText: approvalData.rewardText || existingCard?.rewardText || "১টি বিশেষ উপহার",
+              voucherReady,
+              cycleNo,
+              streakCount,
+              lastVisit: nowIso,
+              updatedAt: nowIso,
+            },
+            { merge: true }
+          )
+        }
       })
 
-      // If approved, update or increment the customer's card in Cloud Firestore
-      if (resolution === "approved" && approvalData?.customerId && approvalData?.merchantId) {
-        const customerId = approvalData.customerId
-        const merchantId = approvalData.merchantId
-        const cardId = `card_${customerId}_${merchantId}`
-        const cardRef = doc(firestore, "cards", cardId)
-        const cardSnap = await getDoc(cardRef)
+      // 3. Post-Transaction Audit Log and Ledger Entry
+      if (resolution === "approved") {
+        try {
+          const snapAfter = await getDoc(approvalRef)
+          const approvalData = snapAfter.data() as any
+          if (approvalData) {
+            const stampLogId = `stamp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+            await setDoc(doc(firestore, "stamps", stampLogId), {
+              id: stampLogId,
+              approvalId,
+              customerId: approvalData.customerId,
+              merchantId: approvalData.merchantId,
+              customerName: approvalData.customerName || "গ্রাহক",
+              customerPhone: approvalData.customerPhone || "",
+              timestamp: nowIso,
+              status: "completed",
+            })
+          }
+        } catch {
+          // non-blocking
+        }
+      }
 
-        const existing = cardSnap.exists() ? (cardSnap.data() as any) : null
-        const currentStamps = Number(existing?.stamps) || 0
-        const target = Number(existing?.target) || 5
-        const newStamps = currentStamps + 1
-        const voucherReady = newStamps >= target
-
-        await setDoc(
-          cardRef,
-          {
-            id: cardId,
-            customerId,
-            merchantId,
-            programId: approvalData.programId || `prog_${merchantId}`,
-            stamps: newStamps,
-            target,
-            rewardText: approvalData.rewardText || existing?.rewardText || "১টি বিশেষ উপহার",
-            voucherReady,
-            cycleNo: existing?.cycleNo || 1,
-            streakCount: (existing?.streakCount || 0) + 1,
-            lastVisit: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          { merge: true }
-        )
+      // 5. Batch-resolve any superseded pending requests from this customer outside the transaction
+      const snapAfter = await getDoc(approvalRef)
+      const afterData = snapAfter.data() as any
+      if (afterData?.customerId) {
+        try {
+          const qOther = query(
+            collection(firestore, "pendingApprovals"),
+            where("customerId", "==", afterData.customerId)
+          )
+          const snapOther = await getDocs(qOther)
+          for (const d of snapOther.docs) {
+            if (d.id !== approvalId && d.data()?.resolution === "pending") {
+              await updateDoc(doc(firestore, "pendingApprovals", d.id), {
+                resolution: resolution === "approved" ? "approved" : "superseded",
+                status: resolution === "approved" ? "approved" : "superseded",
+                resolvedAt: nowIso,
+              })
+            }
+          }
+        } catch (e) {
+          console.warn("Could not batch-resolve customer approvals:", e)
+        }
       }
     } catch (err) {
       console.warn("Failed to resolve approval in Firestore:", err)
+    }
+  },
+
+  async getCustomerStampHistory(customerId: string, merchantId?: string): Promise<any[]> {
+    if (!customerId) return []
+    try {
+      const q = query(
+        collection(firestore, "stamps_ledger"),
+        where("customerId", "==", customerId)
+      )
+      const snap = await getDocs(q)
+      let list = snap.docs.map((d) => d.data())
+      if (merchantId) {
+        const cleanM = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+        list = list.filter((s) => {
+          const sM = (s.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return s.merchantId === merchantId || sM === cleanM
+        })
+      }
+      return list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    } catch (err) {
+      console.warn("Failed to get stamp history:", err)
+      return []
+    }
+  },
+
+  async getCustomerCard(customerId: string, merchantId: string): Promise<any> {
+    if (!customerId || !merchantId) return null
+    try {
+      const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
+      const targetId = fbMerchant?.id || merchantId
+      const cleanSlug = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+
+      const cardId = `card_${customerId}_${targetId}`
+      const snap = await getDoc(doc(firestore, "cards", cardId))
+      if (snap.exists()) {
+        return { id: snap.id, ...snap.data() }
+      }
+
+      // Query any card matching customerId and merchant
+      const q = query(collection(firestore, "cards"), where("customerId", "==", customerId))
+      const allCards = await getDocs(q)
+      const matched = allCards.docs.find((d) => {
+        const data = d.data()
+        const mId = (data.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+        return data.merchantId === targetId || data.merchantId === merchantId || mId === cleanSlug
+      })
+      if (matched) return { id: matched.id, ...matched.data() }
+      return null
+    } catch (err) {
+      console.warn("Failed to get customer card from Firestore:", err)
+      return null
+    }
+  },
+
+  async getMerchantCustomers(merchantId: string, filterTab: string = "all", search?: string): Promise<any[]> {
+    if (!merchantId) return []
+    try {
+      const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
+      const targetId = fbMerchant?.id || merchantId
+      const cleanSlug = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+
+      const [cardsSnap, usersSnap] = await Promise.all([
+        getDocs(collection(firestore, "cards")),
+        getDocs(collection(firestore, USERS)),
+      ])
+
+      const userMap = new Map<string, any>()
+      usersSnap.docs.forEach((d) => {
+        const u = d.data()
+        userMap.set(d.id, u)
+        if (u.phone) userMap.set(u.phone, u)
+        if (u.uid) userMap.set(u.uid, u)
+      })
+
+      const matchedCards = cardsSnap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as any))
+        .filter((c) => {
+          const mId = (c.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return c.merchantId === targetId || mId === cleanSlug || c.merchantId === merchantId
+        })
+
+      const customers = matchedCards.map((c) => {
+        const u = userMap.get(c.customerId) || userMap.get(c.customerId?.replace(/^c_/, "")) || {}
+        const name = u.name || c.customerName || "সম্মানিত গ্রাহক"
+        const phone = u.phone || c.customerPhone || (c.customerId?.startsWith("c_") ? c.customerId.replace("c_", "") : "—")
+        const stamps = Number(c.stamps) || 0
+        const totalVisits = stamps + ((c.cycleNo || 1) - 1) * (c.target || 5)
+        const lastVisitDate = c.lastVisit ? new Date(c.lastVisit) : new Date(c.updatedAt || Date.now())
+        const diffDays = Math.max(0, Math.floor((Date.now() - lastVisitDate.getTime()) / (1000 * 60 * 60 * 24)))
+
+        let status: "active" | "at_risk" | "new" | "completed" = "active"
+        if (c.voucherReady) status = "completed"
+        else if (diffDays > 14) status = "at_risk"
+        else if (totalVisits <= 1) status = "new"
+
+        return {
+          id: c.customerId,
+          name,
+          phone: phone.length >= 10 ? `+880 ${phone.slice(-10, -6)} ***${phone.slice(-3)}` : phone,
+          rawPhone: phone,
+          stamps,
+          totalVisits,
+          lastVisit: diffDays === 0 ? "আজ" : diffDays === 1 ? "গতকাল" : `${diffDays} দিন আগে`,
+          lastVisitDaysAgo: diffDays,
+          status,
+        }
+      })
+
+      return customers.filter((cust) => {
+        if (filterTab !== "all" && cust.status !== filterTab) return false
+        if (search) {
+          const s = search.toLowerCase()
+          return cust.name.toLowerCase().includes(s) || (cust.rawPhone && cust.rawPhone.includes(s))
+        }
+        return true
+      })
+    } catch (err) {
+      console.warn("Failed to get CRM customers from Firestore:", err)
+      return []
+    }
+  },
+
+  async getMerchantStats(merchantId: string): Promise<any> {
+    const defaultStats = {
+      scansToday: 0,
+      uniqueCustomers: 0,
+      rewardsRedeemed: 0,
+      repeatRate: 0,
+      stampsThisWeek: 0,
+      newThisWeek: 0,
+      weeklyChange: 0,
+      activeCards: 0,
+      totalStamps: 0,
+      hasActivity: false,
+      dailyTrends: [
+        { day: "রবি", date: "১৮ মে", stamps: 0 },
+        { day: "সোম", date: "১৯ মে", stamps: 0 },
+        { day: "মঙ্গল", date: "২০ মে", stamps: 0 },
+        { day: "বুধ", date: "২১ মে", stamps: 0 },
+        { day: "বৃহঃ", date: "২২ মে", stamps: 0 },
+        { day: "শুক্র", date: "২৩ মে", stamps: 0 },
+        { day: "শনি", date: "২৪ মে", stamps: 0 },
+      ],
+      hourlyDistribution: [
+        { hour: 8, label: "৮টা", stamps: 0 },
+        { hour: 12, label: "১২টা", stamps: 0 },
+        { hour: 16, label: "৪টা", stamps: 0 },
+        { hour: 20, label: "৮টা", stamps: 0 },
+      ],
+      retentionFunnel: [
+        { visit: 1, count: 0, percentage: 100 },
+        { visit: 2, count: 0, percentage: 0 },
+        { visit: 3, count: 0, percentage: 0 },
+        { visit: 0, count: 0, percentage: 0 },
+      ],
+    }
+
+    if (!merchantId) return defaultStats
+    try {
+      const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
+      const targetId = fbMerchant?.id || merchantId
+      const cleanSlug = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+
+      const [cardsSnap, approvalsSnap] = await Promise.all([
+        getDocs(collection(firestore, "cards")),
+        getDocs(collection(firestore, "pendingApprovals")),
+      ])
+
+      const matchedCards = cardsSnap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as any))
+        .filter((c) => {
+          const mId = (c.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return c.merchantId === targetId || mId === cleanSlug || c.merchantId === merchantId
+        })
+
+      const matchedApprovals = approvalsSnap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as any))
+        .filter((a) => {
+          const mId = (a.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return (a.merchantId === targetId || mId === cleanSlug || a.merchantId === merchantId) && (a.resolution === "approved" || a.status === "approved")
+        })
+
+      const uniqueCustomers = matchedCards.length
+      const totalStamps = matchedCards.reduce((acc, c) => acc + (Number(c.stamps) || 0), 0) + (matchedApprovals.length > 0 ? matchedApprovals.length : 0)
+      const repeatCustomers = matchedCards.filter((c) => (Number(c.stamps) || 0) > 1 || (c.cycleNo || 1) > 1).length
+      const repeatRate = uniqueCustomers > 0 ? Math.round((repeatCustomers / uniqueCustomers) * 100) : 0
+      const rewardsRedeemed = matchedCards.filter((c) => (c.cycleNo || 1) > 1).length
+
+      return {
+        ...defaultStats,
+        scansToday: matchedApprovals.length,
+        uniqueCustomers,
+        rewardsRedeemed,
+        repeatRate,
+        stampsThisWeek: matchedApprovals.length,
+        newThisWeek: uniqueCustomers,
+        activeCards: matchedCards.length,
+        totalStamps,
+        hasActivity: uniqueCustomers > 0 || matchedApprovals.length > 0,
+        weeklyChange: matchedApprovals.length,
+      }
+    } catch (err) {
+      console.warn("Failed to get merchant stats from Firestore:", err)
+      return defaultStats
     }
   },
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { api, type MerchantStats, type MerchantCustomer } from "../../services/api"
 import { TrendingUpIcon, UsersIcon, GiftIcon } from "../../components/Icons"
+import { firebaseService } from "../../services/firebaseService"
 
 interface ReportPageProps {
   merchantId: string
@@ -38,13 +39,31 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
     setLoading(true)
     setError(null)
     try {
-      const [statsData, customers] = await Promise.all([
-        api.getMerchantStats(merchantId),
+      const [apiStats, fbStats, apiCust, fbCust] = await Promise.all([
+        api.getMerchantStats(merchantId).catch(() => null),
+        firebaseService.getMerchantStats(merchantId).catch(() => null),
         api.getCrmCustomers(merchantId, "all").catch(() => [] as MerchantCustomer[]),
+        firebaseService.getMerchantCustomers(merchantId, "all").catch(() => [] as MerchantCustomer[]),
       ])
-      setStats(statsData)
+
+      const mergedStats = {
+        ...(apiStats || {}),
+        ...(fbStats || {}),
+        scansToday: Math.max(apiStats?.scansToday || 0, fbStats?.scansToday || 0),
+        uniqueCustomers: Math.max(apiStats?.uniqueCustomers || 0, fbStats?.uniqueCustomers || 0),
+        rewardsRedeemed: Math.max(apiStats?.rewardsRedeemed || 0, fbStats?.rewardsRedeemed || 0),
+        repeatRate: fbStats?.repeatRate ?? apiStats?.repeatRate ?? 0,
+        hasActivity: Boolean(fbStats?.hasActivity || apiStats?.hasActivity),
+      }
+
+      const map = new Map<string, MerchantCustomer>()
+      apiCust.forEach((c: any) => map.set(c.id, c))
+      fbCust.forEach((c: any) => map.set(c.id, { ...map.get(c.id), ...c }))
+      const allCustomers = Array.from(map.values())
+
+      setStats(mergedStats as any)
       setTopCustomers(
-        [...customers].sort((a, b) => (b.totalVisits || 0) - (a.totalVisits || 0)).slice(0, 5)
+        [...allCustomers].sort((a, b) => (b.totalVisits || 0) - (a.totalVisits || 0)).slice(0, 5)
       )
     } catch (err: any) {
       setError(err.message)

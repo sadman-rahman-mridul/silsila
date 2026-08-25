@@ -3,6 +3,8 @@ import { api, type MerchantStats, type MerchantCustomer, emptyMerchantStats } fr
 import { useAuth } from "../../context/AuthContext"
 import { TrendingUpIcon, UsersIcon, GiftIcon } from "../../components/Icons"
 
+import { firebaseService } from "../../services/firebaseService"
+
 interface AnalyticsPageProps {
   activeMerchantId?: string
 }
@@ -22,13 +24,31 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
   async function loadAnalytics() {
     try {
       setLoading(true)
-      const [data, customers] = await Promise.all([
-        api.getMerchantStats(merchantId),
+      const [apiStats, fbStats, apiCust, fbCust] = await Promise.all([
+        api.getMerchantStats(merchantId).catch(() => null),
+        firebaseService.getMerchantStats(merchantId).catch(() => null),
         api.getCrmCustomers(merchantId, "all").catch(() => []),
+        firebaseService.getMerchantCustomers(merchantId, "all").catch(() => []),
       ])
-      setStats(data || emptyMerchantStats)
-      if (customers && customers.length > 0) {
-        const sorted = [...customers]
+
+      const mergedStats = {
+        ...(apiStats || {}),
+        ...(fbStats || {}),
+        scansToday: Math.max(apiStats?.scansToday || 0, fbStats?.scansToday || 0),
+        uniqueCustomers: Math.max(apiStats?.uniqueCustomers || 0, fbStats?.uniqueCustomers || 0),
+        rewardsRedeemed: Math.max(apiStats?.rewardsRedeemed || 0, fbStats?.rewardsRedeemed || 0),
+        repeatRate: fbStats?.repeatRate ?? apiStats?.repeatRate ?? 0,
+        hasActivity: Boolean(fbStats?.hasActivity || apiStats?.hasActivity),
+      }
+
+      const map = new Map<string, MerchantCustomer>()
+      apiCust.forEach((c: any) => map.set(c.id, c))
+      fbCust.forEach((c: any) => map.set(c.id, { ...map.get(c.id), ...c }))
+      const allCustomers = Array.from(map.values())
+
+      setStats(mergedStats as any)
+      if (allCustomers && allCustomers.length > 0) {
+        const sorted = [...allCustomers]
           .sort((a, b) => (b.totalVisits || 0) - (a.totalVisits || 0))
           .slice(0, 5)
         setTopCustomers(sorted)
