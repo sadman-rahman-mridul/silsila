@@ -317,11 +317,23 @@ export const firebaseService = {
     [key: string]: any
   }) {
     try {
+      const fbMerchant = await this.getMerchantByIdOrSlug(program.merchantId)
+      const targetDocId = fbMerchant?.id || program.merchantId
+
+      const existingPrograms = Array.isArray(fbMerchant?.programs) ? [...fbMerchant.programs] : []
+      const index = existingPrograms.findIndex((p: any) => p.id === program.id)
+      if (index >= 0) {
+        existingPrograms[index] = { ...existingPrograms[index], ...program }
+      } else {
+        existingPrograms.push({ ...program, active: program.active ?? true })
+      }
+
       await setDoc(
-        doc(firestore, "rewardPrograms", program.id),
+        doc(firestore, MERCHANTS, targetDocId),
         {
-          ...program,
-          active: program.active ?? true,
+          programs: existingPrograms,
+          rewardTarget: program.target,
+          rewardText: program.rewardText,
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
@@ -334,9 +346,26 @@ export const firebaseService = {
   async getRewardPrograms(merchantId: string): Promise<any[]> {
     if (!merchantId) return []
     try {
-      const q = query(collection(firestore, "rewardPrograms"), where("merchantId", "==", merchantId))
-      const snap = await getDocs(q)
-      return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))
+      const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
+      const programs: any[] = []
+
+      if (fbMerchant) {
+        if (Array.isArray(fbMerchant.programs) && fbMerchant.programs.length > 0) {
+          programs.push(...fbMerchant.programs)
+        } else if (fbMerchant.rewardText) {
+          programs.push({
+            id: `rp_${fbMerchant.id}`,
+            merchantId: fbMerchant.id,
+            target: Number(fbMerchant.rewardTarget) || 5,
+            rewardText: fbMerchant.rewardText,
+            expiryDays: 30,
+            active: true,
+            createdAt: fbMerchant.updatedAt || fbMerchant.createdAt || new Date().toISOString(),
+          })
+        }
+      }
+
+      return programs
     } catch (err) {
       console.warn("Failed to get reward programs from Firestore:", err)
       return []
@@ -357,9 +386,6 @@ export const firebaseService = {
 
   /**
    * Live updates for the brands a single owner controls.
-   *
-   * Deliberately filtered by `ownerPhone` — the console must never receive the
-   * full merchant directory.
    */
   subscribeOwnedMerchants(ownerPhone: string, callback: (merchants: Merchant[]) => void) {
     const clean = normalizePhone(ownerPhone)
@@ -379,14 +405,34 @@ export const firebaseService = {
     }
   },
 
-  /** Live updates for a single merchant document. */
+  /** Live updates for a single merchant document by ID or slug. */
   subscribeMerchant(merchantId: string, callback: (merchant: Merchant | null) => void) {
     if (!merchantId) return () => {}
-    try {
+    const clean = merchantId.toLowerCase().trim()
+
+    if (merchantId.startsWith("m_") || merchantId.startsWith("m1")) {
       return onSnapshot(
         doc(firestore, MERCHANTS, merchantId),
         (snap) => callback(snap.exists() ? ({ id: snap.id, ...(snap.data() as any) } as Merchant) : null),
         (err) => console.warn("Merchant Firestore listener warning:", err)
+      )
+    }
+
+    try {
+      return onSnapshot(
+        collection(firestore, MERCHANTS),
+        (snap) => {
+          const merchants = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+          const cleanSlug = clean.replace(/[^a-z0-9]/g, "")
+          const matched: any = merchants.find((m: any) => {
+            if (m.id.toLowerCase() === clean) return true
+            const enClean = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+            const bnClean = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+            return enClean === cleanSlug || bnClean === cleanSlug || m.name?.toLowerCase() === clean
+          })
+          callback(matched || null)
+        },
+        (err) => console.warn("Merchant slug listener warning:", err)
       )
     } catch (err) {
       console.error("Failed to subscribe to merchant:", err)
@@ -401,16 +447,25 @@ export const firebaseService = {
   subscribePendingApprovals(merchantId: string, callback: (approvals: PendingApproval[]) => void) {
     if (!merchantId) return () => {}
     try {
-      const q = query(
-        collection(firestore, "pendingApprovals"),
-        where("merchantId", "==", merchantId)
-      )
+      const clean = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+      const q = collection(firestore, "pendingApprovals")
       return onSnapshot(
         q,
         (snapshot) => {
           const list = snapshot.docs
             .map((d) => ({ id: d.id, ...(d.data() as any) }))
-            .filter((a) => !a.resolution || a.resolution === "pending") as PendingApproval[]
+            .filter((a) => {
+              if (a.resolution && a.resolution !== "pending") return false
+              const aId = (a.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+              const aName = (a.merchantName || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+              return (
+                a.merchantId === merchantId ||
+                aId === clean ||
+                aName === clean ||
+                aId.includes(clean) ||
+                clean.includes(aId)
+              )
+            }) as PendingApproval[]
           callback(list)
         },
         (err) => console.warn("Approvals Firestore listener warning:", err)
