@@ -393,7 +393,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           <h1 className="font-display text-5xl font-black text-white tracking-tight leading-none mb-2">
             সিলসিলা
           </h1>
-          <p className="text-[#52B788] text-lg font-medium tracking-wide">Silsila</p>
+          <p className="text-[#52B788] text-base font-semibold tracking-wide mt-1">
+            আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!
+          </p>
         </div>
 
         {error && (

@@ -157,7 +157,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             </div>
             <div>
               <p className="text-white font-display font-bold">সিলসিলায় স্বাগতম!</p>
-              <p className="text-[#52B788] text-xs">৩ মিনিটে আপনার ডিজিটাল লয়্যালটি স্ট্যাম্প সেট আপ করুন</p>
+              <p className="text-[#52B788] text-xs">আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!</p>
             </div>
           </div>
           {onBack && (
