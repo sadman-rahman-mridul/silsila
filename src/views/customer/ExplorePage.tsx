@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { api, type Merchant } from "../../services/api"
+import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES, categoryLabel } from "../../constants/categories"
 import { MapPinIcon, SearchIcon, ShieldCheckIcon } from "../../components/Icons"
 
@@ -146,37 +147,58 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                 className="bg-white rounded-2xl overflow-hidden card-shadow cursor-pointer transition-all active:scale-[0.99] hover:shadow-md group"
               >
                 <div
-                  className="h-28 relative"
-                  style={{ background: `linear-gradient(135deg, ${merchant.logoBg || "#D8EDDF"} 0%, ${merchant.logoBg || "#D8EDDF"}88 100%)` }}
+                  className="h-32 relative bg-[#1B4332] overflow-hidden"
                 >
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span
-                      className="font-display font-black text-6xl opacity-20"
-                      style={{ color: merchant.logoColor || "#1B4332" }}
+                  {merchant.coverUrl ? (
+                    <img
+                      src={merchant.coverUrl}
+                      alt={merchant.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-full h-full relative"
+                      style={{ background: `linear-gradient(135deg, ${merchant.logoBg || "#D8EDDF"} 0%, ${merchant.logoBg || "#D8EDDF"}88 100%)` }}
                     >
-                      {merchant.logoInitials}
-                    </span>
-                  </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span
+                          className="font-display font-black text-6xl opacity-20"
+                          style={{ color: merchant.logoColor || "#1B4332" }}
+                        >
+                          {merchant.logoInitials || (merchant.name ? merchant.name.slice(0, 2) : "সি")}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
                   <div className="absolute top-3 left-3">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-sm shadow-md"
-                      style={{ background: merchant.logoBg || "#D8EDDF", color: merchant.logoColor || "#1B4332", border: `2px solid ${merchant.logoColor || "#1B4332"}22` }}
+                      className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-sm shadow-md overflow-hidden bg-white"
+                      style={{ border: `2px solid #FFFFFF` }}
                     >
-                      {merchant.logoInitials}
+                      {merchant.logoUrl ? (
+                        <img src={merchant.logoUrl} alt={merchant.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span style={{ color: merchant.logoColor || "#1B4332" }}>
+                          {merchant.logoInitials || (merchant.name ? merchant.name.slice(0, 2) : "সি")}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="absolute top-3 right-3 flex gap-2">
                     {merchant.verified && (
-                      <span className="bg-[#D8EDDF] text-[#1B4332] text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                      <span className="bg-[#D8EDDF] text-[#1B4332] text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 shadow-xs">
                         <ShieldCheckIcon size={10} /> যাচাইকৃত
                       </span>
                     )}
                     <span
-                      className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        merchant.isOpen ? "bg-[#D8EDDF] text-[#1B4332]" : "bg-gray-100 text-gray-500"
+                      className={`text-xs px-2 py-1 rounded-full font-medium shadow-xs ${
+                        merchant.isOpen !== false ? "bg-[#D8EDDF] text-[#1B4332]" : "bg-gray-100 text-gray-500"
                       }`}
                     >
-                      {merchant.isOpen ? "খোলা" : "বন্ধ"}
+                      {merchant.isOpen !== false ? "খোলা" : "বন্ধ"}
                     </span>
                   </div>
                 </div>

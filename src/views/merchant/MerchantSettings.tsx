@@ -59,6 +59,12 @@ export default function MerchantSettings({
   const [logoUrl, setLogoUrl] = useState<string>("")
   const [logoInitials, setLogoInitials] = useState<string>("")
 
+  // Cover Photo & In-browser Cropper (< 1 MB)
+  const [coverUrl, setCoverUrl] = useState<string>("")
+  const [rawCoverImage, setRawCoverImage] = useState<string | null>(null)
+  const [coverScale, setCoverScale] = useState(1)
+  const [coverOffsetY, setCoverOffsetY] = useState(0)
+
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -115,6 +121,7 @@ export default function MerchantSettings({
         setGeofenceM(m.geofenceM || 200)
         setLogoUrl(m.logoUrl || "")
         setLogoInitials(m.logoInitials || (m.name ? m.name.slice(0, 2) : ""))
+        setCoverUrl(m.coverUrl || "")
         setInstagram(m.instagram || "")
         setFacebook(m.facebook || "")
         setWhatsapp(m.whatsapp || "")
@@ -165,6 +172,62 @@ export default function MerchantSettings({
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const coverInputRef = useRef<HTMLInputElement | null>(null)
+
+  function handleCoverFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith("image/")) {
+      alert("অনুগ্রহ করে একটি ছবি (PNG, JPG, WebP) নির্বাচন করুন")
+      return
+    }
+    if (file.size > 1024 * 1024) {
+      alert("কভার ছবির ফাইলের আকার অবশ্যই ১ MB এর নিচে হতে হবে (Cover photo must be under 1 MB)")
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      setRawCoverImage(event.target?.result as string)
+      setCoverScale(1)
+      setCoverOffsetY(0)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleApplyCrop() {
+    if (!rawCoverImage) return
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement("canvas")
+      const targetWidth = 1200
+      const targetHeight = 500
+      canvas.width = targetWidth
+      canvas.height = targetHeight
+      const ctx = canvas.getContext("2d")
+      if (!ctx) return
+
+      ctx.fillStyle = "#1B4332"
+      ctx.fillRect(0, 0, targetWidth, targetHeight)
+
+      const scaledW = targetWidth * coverScale
+      const scaledH = (img.height / img.width) * scaledW
+      const posX = (targetWidth - scaledW) / 2
+      const posY = (targetHeight - scaledH) / 2 + coverOffsetY
+
+      ctx.drawImage(img, posX, posY, scaledW, scaledH)
+
+      const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.88)
+      setCoverUrl(croppedDataUrl)
+      setRawCoverImage(null)
+    }
+    img.src = rawCoverImage
+  }
+
+  function handleRemoveCoverImage() {
+    setCoverUrl("")
+    if (coverInputRef.current) coverInputRef.current.value = ""
+  }
+
   async function handleSave() {
     setSaving(true)
     try {
@@ -181,6 +244,7 @@ export default function MerchantSettings({
         geofenceM,
         logoUrl: logoUrl || undefined,
         logoInitials: logoInitials.trim() || businessName.slice(0, 2),
+        coverUrl: coverUrl || undefined,
         instagram: instagram.trim() || undefined,
         facebook: facebook.trim() || undefined,
         whatsapp: whatsapp.trim() || undefined,
@@ -433,7 +497,77 @@ export default function MerchantSettings({
           </div>
         </div>
 
-        {/* 2. Business Details */}
+        {/* 2. Cover Photo / Banner (< 1 MB with Cropper) */}
+        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
+          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-[#E9E5DC]">
+            <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-[#92400E]">
+              🖼️
+            </div>
+            <div>
+              <h2 className="font-display font-bold text-[#1A1916] text-base">কভার ফটো ও ব্যানার</h2>
+              <p className="text-xs text-[#6B6158]">খুঁজুন পেজ ও স্টোর পেজে প্রদর্শিত ব্যানার ছবি</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Banner Preview */}
+            <div className="h-36 rounded-2xl overflow-hidden relative bg-[#1B4332] border-2 border-[#E9E5DC] shadow-inner flex items-center justify-center">
+              {coverUrl ? (
+                <img src={coverUrl} alt="Store Cover" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-center p-4">
+                  <p className="text-3xl mb-1 opacity-50">🏞️</p>
+                  <p className="text-white/80 text-xs font-semibold">কোনো কভার ছবি আপলোড করা হয়নি</p>
+                  <p className="text-white/50 text-[11px]">খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে</p>
+                </div>
+              )}
+
+              {coverUrl && (
+                <button
+                  onClick={handleRemoveCoverImage}
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold shadow-md cursor-pointer"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="p-3 bg-[#F0F7F2] rounded-xl border border-[#52B788]/30 flex items-start gap-2">
+              <span className="text-sm">📌</span>
+              <p className="text-xs text-[#1B4332]">
+                <strong>নিয়মাবলী:</strong> কভার ছবির সাইজ অবশ্যই ১ MB এর নিচে হতে হবে। আপলোডের আগে ক্রপ ও পজিশন ঠিক করে নিন।
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                ref={coverInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={handleCoverFileChange}
+                className="hidden"
+                id="cover-file-input"
+              />
+              <label
+                htmlFor="cover-file-input"
+                className="flex-1 py-3 bg-[#1B4332] hover:bg-[#143427] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-95 text-center"
+              >
+                📸 নতুন কভার ফটো নির্বাচন ও ক্রপ
+              </label>
+
+              {coverUrl && (
+                <button
+                  onClick={handleRemoveCoverImage}
+                  className="px-4 py-3 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                >
+                  ছবি মুছুন
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Business Details */}
         <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
           <h2 className="font-display font-bold text-[#1A1916] text-base mb-3">ব্যবসার বিবরণ</h2>
 
@@ -784,6 +918,99 @@ export default function MerchantSettings({
           লগ আউট
         </button>
       </div>
+
+      {/* Interactive Cover Photo Cropper Modal */}
+      {rawCoverImage && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full card-shadow-md animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-display font-black text-lg text-[#1A1916]">কভার ছবি ক্রপ করুন</h3>
+                <p className="text-xs text-[#6B6158]">ব্যানার ফ্রেমের সাথে ছবি মিলিয়ে নিন</p>
+              </div>
+              <button
+                onClick={() => setRawCoverImage(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold hover:bg-gray-200 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Viewport Frame */}
+            <div className="relative w-full h-48 bg-black rounded-2xl overflow-hidden mb-4 flex items-center justify-center border-2 border-[#52B788]">
+              <img
+                src={rawCoverImage}
+                alt="Crop preview"
+                className="max-w-none transition-transform select-none pointer-events-none"
+                style={{
+                  transform: `scale(${coverScale}) translateY(${coverOffsetY}px)`,
+                  width: "100%",
+                  height: "auto",
+                }}
+              />
+              <div className="absolute inset-0 pointer-events-none border-2 border-dashed border-white/60 rounded-2xl" />
+            </div>
+
+            {/* Zoom Slider */}
+            <div className="space-y-2 mb-4 bg-[#F7F5F0] p-3 rounded-2xl border border-[#E9E5DC]">
+              <div className="flex items-center justify-between text-xs text-[#1A1916] font-bold">
+                <span>🔍 জুম (Zoom): {coverScale.toFixed(1)}x</span>
+                <button
+                  type="button"
+                  onClick={() => { setCoverScale(1); setCoverOffsetY(0) }}
+                  className="text-[#1B4332] text-[11px] underline"
+                >
+                  রিসেট
+                </button>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="2.5"
+                step="0.1"
+                value={coverScale}
+                onChange={(e) => setCoverScale(parseFloat(e.target.value))}
+                className="w-full accent-[#1B4332] cursor-pointer"
+              />
+
+              <div className="flex items-center justify-between text-xs text-[#1A1916] font-bold pt-2 border-t border-[#E9E5DC]">
+                <span>↕️ উচ্চতা পজিশন:</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCoverOffsetY((y) => y - 15)}
+                    className="px-2.5 py-1 bg-white border border-[#E9E5DC] rounded-lg text-xs font-bold text-[#1B4332]"
+                  >
+                    ▲ উপরে
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCoverOffsetY((y) => y + 15)}
+                    className="px-2.5 py-1 bg-white border border-[#E9E5DC] rounded-lg text-xs font-bold text-[#1B4332]"
+                  >
+                    ▼ নিচে
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRawCoverImage(null)}
+                className="flex-1 py-3 bg-[#F0EDE6] text-[#6B6158] rounded-xl text-xs font-bold hover:bg-[#E5E0D6] cursor-pointer"
+              >
+                বাতিল
+              </button>
+              <button
+                onClick={handleApplyCrop}
+                className="flex-[2] py-3 bg-[#1B4332] text-white rounded-xl text-xs font-bold hover:bg-[#143427] cursor-pointer shadow-sm"
+              >
+                ✓ ক্রপ ও ব্যানার নিশ্চিত করুন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -137,7 +137,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     }
   }
 
-  // STEP 3B: New User Registration (Direct name prompt and Firestore persistence)
+  // STEP 3B: New User Registration -> Send OTP verification first
   async function handleNewUserRegisterSubmit() {
     if (password.trim().length < 4) {
       setError("পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে")
@@ -146,8 +146,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
     setError(null)
     setInfoMsg(null)
-    // Open name prompt modal directly so user enters name and gets registered immediately
-    setShowNameModal(true)
+    await handleSendOtp("নিবন্ধন যাচাই করতে আপনার ফোনে ৬-সংখ্যার OTP কোড পাঠানো হয়েছে।")
   }
 
   // Send OTP
@@ -649,13 +648,13 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 />
               </div>
 
-              {/* Button: Set Password & Continue */}
+              {/* Button: Set Password & Send OTP */}
               <button
                 onClick={handleNewUserRegisterSubmit}
                 disabled={loading || password.trim().length < 4}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
-                {loading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "পাসওয়ার্ড নিশ্চিত করুন ও শুরু করুন →"}
+                {loading ? "OTP পাঠানো হচ্ছে..." : "OTP পাঠান ও এগিয়ে যান →"}
               </button>
             </div>
           </div>
