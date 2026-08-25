@@ -39,14 +39,35 @@ export default function CustomerApp({ onBack, initialMerchantId, initialSubpage 
     api.getMerchants().then((m) => setAllMerchants(m || [])).catch(() => {})
   }, [])
 
+  // User phone number last 7 digits prefix for personalized customer routing (domain/last7digits/page)
+  const userPhoneTag = profile?.phone
+    ? profile.phone.replace(/\D/g, "").slice(-7)
+    : user?.phoneNumber
+    ? user.phoneNumber.replace(/\D/g, "").slice(-7)
+    : null
+
+  function buildUserUrl(path: string) {
+    const cleanPath = path.startsWith("/") ? path : `/${path}`
+    if (userPhoneTag) {
+      return `/${userPhoneTag}${cleanPath === "/" ? "" : cleanPath}`
+    }
+    return cleanPath
+  }
+
   useEffect(() => {
     if (initialMerchantId && (!initialSubpage || initialSubpage === "card")) {
       setSelectedMerchantId(initialMerchantId)
+      const m = allMerchants.find((x) => x.id === initialMerchantId)
+      const slug = m ? generateMerchantSlug(m) : initialMerchantId
+      window.history.replaceState(null, "", buildUserUrl(`/${slug}`))
     } else if (initialSubpage && ["explore", "scan", "rewards", "profile"].includes(initialSubpage)) {
       setTab(initialSubpage as CustomerTab)
       setSelectedMerchantId(null)
+      window.history.replaceState(null, "", buildUserUrl(`/${initialSubpage}`))
+    } else if (userPhoneTag) {
+      window.history.replaceState(null, "", buildUserUrl(tab === "home" ? "" : `/${tab}`))
     }
-  }, [initialMerchantId, initialSubpage])
+  }, [initialMerchantId, initialSubpage, userPhoneTag, allMerchants])
 
   const customerId = profile?.id || user?.uid || null
 
@@ -61,17 +82,6 @@ export default function CustomerApp({ onBack, initialMerchantId, initialSubpage 
       if (typeof unsubscribe === "function") unsubscribe()
     }
   }, [customerId])
-
-  // User phone number last 7 digits prefix for personalized customer routing (domain/last7digits/page)
-  const userPhoneTag = profile?.phone ? profile.phone.replace(/\D/g, "").slice(-7) : null
-
-  function buildUserUrl(path: string) {
-    const cleanPath = path.startsWith("/") ? path : `/${path}`
-    if (userPhoneTag) {
-      return `/${userPhoneTag}${cleanPath === "/" ? "" : cleanPath}`
-    }
-    return cleanPath
-  }
 
   // Sync browser URL dynamically with user navigation
   function handleSelectCard(id: string) {
