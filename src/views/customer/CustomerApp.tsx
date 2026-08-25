@@ -46,7 +46,13 @@ export default function CustomerApp({ onBack }: CustomerAppProps) {
           </div>
         ) : (
           <div className="absolute inset-0 overflow-y-auto">
-            {tab === "home" && <WalletHome onSelectCard={(id) => setSelectedMerchantId(id)} onExploreClick={() => setTab("explore")} />}
+            {tab === "home" && (
+              <WalletHome
+                onSelectCard={(id) => setSelectedMerchantId(id)}
+                onExploreClick={() => setTab("explore")}
+                onLogout={onBack}
+              />
+            )}
             {tab === "explore" && <ExplorePage onSelectMerchant={(id) => { setSelectedMerchantId(id); setTab("home") }} />}
             {tab === "scan" && (
               <ScanFlow

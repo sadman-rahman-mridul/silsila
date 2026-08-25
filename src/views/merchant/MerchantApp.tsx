@@ -125,6 +125,7 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
               onMerchantChange={setMerchantId}
               onViewCustomers={() => setTab("customers")}
               onOpenSettings={() => setTab("settings")}
+              onLogout={onBack}
             />
           )}
           {tab === "customers" && <CustomersPage merchantId={merchantId} />}

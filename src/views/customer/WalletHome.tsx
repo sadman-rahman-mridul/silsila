@@ -3,14 +3,15 @@ import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import StampGrid from "../../components/StampGrid"
-import { FireIcon, GiftIcon } from "../../components/Icons"
+import { FireIcon, GiftIcon, LogOutIcon } from "../../components/Icons"
 
 interface WalletHomeProps {
   onSelectCard: (merchantId: string) => void
   onExploreClick?: () => void
+  onLogout?: () => void
 }
 
-export default function WalletHome({ onSelectCard, onExploreClick }: WalletHomeProps) {
+export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: WalletHomeProps) {
   const { user, profile } = useAuth()
   const [cards, setCards] = useState<CustomerCard[]>([])
   const [availableMerchants, setAvailableMerchants] = useState<any[]>([])
@@ -86,18 +87,30 @@ export default function WalletHome({ onSelectCard, onExploreClick }: WalletHomeP
             <p className="text-[#52B788] text-sm font-medium">স্বাগতম,</p>
             <h1 className="font-display text-2xl font-bold text-white">{displayName}</h1>
           </div>
-          <div className="relative">
-            <button
-              onClick={loadCards}
-              title="রিফ্রেশ করুন"
-              className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
-            >
-              <span className="text-base">🔄</span>
-            </button>
-            {cards.some((c) => c.voucherReady) && (
-              <span className="absolute top-0 right-0 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse">
-                {cards.filter((c) => c.voucherReady).length}
-              </span>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                onClick={loadCards}
+                title="রিফ্রেশ করুন"
+                className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer"
+              >
+                <span className="text-base">🔄</span>
+              </button>
+              {cards.some((c) => c.voucherReady) && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse">
+                  {cards.filter((c) => c.voucherReady).length}
+                </span>
+              )}
+            </div>
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                title="লগআউট করুন"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-semibold border border-red-500/30 transition-all cursor-pointer active:scale-95"
+              >
+                <LogOutIcon size={14} />
+                <span>লগআউট</span>
+              </button>
             )}
           </div>
         </div>

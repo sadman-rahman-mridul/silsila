@@ -12,6 +12,7 @@ import {
   DownloadIcon,
   CopyIcon,
   QRIcon,
+  LogOutIcon,
 } from "../../components/Icons"
 
 interface MerchantDashboardProps {
@@ -19,6 +20,7 @@ interface MerchantDashboardProps {
   onMerchantChange: (id: string) => void
   onViewCustomers: () => void
   onOpenSettings?: () => void
+  onLogout?: () => void
 }
 
 export default function MerchantDashboard({
@@ -26,6 +28,7 @@ export default function MerchantDashboard({
   onMerchantChange,
   onViewCustomers,
   onOpenSettings,
+  onLogout,
 }: MerchantDashboardProps) {
   const { profile } = useAuth()
 
@@ -265,6 +268,16 @@ export default function MerchantDashboard({
                 className="w-9 h-9 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] flex items-center justify-center hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
               >
                 <SettingsIcon size={16} />
+              </button>
+            )}
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                title="লগআউট করুন"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white text-xs font-semibold border border-red-500/30 transition-all cursor-pointer active:scale-95 ml-1"
+              >
+                <LogOutIcon size={14} />
+                <span>লগআউট</span>
               </button>
             )}
           </div>
