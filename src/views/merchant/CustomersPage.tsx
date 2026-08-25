@@ -59,14 +59,38 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
     }
   }
 
-  async function handleExportCsv() {
-    if (!consentAcknowledged) return
+  function handleExportCsv() {
+    if (customers.length === 0) {
+      alert("এক্সপোর্ট করার জন্য কোনো কাস্টমার নেই।")
+      return
+    }
     setExporting(true)
     try {
-      await api.exportCrmCsv(merchantId, true)
+      const headers = ["Customer Name", "Phone Number", "Current Stamps", "Total Visits", "Status", "Last Visit"]
+      const rows = customers.map((c) => [
+        `"${(c.name || "Customer").replace(/"/g, '""')}"`,
+        `"${c.rawPhone || c.phone || ""}"`,
+        c.stamps ?? 0,
+        c.totalVisits ?? 1,
+        `"${c.status || "active"}"`,
+        `"${c.lastVisit || ""}"`,
+      ])
+
+      const csvContent =
+        "data:text/csv;charset=utf-8,\uFEFF" +
+        [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n")
+
+      const encodedUri = encodeURI(csvContent)
+      const link = document.createElement("a")
+      link.setAttribute("href", encodedUri)
+      link.setAttribute("download", `silsila_customers_${merchantId || "export"}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
       setShowExportModal(false)
     } catch (err: any) {
-      setError(err.message || "CSV এক্সপোর্ট ব্যর্থ")
+      console.error("Export error:", err)
+      setError(err?.message || "CSV এক্সপোর্ট ব্যর্থ হয়েছে")
     } finally {
       setExporting(false)
     }

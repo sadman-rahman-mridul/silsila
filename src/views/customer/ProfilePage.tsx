@@ -10,7 +10,15 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
   const { user, profile, logout } = useAuth()
-  const [lang, setLang] = useState<"বাংলা" | "English">("বাংলা")
+  const [lang, setLang] = useState<"বাংলা" | "English">(() => {
+    return (localStorage.getItem("silsila_lang") as any) || "বাংলা"
+  })
+
+  function handleToggleLang() {
+    const next = lang === "বাংলা" ? "English" : "বাংলা"
+    setLang(next)
+    localStorage.setItem("silsila_lang", next)
+  }
   const [notifications, setNotifications] = useState(true)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
@@ -123,8 +131,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
         <div className="bg-white rounded-2xl card-shadow overflow-hidden mb-4">
           <button
-            onClick={() => setLang((l) => (l === "বাংলা" ? "English" : "বাংলা"))}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-[#E9E5DC] hover:bg-[#F7F5F0] transition-colors"
+            onClick={handleToggleLang}
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-[#E9E5DC] hover:bg-[#F7F5F0] transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🌐</span>
             <p className="flex-1 text-left font-medium text-sm text-[#1A1916]">ভাষা (Language)</p>

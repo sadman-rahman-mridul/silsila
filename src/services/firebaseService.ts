@@ -823,10 +823,15 @@ export const firebaseService = {
         else if (diffDays > 14) status = "at_risk"
         else if (totalVisits <= 1) status = "new"
 
+        const formattedPhone =
+          phone.length >= 10
+            ? `+880 ${phone.slice(-10)}`
+            : phone
+
         return {
           id: c.customerId,
           name,
-          phone: phone.length >= 10 ? `+880 ${phone.slice(-10, -6)} ***${phone.slice(-3)}` : phone,
+          phone: formattedPhone,
           rawPhone: phone,
           stamps,
           totalVisits,

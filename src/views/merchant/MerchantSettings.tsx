@@ -70,6 +70,16 @@ export default function MerchantSettings({
   const [pinError, setPinError] = useState("")
   const [pinSuccess, setPinSuccess] = useState("")
 
+  // Language preference
+  const [currentLang, setCurrentLang] = useState<"বাংলা" | "English">(() => {
+    return (localStorage.getItem("silsila_lang") as any) || "বাংলা"
+  })
+
+  function handleSetLanguage(l: "বাংলা" | "English") {
+    setCurrentLang(l)
+    localStorage.setItem("silsila_lang", l)
+  }
+
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -612,7 +622,46 @@ export default function MerchantSettings({
           </div>
         </div>
 
-        {/* 5. Staff Mode PIN Setup */}
+        {/* 5. Language Preference */}
+        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#D8EDDF] flex items-center justify-center text-xl">
+                🌐
+              </div>
+              <div>
+                <h2 className="font-display font-bold text-[#1A1916] text-base">ভাষা / Language</h2>
+                <p className="text-xs text-[#6B6158]">অ্যাপের ভাষা নির্বাচন করুন</p>
+              </div>
+            </div>
+            <div className="flex bg-[#F7F5F0] p-1 rounded-xl border border-[#E9E5DC]">
+              <button
+                type="button"
+                onClick={() => handleSetLanguage("বাংলা")}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  currentLang === "বাংলা"
+                    ? "bg-[#1B4332] text-white shadow-xs"
+                    : "text-[#6B6158] hover:text-[#1A1916]"
+                }`}
+              >
+                বাংলা
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetLanguage("English")}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  currentLang === "English"
+                    ? "bg-[#1B4332] text-white shadow-xs"
+                    : "text-[#6B6158] hover:text-[#1A1916]"
+                }`}
+              >
+                English
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 6. Staff Mode PIN Setup */}
         <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
           <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#E9E5DC]">
             <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] flex items-center justify-center">
