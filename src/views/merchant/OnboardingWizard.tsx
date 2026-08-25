@@ -1,8 +1,10 @@
 import { useState } from "react"
+import QRCode from "qrcode"
 import { api } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES } from "../../constants/categories"
-import { CheckIcon, MapPinIcon, DownloadIcon, ShareIcon } from "../../components/Icons"
+import { CheckIcon, DownloadIcon, ShareIcon } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 
 interface OnboardingWizardProps {
@@ -30,9 +32,6 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
   const [category, setCategory] = useState("")
   const [area, setArea] = useState("")
   const [address, setAddress] = useState("")
-  const [lat, setLat] = useState<number>(0)
-  const [lng, setLng] = useState<number>(0)
-  const [locationSet, setLocationSet] = useState(false)
   const [rewardTarget, setRewardTarget] = useState(5)
   const [rewardText, setRewardText] = useState("")
   const [expiryDays, setExpiryDays] = useState(30)
@@ -44,63 +43,28 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
 
   function canAdvance() {
     if (step === 1) return bizName.trim().length >= 2 && category !== ""
-    if (step === 2) return locationSet || address.trim().length >= 4
+    if (step === 2) return area.trim().length >= 2 || address.trim().length >= 4
     if (step === 3) return rewardText.trim().length >= 3
     return true
-  }
-
-  function handleUseGPS() {
-    if (!navigator.geolocation) {
-      setError("এই ব্রাউজারে জিপিএস সাপোর্ট নেই — ঠিকানা লিখুন")
-      return
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLat(Number(pos.coords.latitude.toFixed(5)))
-        setLng(Number(pos.coords.longitude.toFixed(5)))
-        setLocationSet(true)
-        setError(null)
-      },
-      () => setError("লোকেশন অনুমতি দেওয়া হয়নি — অনুগ্রহ করে ঠিকানা লিখুন")
-    )
   }
 
   async function handleCompleteStep3() {
     setSaving(true)
     setError(null)
     try {
-      const res = await api.createMerchant({
-        name: bizName.trim(),
-        nameEn: "",
-        category,
-        area: area.trim(),
-        address: address.trim(),
-        lat,
-        lng,
-        phone: profile?.phone || "",
-        ownerPhone: profile?.phone || "",
-        ownerName: profile?.name || "",
-        logoInitials: bizName.trim().slice(0, 2),
-      })
-
-      const newId = res.merchant.id
+      const newId = profile?.merchantId || profile?.id || `m_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
       setCreatedMerchantId(newId)
 
-      await api.createRewardProgram({
-        merchantId: newId,
-        target: rewardTarget,
-        rewardText: rewardText.trim(),
-        expiryDays,
-      })
+      const slug = bizName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || newId
 
-      // Sync onboarding completion to Cloud Firestore
+      // 1. Direct Cloud Firestore save
       await firebaseService.saveMerchantProfile({
         id: newId,
         name: bizName.trim(),
         nameEn: "",
         category,
-        area,
-        address,
+        area: area.trim(),
+        address: address.trim(),
         lat,
         lng,
         ownerPhone: profile?.phone || "",
@@ -120,12 +84,43 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
         onboarded: true,
       })
 
-      const qrRes = await api.getMerchantQr(newId)
-      setQrDataUrl(qrRes.qrDataUrl)
-      setQrLink(qrRes.formattedQrLink)
+      // 2. Call backend API with safe fallback
+      await api.createMerchant({
+        id: newId,
+        name: bizName.trim(),
+        nameEn: "",
+        category,
+        area: area.trim(),
+        address: address.trim(),
+        lat,
+        lng,
+        phone: profile?.phone || "",
+        ownerPhone: profile?.phone || "",
+        ownerName: profile?.name || "",
+        logoInitials: bizName.trim().slice(0, 2),
+      }).catch(console.warn)
 
+      await api.createRewardProgram({
+        merchantId: newId,
+        target: rewardTarget,
+        rewardText: rewardText.trim(),
+        expiryDays,
+      }).catch(console.warn)
+
+      // 3. Generate QR code on client
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://silsilaqr.vercel.app"
+      const scanUrl = `${origin}/${slug}`
+      const qrData = await QRCode.toDataURL(scanUrl, {
+        width: 800,
+        margin: 2,
+        color: { dark: "#1B4332", light: "#FFFFFF" },
+      })
+
+      setQrDataUrl(qrData)
+      setQrLink(scanUrl)
       setStep(4)
     } catch (err: any) {
+      console.error("Onboarding failed:", err)
       setError(err.message || "সেটআপ সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।")
     } finally {
       setSaving(false)
@@ -241,33 +236,10 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
 
         {step === 2 && (
           <div className="animate-slide-up">
-            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">দোকানের অবস্থান ও জিওফেন্স</h2>
+            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">দোকানের অবস্থান</h2>
             <p className="text-[#6B6158] text-xs mb-6">
-              অবস্থান নির্ধারণ করলে কাস্টমারের স্ক্যান যাচাই হবে এবং জালিয়াতি রোধ হবে (২০০ মিটার জিওফেন্স)
+              কাস্টমাররা কোথায় আপনার দোকান খুঁজে পাবে?
             </p>
-
-            <button
-              onClick={handleUseGPS}
-              className={`w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 mb-4 transition-all font-bold text-sm ${
-                locationSet
-                  ? "bg-[#D8EDDF] text-[#1B4332] border-2 border-[#52B788]"
-                  : "bg-[#1B4332] text-white"
-              }`}
-            >
-              <MapPinIcon size={18} />
-              {locationSet ? "✓ জিপিএস অবস্থান সিঙ্ক হয়েছে" : "বর্তমান GPS অবস্থান ব্যবহার করুন"}
-            </button>
-
-            {locationSet && (
-              <div className="bg-white rounded-xl p-4 card-shadow mb-4 border border-[#D8EDDF]">
-                <p className="text-[#6B6158] text-xs mb-1 font-medium">নির্ধারিত জিও-কোঅর্ডিনেট</p>
-                <p className="font-bold text-[#1A1916] text-sm">{address || area || "ঠিকানা লিখুন"}</p>
-                <p className="text-[#B0A99E] font-mono text-[11px] mt-0.5">{lat}°N, {lng}°E</p>
-                <div className="mt-2 p-2 bg-[#F0F7F2] rounded-lg text-xs text-[#1B4332] font-semibold">
-                  🛡️ ২০০ মিটার জিওফেন্স এনফোর্সড
-                </div>
-              </div>
-            )}
 
             <div className="space-y-3">
               <div>

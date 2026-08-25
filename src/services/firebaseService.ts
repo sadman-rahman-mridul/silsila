@@ -111,12 +111,16 @@ export const firebaseService = {
       // Customer check: first check direct docId `c_${digits10}`
       const directDoc = await getDoc(doc(firestore, USERS, `c_${digits10}`)).catch(() => null)
       if (directDoc && directDoc.exists()) {
-        return { id: directDoc.id, ...(directDoc.data() as any) }
+        const data = directDoc.data() as any
+        // Only return if this is actually a customer record (not a merchant who shares same phone)
+        if (data.role === "customer" || !data.role) {
+          return { id: directDoc.id, ...data }
+        }
       }
 
       const usersCol = collection(firestore, USERS)
       for (const value of possibleValues) {
-        const snap = await getDocs(query(usersCol, where("phone", "==", value)))
+        const snap = await getDocs(query(usersCol, where("phone", "==", value), where("role", "==", "customer")))
         if (!snap.empty) {
           return { id: snap.docs[0].id, ...(snap.docs[0].data() as any) }
         }

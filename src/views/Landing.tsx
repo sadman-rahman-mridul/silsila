@@ -8,10 +8,9 @@ type Role = "customer" | "merchant"
 
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
-  targetMerchantName?: string | null
 }
 
-export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
+export default function Landing({ onEnter }: LandingProps) {
   const { setSessionProfile } = useAuth()
   const [step, setStep] = useState<LandingStep>("choose")
   const [role, setRole] = useState<Role>("customer")
@@ -66,36 +65,30 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
     setInfoMsg(null)
 
     try {
-      // 1. Check local backend
-      const lookup = await api.lookupPhone(clean, role).catch(() => null)
-      // 2. Check Cloud Firestore (works across all serverless restarts)
+      // Check Cloud Firestore directly (single source of truth)
       const fbAccount = await firebaseService.findAccountByPhone(clean, role).catch(() => null)
       setCachedAccount(fbAccount)
 
-      const exists = !!lookup?.exists || !!lookup?.isExistingUser || !!fbAccount
-      const name =
-        lookup?.name ||
-        (role === "merchant" ? fbAccount?.ownerName || fbAccount?.name : fbAccount?.name) ||
-        null
+      const exists = !!fbAccount
+      const name = (role === "merchant" ? fbAccount?.ownerName || fbAccount?.name : fbAccount?.name) || null
 
       setIsExistingAccount(exists)
       setExistingUserName(name)
 
       if (exists) {
-        // Phone matches an existing user -> ask for Password (with OTP option below)
+        // Phone matches an existing user in Firestore -> ask for Password (with OTP option below)
         setStep("login_password")
         if (name) {
           setInfoMsg(`স্বাগতম ${name}! আপনার অ্যাকাউন্টের পাসওয়ার্ড লিখুন।`)
         }
       } else {
-        // Phone doesn't match -> ask to start Registration by writing password
+        // Phone doesn't match any Firestore account -> ask to start Registration by writing password
         setStep("register_password")
         setInfoMsg("এই নম্বরে কোনো অ্যাকাউন্ট নেই। অনুগ্রহ করে রেজিস্ট্রেশন করতে একটি পাসওয়ার্ড তৈরি করুন।")
       }
     } catch (err: any) {
       console.error("Lookup error:", err)
-      // Fallback: Proceed to password screen
-      setStep("login_password")
+      setStep("register_password")
     } finally {
       setLoading(false)
     }
@@ -113,17 +106,7 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
     setInfoMsg(null)
 
     try {
-      // 1. Check with API
-      const res = await api.loginWithPassword(phone, password.trim(), role).catch(() => null)
-
-      if (res && res.success && res.token) {
-        const storedName =
-          role === "merchant" ? res.merchant?.ownerName : res.customer?.name
-        await finalizeLogin(res, storedName || existingUserName || (role === "merchant" ? "মার্চেন্ট" : "কাস্টমার"))
-        return
-      }
-
-      // 2. Direct Firestore authentication (seamless persistence on Netlify / cloud)
+      // Firestore-only authentication (single source of truth, role-aware)
       if (cachedAccount) {
         if (cachedAccount.password && cachedAccount.password === password.trim()) {
           const storedName =
@@ -141,58 +124,29 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
         } else if (cachedAccount.password && cachedAccount.password !== password.trim()) {
           setError("ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
           return
-        } else if (!cachedAccount.password) {
-          await handleSendOtp(
-            "আপনার অ্যাকাউন্টে পূর্বে পাসওয়ার্ড সেট করা ছিল না। লগইন করতে আপনার ফোনে OTP কোড পাঠানো হয়েছে।"
-          )
-          return
         }
       }
 
-      if (res && res.noPasswordSet) {
-        await handleSendOtp(
-          "আপনার অ্যাকাউন্টে পূর্বে পাসওয়ার্ড সেট করা ছিল না। লগইন করতে আপনার ফোনে OTP কোড পাঠানো হয়েছে।"
-        )
-        return
-      }
-
-      if (res && res.message) {
-        setError(res.message)
-      } else {
-        setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
-      }
+      setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
     } catch (err: any) {
       console.error("Password login error:", err)
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : "পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
-      )
+      setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
     } finally {
       setLoading(false)
     }
   }
 
-  // STEP 3B: New User Registration (Save password & send OTP to verify)
+  // STEP 3B: New User Registration (Direct name prompt and Firestore persistence)
   async function handleNewUserRegisterSubmit() {
     if (password.trim().length < 4) {
       setError("পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে")
       return
     }
 
-    setLoading(true)
     setError(null)
     setInfoMsg(null)
-
-    try {
-      await handleSendOtp(
-        `নতুন অ্যাকাউন্ট যাচাই করতে আপনার নম্বরে OTP কোড পাঠানো হয়েছে (+৮৮০ ${phone})।`
-      )
-    } catch (err: any) {
-      console.error("Registration error:", err)
-      setError("OTP পাঠানো যায়নি। পুনরায় চেষ্টা করুন।")
-      setLoading(false)
-    }
+    // Open name prompt modal directly so user enters name and gets registered immediately
+    setShowNameModal(true)
   }
 
   // Send OTP
@@ -287,17 +241,60 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
     }
 
     setLoading(true)
+    setError(null)
     try {
       const finalName = modalName.trim()
-      const res = pendingAuthResult || {}
-      const accountId = role === "merchant" ? res.merchant?.id : res.customer?.id
-      if (!accountId) {
-        throw new Error("অ্যাকাউন্ট তৈরি হয়নি। আবার চেষ্টা করুন।")
+      const cleanPhone = phone.replace(/\D/g, "")
+      const digits10 = cleanPhone.slice(-10)
+
+      if (role === "customer") {
+        const accountId = `c_${digits10}`
+        // Save to Firestore
+        await firebaseService.saveCustomerProfile({
+          id: accountId,
+          name: finalName,
+          phone: cleanPhone,
+          password: password.trim(),
+        })
+        // Set session and navigate
+        const profile: UserProfile = {
+          id: accountId,
+          phone: cleanPhone,
+          name: finalName,
+          role: "customer",
+          createdAt: new Date().toISOString(),
+        }
+        setSessionProfile(profile, `token_customer_${accountId}`)
+        setShowNameModal(false)
+        onEnter("customer")
+      } else {
+        // Merchant
+        const accountId = `m_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+        await firebaseService.saveMerchantProfile({
+          id: accountId,
+          ownerPhone: cleanPhone,
+          ownerName: finalName,
+          name: "",
+          password: password.trim(),
+          onboarded: false,
+        })
+        const profile: UserProfile = {
+          id: accountId,
+          phone: cleanPhone,
+          name: finalName,
+          role: "merchant",
+          merchantId: accountId,
+          ownedMerchantIds: [accountId],
+          onboarded: false,
+          createdAt: new Date().toISOString(),
+        }
+        setSessionProfile(profile, `token_merchant_${accountId}`)
+        setShowNameModal(false)
+        onEnter("merchant", { needsOnboarding: true })
       }
 
-      await api.updateProfile(accountId, finalName, role)
-      setShowNameModal(false)
-      await finalizeLogin(res, finalName)
+      // Non-blocking backend sync
+      api.registerWithPassword(cleanPhone, password.trim(), finalName, role).catch(() => {})
     } catch (err: any) {
       console.error("Failed to save new profile:", err)
       setError(err?.message || "প্রোফাইল সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।")
@@ -314,9 +311,8 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
         return
       }
 
-      const hasCompletedOnboarding =
-        Boolean(merchant.onboarded) ||
-        Boolean(merchant.name && merchant.name.trim().length > 0 && merchant.name.trim() !== "মার্চেন্ট")
+      // A merchant is only considered onboarded if the flag is explicitly true
+      const hasCompletedOnboarding = Boolean(merchant.onboarded) === true
 
       const profile: UserProfile = {
         id: merchant.id,
@@ -471,13 +467,6 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
               <p className="text-white/80 text-xs mb-4 leading-relaxed">
                 আপনার ১১ ডিজিটের মোবাইল নম্বর দিন
               </p>
-
-              {targetMerchantName && (
-                <div className="mb-4 bg-[#52B788]/20 border border-[#52B788]/40 text-white px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
-                  <span>🏪</span>
-                  <span><strong>{targetMerchantName}</strong>-এর স্ট্যাম্প কার্ড পেতে এগিয়ে যান</span>
-                </div>
-              )}
 
               {/* Phone Number Field */}
               <div className="mb-5">
@@ -659,13 +648,13 @@ export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
                 />
               </div>
 
-              {/* Button: Set Password & Send OTP */}
+              {/* Button: Set Password & Continue */}
               <button
                 onClick={handleNewUserRegisterSubmit}
                 disabled={loading || password.trim().length < 4}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
-                {loading ? "OTP পাঠানো হচ্ছে..." : "পাসওয়ার্ড সেট ও OTP পাঠান →"}
+                {loading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "পাসওয়ার্ড নিশ্চিত করুন ও শুরু করুন →"}
               </button>
             </div>
           </div>

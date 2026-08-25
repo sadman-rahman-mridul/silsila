@@ -1,13 +1,10 @@
 {
-  "version": 2,
-  "sponsors": [],
   "merchants": [],
-  "staff": [],
   "customers": [],
-  "rewardPrograms": [],
-  "cards": [],
-  "pendingApprovals": [],
+  "customerCards": [],
   "stamps": [],
   "vouchers": [],
-  "fraudSignals": []
+  "pendingApprovals": [],
+  "rewardPrograms": [],
+  "settings": {}
 }

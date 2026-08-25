@@ -7,7 +7,7 @@ import MerchantSettings from "./MerchantSettings"
 import AnalyticsPage from "./AnalyticsPage"
 import StaffMode from "./StaffMode"
 import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon } from "../../components/Icons"
-import { type Merchant, generateMerchantSlug } from "../../services/api"
+import { type Merchant } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
 
@@ -15,46 +15,20 @@ type MerchantTab = "home" | "customers" | "rewards" | "marketing" | "settings"
 
 interface MerchantAppProps {
   onBack: () => void
-  initialMerchantId?: string | null
-  initialSubpage?: string | null
 }
 
-export default function MerchantApp({ onBack, initialMerchantId, initialSubpage }: MerchantAppProps) {
+export default function MerchantApp({ onBack }: MerchantAppProps) {
   const { profile } = useAuth()
-  const [tab, setTab] = useState<MerchantTab>(() => {
-    if (initialSubpage && ["customers", "rewards", "marketing", "settings"].includes(initialSubpage)) {
-      return initialSubpage as MerchantTab
-    }
-    return "home"
-  })
-  const [showAnalytics, setShowAnalytics] = useState(initialSubpage === "analytics")
-  const [showStaffMode, setShowStaffMode] = useState(initialSubpage === "staff")
+  const [tab, setTab] = useState<MerchantTab>("home")
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showStaffMode, setShowStaffMode] = useState(false)
 
-  // Use provided merchantId or fall back to profile
+  // Use profile to determine merchantId
   const [merchantId, setMerchantId] = useState<string>(
-    () => initialMerchantId || profile?.merchantId || profile?.id || ""
+    () => profile?.merchantId || profile?.id || ""
   )
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState<number>(0)
   const [activeMerchant, setActiveMerchant] = useState<Merchant | null>(null)
-
-  useEffect(() => {
-    if (initialMerchantId && initialMerchantId !== merchantId) {
-      setMerchantId(initialMerchantId)
-    }
-    if (initialSubpage) {
-      if (initialSubpage === "analytics") {
-        setShowAnalytics(true)
-        setShowStaffMode(false)
-      } else if (initialSubpage === "staff") {
-        setShowStaffMode(true)
-        setShowAnalytics(false)
-      } else if (["customers", "rewards", "marketing", "settings", "home"].includes(initialSubpage)) {
-        setTab(initialSubpage as MerchantTab)
-        setShowAnalytics(false)
-        setShowStaffMode(false)
-      }
-    }
-  }, [initialMerchantId, initialSubpage])
 
   useEffect(() => {
     if (!merchantId) return
@@ -79,41 +53,29 @@ export default function MerchantApp({ onBack, initialMerchantId, initialSubpage 
 
   // Keep merchantId in sync if profile updates
   useEffect(() => {
-    const id = initialMerchantId || profile?.merchantId || profile?.id || ""
+    const id = profile?.merchantId || profile?.id || ""
     if (id && id !== merchantId) setMerchantId(id)
-  }, [profile?.merchantId, profile?.id, initialMerchantId])
-
-  function updateMerchantUrl(targetView: string, mId = merchantId, m = activeMerchant) {
-    const slug = m ? generateMerchantSlug(m) : mId
-    if (slug) {
-      const sub = targetView === "home" ? "" : `/${targetView}`
-      window.history.replaceState(null, "", `/${slug}${sub}`)
-    }
-  }
+  }, [profile?.merchantId, profile?.id])
 
   function handleTabChange(nextTab: MerchantTab) {
     setTab(nextTab)
     setShowAnalytics(false)
     setShowStaffMode(false)
-    updateMerchantUrl(nextTab)
   }
 
   function handleOpenStaff() {
     setShowStaffMode(true)
     setShowAnalytics(false)
-    updateMerchantUrl("staff")
   }
 
   function handleOpenAnalytics() {
     setShowAnalytics(true)
     setShowStaffMode(false)
-    updateMerchantUrl("analytics")
   }
 
   function handleExitSpecialMode() {
     setShowStaffMode(false)
     setShowAnalytics(false)
-    updateMerchantUrl(tab)
   }
 
   if (showStaffMode) {
