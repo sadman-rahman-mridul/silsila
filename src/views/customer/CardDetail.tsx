@@ -99,18 +99,18 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
       const activeProgramsList = fbPrograms.length > 0
         ? fbPrograms
-        : (apiRes?.programs || [
-            {
-              id: `prog_${resolvedMerchantId}`,
-              merchantId: resolvedMerchantId,
-              target: merchant.rewardTarget || 3,
-              rewardText: merchant.rewardText || "১০০ টাকা ছাড়",
-              active: true,
-            },
-          ])
+        : (Array.isArray(merchant.programs) && merchant.programs.length > 0
+            ? merchant.programs.filter((p: any) => p && p.rewardText)
+            : (merchant.rewardText ? [{
+                id: `rp_${resolvedMerchantId}`,
+                merchantId: resolvedMerchantId,
+                target: merchant.rewardTarget || 5,
+                rewardText: merchant.rewardText,
+                active: true,
+              }] : []))
 
-      const defaultTarget = activeProgramsList[0]?.target || merchant.rewardTarget || 3
-      const defaultReward = activeProgramsList[0]?.rewardText || merchant.rewardText || "১০০ টাকা ছাড়"
+      const defaultTarget = activeProgramsList[0]?.target || merchant.rewardTarget || 5
+      const defaultReward = activeProgramsList[0]?.rewardText || merchant.rewardText || "পুরস্কার"
 
       const card = {
         id: fbCard?.id || apiRes?.card?.id || `card_${customerId}_${resolvedMerchantId}`,

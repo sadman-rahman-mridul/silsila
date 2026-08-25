@@ -383,29 +383,21 @@ export const firebaseService = {
     if (!merchantId) return []
     try {
       const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
-      const programs: any[] = []
-
-      if (fbMerchant) {
-        if (Array.isArray(fbMerchant.programs) && fbMerchant.programs.length > 0) {
-          programs.push(...fbMerchant.programs)
-        }
-        if (fbMerchant.rewardText && fbMerchant.rewardText.trim()) {
-          const alreadyIn = programs.some((p) => (p.rewardText || "").trim() === fbMerchant.rewardText.trim())
-          if (!alreadyIn) {
-            programs.push({
-              id: `rp_${fbMerchant.id}`,
-              merchantId: fbMerchant.id,
-              target: Number(fbMerchant.rewardTarget) || 5,
-              rewardText: fbMerchant.rewardText,
-              expiryDays: 30,
-              active: true,
-              createdAt: fbMerchant.updatedAt || fbMerchant.createdAt || new Date().toISOString(),
-            })
-          }
-        }
+      if (fbMerchant && Array.isArray(fbMerchant.programs) && fbMerchant.programs.length > 0) {
+        return fbMerchant.programs.filter((p: any) => p && p.rewardText && p.rewardText.trim().length > 0)
       }
-
-      return programs
+      if (fbMerchant && fbMerchant.rewardText && fbMerchant.rewardText.trim().length > 0) {
+        return [{
+          id: `rp_${fbMerchant.id}`,
+          merchantId: fbMerchant.id,
+          target: Number(fbMerchant.rewardTarget) || 5,
+          rewardText: fbMerchant.rewardText.trim(),
+          expiryDays: 30,
+          active: true,
+          createdAt: fbMerchant.updatedAt || fbMerchant.createdAt || new Date().toISOString(),
+        }]
+      }
+      return []
     } catch (err) {
       console.warn("Failed to get reward programs from Firestore:", err)
       return []
