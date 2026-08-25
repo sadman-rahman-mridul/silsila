@@ -42,6 +42,54 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
     }
   }, [customerId])
 
+  async function handleOpenMerchant(idOrSlug: string) {
+    if (!idOrSlug) return
+    setSelectedMerchantId(idOrSlug)
+
+    try {
+      let slug = idOrSlug.toLowerCase().trim()
+      // If it looks like a database ID (e.g. m_...), resolve its friendly business slug
+      if (slug.startsWith("m_")) {
+        const m = await firebaseService.getMerchantByIdOrSlug(idOrSlug).catch(() => null)
+        if (m) {
+          slug = m.slug || (m.nameEn ? m.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "") || (m.name ? m.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : idOrSlug)
+        }
+      }
+      if (typeof window !== "undefined") {
+        const targetPath = `/${slug}`
+        if (window.location.pathname !== targetPath) {
+          window.history.pushState({ merchantId: idOrSlug, slug }, "", targetPath)
+        }
+      }
+    } catch {
+      if (typeof window !== "undefined") {
+        window.history.pushState({ merchantId: idOrSlug }, "", `/${idOrSlug}`)
+      }
+    }
+  }
+
+  function handleCloseCard() {
+    setSelectedMerchantId(null)
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      window.history.pushState({}, "", "/")
+    }
+  }
+
+  useEffect(() => {
+    function handlePopState() {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
+      const firstSegment = path.split("/")[0].toLowerCase().trim()
+      const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined", "home", "explore", "scan", "rewards", "profile"]
+      if (firstSegment && !reserved.includes(firstSegment)) {
+        setSelectedMerchantId(firstSegment)
+      } else {
+        setSelectedMerchantId(null)
+      }
+    }
+    window.addEventListener("popstate", handlePopState)
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [])
+
   const showCard = !!selectedMerchantId
 
   return (
@@ -49,22 +97,22 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
       <div className="flex-1 overflow-hidden relative">
         {showCard ? (
           <div className="absolute inset-0 overflow-y-auto">
-            <CardDetail merchantId={selectedMerchantId} onBack={() => setSelectedMerchantId(null)} />
+            <CardDetail merchantId={selectedMerchantId} onBack={handleCloseCard} />
           </div>
         ) : (
           <div className="absolute inset-0 overflow-y-auto">
             {tab === "home" && (
               <WalletHome
-                onSelectCard={(id) => setSelectedMerchantId(id)}
+                onSelectCard={(id) => handleOpenMerchant(id)}
                 onExploreClick={() => setTab("explore")}
                 onLogout={onBack}
               />
             )}
-            {tab === "explore" && <ExplorePage onSelectMerchant={(id) => { setSelectedMerchantId(id); setTab("home") }} />}
+            {tab === "explore" && <ExplorePage onSelectMerchant={(id) => { handleOpenMerchant(id); setTab("home") }} />}
             {tab === "scan" && (
               <ScanFlow
                 onNavigateToCard={(merchantId) => {
-                  setSelectedMerchantId(merchantId)
+                  handleOpenMerchant(merchantId)
                   setTab("home")
                 }}
                 onNavigateHome={() => setTab("home")}

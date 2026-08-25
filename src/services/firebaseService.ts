@@ -594,35 +594,6 @@ export const firebaseService = {
     }
   },
 
-  async getPendingApprovals(merchantId: string): Promise<PendingApproval[]> {
-    if (!merchantId) return []
-    try {
-      const snap = await getDocs(query(collection(firestore, "pendingApprovals"), where("merchantId", "==", merchantId)))
-      return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as PendingApproval[]
-    } catch (err) {
-      console.warn("Failed to get pending approvals:", err)
-      return []
-    }
-  },
-
-  async getPendingApprovalById(approvalId: string): Promise<PendingApproval | null> {
-    if (!approvalId) return null
-    try {
-      const snap = await getDoc(doc(firestore, "pendingApprovals", approvalId))
-      return snap.exists() ? ({ id: snap.id, ...(snap.data() as any) }) : null
-    } catch (err) {
-      console.warn("Failed to get pending approval by id:", err)
-      return null
-    }
-  },
-
-  async deletePendingApproval(approvalId: string) {
-    try {
-      const ref = doc(firestore, "pendingApprovals", approvalId)
-      await updateDoc(ref, { status: "deleted", resolution: "deleted" }).catch(() => {})
-    } catch {}
-  },
-
   async resolveApprovalInFirestore(approvalId: string, resolution: "approved" | "rejected") {
     try {
       const approvalRef = doc(firestore, "pendingApprovals", approvalId)
