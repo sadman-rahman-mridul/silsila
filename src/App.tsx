@@ -5,22 +5,122 @@ import MerchantApp from "./views/merchant/MerchantApp"
 import OnboardingWizard from "./views/merchant/OnboardingWizard"
 import OpsConsole from "./views/ops/OpsConsole"
 import { AuthProvider, useAuth } from "./context/AuthContext"
+import { api, type Merchant, generateMerchantSlug } from "./services/api"
+import { firebaseService } from "./services/firebaseService"
 
 type AppView = "landing" | "customer" | "merchant" | "merchant-onboarding" | "ops"
 
 function MainContent() {
-  const { updateSessionProfile, logout } = useAuth()
+  const { profile, updateSessionProfile, logout } = useAuth()
+  const [targetMerchantId, setTargetMerchantId] = useState<string | null>(null)
+  const [targetMerchantName, setTargetMerchantName] = useState<string | null>(null)
+
+  // 1. Resolve Target Merchant from URL pathname (e.g. /cafedhaka) or query (?m=...)
+  useEffect(() => {
+    async function resolveTargetMerchant() {
+      if (typeof window === "undefined") return
+
+      const params = new URLSearchParams(window.location.search)
+      const paramM = params.get("m") || params.get("merchantId")
+
+      const rawPath = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
+      const isOps = rawPath.toLowerCase() === "ops" || params.get("view") === "ops"
+
+      if (isOps) {
+        setView("ops")
+        return
+      }
+
+      // Ignore standard reserved paths
+      const reservedPaths = ["", "api", "landing", "login", "register", "ops", "admin"]
+      const pathSlug = reservedPaths.includes(rawPath.toLowerCase()) ? null : rawPath
+
+      const candidate = paramM || pathSlug
+      if (!candidate) return
+
+      try {
+        // Direct ID check
+        if (candidate.startsWith("m_") || candidate.startsWith("m1")) {
+          setTargetMerchantId(candidate)
+          return
+        }
+
+        // Search in local merchants API
+        const merchants = await api.getMerchants().catch(() => [])
+        const cleanCandidate = candidate.toLowerCase().replace(/[^a-z0-9]/g, "")
+
+        const matched = merchants.find((m: Merchant) => {
+          if (m.id === candidate) return true
+          const slug = generateMerchantSlug(m).toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (slug === cleanCandidate) return true
+          const en = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (en === cleanCandidate) return true
+          const bn = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (bn === cleanCandidate) return true
+          return false
+        })
+
+        if (matched) {
+          setTargetMerchantId(matched.id)
+          setTargetMerchantName(matched.name)
+          return
+        }
+
+        // Fallback search in Cloud Firestore
+        const fbMerchants = await firebaseService.getMerchants().catch(() => [])
+        const fbMatched = fbMerchants.find((m: any) => {
+          if (m.id === candidate) return true
+          const slug = generateMerchantSlug(m).toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (slug === cleanCandidate) return true
+          const en = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (en === cleanCandidate) return true
+          const bn = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          if (bn === cleanCandidate) return true
+          return false
+        })
+
+        if (fbMatched) {
+          setTargetMerchantId(fbMatched.id)
+          setTargetMerchantName(fbMatched.name)
+        } else {
+          setTargetMerchantId(candidate)
+        }
+      } catch (err) {
+        console.warn("Could not resolve target merchant:", err)
+        setTargetMerchantId(candidate)
+      }
+    }
+
+    resolveTargetMerchant()
+  }, [])
+
+  // 2. Authentication Gate:
+  // - If user has logged in from this device, launch their app directly.
+  // - If not logged in, ALWAYS show Landing (Login / Registration) first.
   const [view, setView] = useState<AppView>(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search)
-      // A scanned counter QR always lands in the customer app.
-      if (params.has("m") || params.has("merchantId")) return "customer"
       if (params.get("view") === "ops" || window.location.pathname.toLowerCase().includes("/ops")) {
         return "ops"
       }
     }
+    const saved = typeof window !== "undefined" ? localStorage.getItem("silsila_profile") : null
+    if (saved) {
+      try {
+        const p = JSON.parse(saved)
+        if (p?.role === "merchant") return p.onboarded ? "merchant" : "merchant-onboarding"
+        if (p?.role === "customer") return "customer"
+      } catch {}
+    }
     return "landing"
   })
+
+  // Sync view when auth profile is modified
+  useEffect(() => {
+    if (!profile && view !== "ops") {
+      setView("landing")
+    }
+  }, [profile])
 
   const handleLogoutAndReturn = async () => {
     await logout()
@@ -28,7 +128,12 @@ function MainContent() {
   }
 
   if (view === "customer") {
-    return <CustomerApp onBack={handleLogoutAndReturn} />
+    return (
+      <CustomerApp
+        onBack={handleLogoutAndReturn}
+        initialMerchantId={targetMerchantId}
+      />
+    )
   }
 
   if (view === "merchant-onboarding") {
@@ -52,6 +157,7 @@ function MainContent() {
 
   return (
     <Landing
+      targetMerchantName={targetMerchantName}
       onEnter={(role, opts) => {
         if (role === "customer") setView("customer")
         else if (role === "merchant") setView(opts?.needsOnboarding ? "merchant-onboarding" : "merchant")

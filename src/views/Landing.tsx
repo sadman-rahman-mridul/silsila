@@ -8,9 +8,10 @@ type Role = "customer" | "merchant"
 
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
+  targetMerchantName?: string | null
 }
 
-export default function Landing({ onEnter }: LandingProps) {
+export default function Landing({ onEnter, targetMerchantName }: LandingProps) {
   const { setSessionProfile } = useAuth()
   const [step, setStep] = useState<LandingStep>("choose")
   const [role, setRole] = useState<Role>("customer")
@@ -470,6 +471,13 @@ export default function Landing({ onEnter }: LandingProps) {
               <p className="text-white/80 text-xs mb-4 leading-relaxed">
                 আপনার ১১ ডিজিটের মোবাইল নম্বর দিন
               </p>
+
+              {targetMerchantName && (
+                <div className="mb-4 bg-[#52B788]/20 border border-[#52B788]/40 text-white px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                  <span>🏪</span>
+                  <span><strong>{targetMerchantName}</strong>-এর স্ট্যাম্প কার্ড পেতে এগিয়ে যান</span>
+                </div>
+              )}
 
               {/* Phone Number Field */}
               <div className="mb-5">
