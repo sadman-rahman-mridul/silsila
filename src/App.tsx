@@ -41,20 +41,9 @@ function MainContent() {
       }
     }
   }, [profile])
-  // Auto-clean URL to root whenever on landing view
-  useEffect(() => {
-    if (view === "landing" && typeof window !== "undefined") {
-      if (window.location.pathname !== "/" && !window.location.pathname.toLowerCase().includes("/ops")) {
-        window.history.replaceState(null, "", "/")
-      }
-    }
-  }, [view])
 
   const handleLogoutAndReturn = async () => {
     await logout()
-    if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", "/")
-    }
     setView("landing")
   }
 
