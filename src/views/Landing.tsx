@@ -313,6 +313,10 @@ export default function Landing({ onEnter }: LandingProps) {
         return
       }
 
+      const hasCompletedOnboarding =
+        Boolean(merchant.onboarded) ||
+        Boolean(merchant.name && merchant.name.trim().length > 0 && merchant.name.trim() !== "মার্চেন্ট")
+
       const profile: UserProfile = {
         id: merchant.id,
         phone,
@@ -320,7 +324,7 @@ export default function Landing({ onEnter }: LandingProps) {
         role: "merchant",
         merchantId: merchant.id,
         ownedMerchantIds: (res.merchants || [merchant]).map((m: any) => m.id),
-        onboarded: !!merchant.onboarded,
+        onboarded: hasCompletedOnboarding,
         createdAt: merchant.createdAt,
       }
 
@@ -330,12 +334,12 @@ export default function Landing({ onEnter }: LandingProps) {
         ownerName: finalName,
         name: merchant.name || "",
         password: password.trim() || merchant.password || undefined,
-        onboarded: !!merchant.onboarded,
+        onboarded: hasCompletedOnboarding,
         createdAt: merchant.createdAt,
       })
 
       setSessionProfile(profile, res.token)
-      onEnter("merchant", { needsOnboarding: !merchant.onboarded })
+      onEnter("merchant", { needsOnboarding: !hasCompletedOnboarding })
       return
     }
 

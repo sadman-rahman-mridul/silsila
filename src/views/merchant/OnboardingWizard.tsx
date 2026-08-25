@@ -93,6 +93,20 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
         expiryDays,
       })
 
+      // Sync onboarding completion to Cloud Firestore
+      await firebaseService.saveMerchantProfile({
+        id: newId,
+        name: bizName.trim(),
+        category,
+        area,
+        address,
+        lat,
+        lng,
+        ownerPhone: profile?.phone || "",
+        ownerName: profile?.name || "",
+        onboarded: true,
+      })
+
       const qrRes = await api.getMerchantQr(newId)
       setQrDataUrl(qrRes.qrDataUrl)
       setQrLink(qrRes.formattedQrLink)
