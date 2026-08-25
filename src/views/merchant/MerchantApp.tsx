@@ -158,7 +158,6 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
               merchantId={merchantId}
               onMerchantChange={(id) => {
                 setMerchantId(id)
-                updateMerchantUrl("home", id)
               }}
               onViewCustomers={() => handleTabChange("customers")}
               onOpenSettings={() => handleTabChange("settings")}
@@ -179,7 +178,6 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
               activeMerchantId={merchantId}
               onMerchantUpdated={(updated) => {
                 setActiveMerchant(updated)
-                updateMerchantUrl(tab, merchantId, updated)
               }}
             />
           )}

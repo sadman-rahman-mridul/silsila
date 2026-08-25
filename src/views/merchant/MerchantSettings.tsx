@@ -201,8 +201,8 @@ export default function MerchantSettings({
     const img = new Image()
     img.onload = () => {
       const canvas = document.createElement("canvas")
-      const targetWidth = 1200
-      const targetHeight = 500
+      const targetWidth = 800
+      const targetHeight = 350
       canvas.width = targetWidth
       canvas.height = targetHeight
       const ctx = canvas.getContext("2d")
@@ -218,7 +218,7 @@ export default function MerchantSettings({
 
       ctx.drawImage(img, posX, posY, scaledW, scaledH)
 
-      const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.88)
+      const croppedDataUrl = canvas.toDataURL("image/jpeg", 0.75)
       setCoverUrl(croppedDataUrl)
       setRawCoverImage(null)
     }
