@@ -2,7 +2,8 @@ import { useState, useEffect } from "react"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
-import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon } from "../../components/Icons"
+import { useSwipeBack } from "../../hooks/useSwipeBack"
+import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon, ChevronLeftIcon } from "../../components/Icons"
 
 interface ProfilePageProps {
   onBack: () => void
@@ -10,6 +11,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
   const { user, profile, logout } = useAuth()
+  const swipeHandlers = useSwipeBack(onBack)
   const [lang, setLang] = useState<"বাংলা" | "English">(() => {
     return (localStorage.getItem("silsila_lang") as any) || "বাংলা"
   })
@@ -87,8 +89,32 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-8">
+    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
+      <div className="bg-[#1B4332] px-5 pt-10 pb-8">
+        {/* Top Navigation Row */}
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
+            title="হোমে ফিরুন"
+          >
+            <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-xs shadow-sm">
+              স
+            </div>
+            <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#F59E0B] transition-colors">
+              সিলসিলা
+            </span>
+          </button>
+
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
+          >
+            <ChevronLeftIcon size={14} />
+            <span>হোমে ফিরুন</span>
+          </button>
+        </div>
+
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
             <span className="font-display font-black text-white text-2xl">{initialLetter}</span>

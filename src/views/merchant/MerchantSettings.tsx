@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { api, type Merchant, generateMerchantSlug } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
+import { useSwipeBack } from "../../hooks/useSwipeBack"
 import {
   MapPinIcon,
   ClockIcon,
@@ -10,6 +11,7 @@ import {
   SparklesIcon,
   RefreshIcon,
   QRIcon,
+  ChevronLeftIcon,
 } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 
@@ -353,10 +355,36 @@ export default function MerchantSettings({
   const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.vercel.app"
   const formattedQrLink = slug ? `${host}/${slug}` : ""
 
+  const swipeHandlers = useSwipeBack(onBack)
+
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
+    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
       {/* Header */}
-      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
+      <div className="bg-[#1B4332] px-5 pt-10 pb-6">
+        {/* Top Navigation Row */}
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
+            title="হোমে ফিরুন"
+          >
+            <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-xs shadow-sm">
+              স
+            </div>
+            <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#F59E0B] transition-colors">
+              সিলসিলা
+            </span>
+          </button>
+
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
+          >
+            <ChevronLeftIcon size={14} />
+            <span>হোমে ফিরুন</span>
+          </button>
+        </div>
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold text-white">সেটিংস</h1>

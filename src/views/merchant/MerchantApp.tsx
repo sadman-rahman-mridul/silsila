@@ -6,7 +6,7 @@ import MarketingPage from "./MarketingPage"
 import MerchantSettings from "./MerchantSettings"
 import AnalyticsPage from "./AnalyticsPage"
 import StaffMode from "./StaffMode"
-import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon } from "../../components/Icons"
+import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon, LogOutIcon } from "../../components/Icons"
 import { type Merchant } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
@@ -104,13 +104,17 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0] max-w-md mx-auto relative overflow-hidden">
-      <div className="flex-shrink-0 bg-[#1B4332] px-4 pt-2 pb-1.5 flex items-center justify-between border-b border-white/10">
-        <div className="flex items-center gap-2">
+      <div className="flex-shrink-0 bg-[#1B4332] px-4 pt-2.5 pb-2 flex items-center justify-between border-b border-white/10">
+        <button
+          onClick={() => handleTabChange("home")}
+          className="flex items-center gap-2 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
+          title="হোম ড্যাশবোর্ড"
+        >
           {activeMerchant?.logoUrl ? (
-            <img src={activeMerchant.logoUrl} alt="Logo" className="w-5 h-5 rounded-md object-cover" />
+            <img src={activeMerchant.logoUrl} alt="Logo" className="w-6 h-6 rounded-lg object-cover border border-white/20 shadow-sm" />
           ) : (
             <div
-              className="w-5 h-5 rounded-md flex items-center justify-center font-bold text-[10px]"
+              className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[10px] shadow-sm"
               style={{
                 backgroundColor: activeMerchant?.logoBg || "#D8EDDF",
                 color: activeMerchant?.logoColor || "#1B4332",
@@ -119,23 +123,30 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
               {activeMerchant?.logoInitials || "সি"}
             </div>
           )}
-          <p className="text-white/60 text-xs font-semibold">
-            {activeMerchant?.name || "মার্চেন্ট কনসোল"}
-          </p>
-        </div>
+          <span className="text-white font-bold text-xs group-hover:text-[#F59E0B] transition-colors truncate max-w-[110px]">
+            {activeMerchant?.name || "সিলসিলা"}
+          </span>
+        </button>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={handleOpenAnalytics}
-            className="px-3 py-1.5 rounded-lg bg-white/10 text-white/70 text-xs font-medium hover:bg-white/20 transition-all cursor-pointer"
+            className="px-2 py-1 rounded-lg bg-white/10 text-white/80 text-xs font-medium hover:bg-white/20 transition-all cursor-pointer"
           >
             📊 রিপোর্ট
           </button>
           <button
             onClick={handleOpenStaff}
-            className="px-3 py-1.5 rounded-lg bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-medium hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
+            className="px-2 py-1 rounded-lg bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-medium hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
           >
-            👷 স্টাফ মোড
+            👷 স্টাফ
+          </button>
+          <button
+            onClick={onBack}
+            title="লগ আউট করুন"
+            className="p-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs"
+          >
+            <LogOutIcon size={14} />
           </button>
         </div>
       </div>

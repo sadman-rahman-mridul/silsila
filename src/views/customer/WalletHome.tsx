@@ -110,20 +110,30 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
-        <div className="flex items-start justify-between gap-3 mb-1">
-          <div className="flex-1 min-w-0">
-            <p className="text-[#52B788] text-xs font-semibold uppercase tracking-wider">স্বাগতম</p>
-            <h1 className="font-display text-2xl font-bold text-white truncate leading-tight mt-0.5">{displayName}</h1>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
+      <div className="bg-[#1B4332] px-5 pt-10 pb-6">
+        {/* Top Bar: Logo on Left, Logout on Right */}
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
+            title="হোম"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-sm shadow-md">
+              স
+            </div>
+            <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#F59E0B] transition-colors">
+              সিলসিলা
+            </span>
+          </button>
+
+          <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 onClick={loadCards}
                 title="রিফ্রেশ করুন"
-                className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer active:scale-95"
+                className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer active:scale-95 text-xs"
               >
-                <span className={`text-base ${loading ? "animate-spin" : ""}`}>🔄</span>
+                <span className={loading ? "animate-spin inline-block" : ""}>🔄</span>
               </button>
               {cards.some((c) => c.voucherReady) && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse">
@@ -131,15 +141,24 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 </span>
               )}
             </div>
+
             {onLogout && (
               <button
                 onClick={onLogout}
                 title="লগআউট করুন"
-                className="w-9 h-9 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center justify-center border border-red-500/30 transition-all cursor-pointer active:scale-95 shadow-sm"
+                className="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center gap-1.5 border border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm"
               >
-                <LogOutIcon size={16} />
+                <LogOutIcon size={14} />
+                <span>লগ আউট</span>
               </button>
             )}
+          </div>
+        </div>
+
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <div className="flex-1 min-w-0">
+            <p className="text-[#52B788] text-xs font-semibold uppercase tracking-wider">স্বাগতম</p>
+            <h1 className="font-display text-2xl font-bold text-white truncate leading-tight mt-0.5">{displayName}</h1>
           </div>
         </div>
 

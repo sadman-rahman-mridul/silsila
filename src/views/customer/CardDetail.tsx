@@ -3,6 +3,7 @@ import confetti from "canvas-confetti"
 import { api, type CustomerCard, type Merchant, type RewardProgram } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
+import { useSwipeBack } from "../../hooks/useSwipeBack"
 import StampGrid from "../../components/StampGrid"
 import {
   ChevronLeftIcon,
@@ -355,8 +356,10 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const pct = Math.min(100, (card.stamps / target) * 100)
   const currentRewardText = activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার"
 
+  const swipeHandlers = useSwipeBack(onBack)
+
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0] overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#F7F5F0] overflow-y-auto" {...swipeHandlers}>
       {/* UNIFIED SCROLLING CONTAINER */}
       <div>
         {/* Top Gradient Header (Scrolls naturally with content) */}
@@ -377,13 +380,26 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
           </div>
 
           <div className="relative px-5 pt-12 pb-6">
-            <button
-              onClick={onBack}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold mb-5 backdrop-blur-md transition-colors cursor-pointer border border-white/10"
-            >
-              <ChevronLeftIcon size={16} />
-              <span>ফিরে যান</span>
-            </button>
+            <div className="flex items-center justify-between mb-5">
+              <button
+                onClick={onBack}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10 active:scale-95"
+              >
+                <ChevronLeftIcon size={16} />
+                <span>হোম</span>
+              </button>
+
+              <button
+                onClick={onBack}
+                className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95"
+                title="হোমে ফিরুন"
+              >
+                <div className="w-6 h-6 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-xs">
+                  স
+                </div>
+                <span className="font-display font-black text-white text-sm">সিলসিলা</span>
+              </button>
+            </div>
 
             <div className="flex items-center gap-4 mb-5">
               <div
