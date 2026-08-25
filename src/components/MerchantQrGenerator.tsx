@@ -492,14 +492,6 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
             <p className="text-xs text-[#6B6158] leading-relaxed max-w-sm">
               কাস্টমাররা স্মার্টফোন ক্যামেরা অথবা সিলসিলা ক্যামেরা দিয়ে স্ক্যান করলেই সরাসরি লয়্যালটি কার্ডে সিল পাবেন।
             </p>
-
-            {/* Display the exact silsila.ai.studio/[company name] format */}
-            <div className="pt-1">
-              <span className="text-[10px] text-[#6B6158] font-bold block mb-1">সিলসিলা শর্ট লিঙ্ক:</span>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#52B788] text-[#1B4332] font-mono text-xs font-bold shadow-xs">
-                <span>🔗 {formattedQrDisplayLink}</span>
-              </div>
-            </div>
           </div>
 
           {/* Standee Preview Frame */}

@@ -246,10 +246,6 @@ export default function MerchantDashboard({
               ) : (
                 <p className="text-white/40 text-sm mt-0.5">অনবোর্ডিং প্রয়োজন</p>
               )}
-
-              {qrDisplayLink && (
-                <p className="text-white/60 text-[11px] font-mono mt-0.5">🔗 {qrDisplayLink}</p>
-              )}
             </div>
           </div>
 
