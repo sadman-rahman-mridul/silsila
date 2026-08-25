@@ -24,17 +24,18 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
   const displayName = profile?.name || user?.displayName || "সম্মানিত গ্রাহক"
 
   useEffect(() => {
-    loadCards()
     loadAvailableMerchants()
 
-    if (!customerId) return
+    if (!customerId) {
+      setCards([])
+      setLoading(false)
+      return
+    }
 
-    // Real-time card updates for this customer.
+    // Single source of truth: Listen to Firestore cards collection directly
     const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
-      if (firestoreCards.length > 0) {
-        setCards(firestoreCards)
-        setLoading(false)
-      }
+      setCards(firestoreCards || [])
+      setLoading(false)
     })
 
     return () => {
@@ -59,15 +60,17 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
 
   async function loadCards() {
     if (!customerId) {
+      setCards([])
       setLoading(false)
       return
     }
     try {
       setLoading(true)
       setError(null)
-      const data = await api.getCustomerCards(customerId)
-      setCards(data)
-      data.forEach((c) => firebaseService.syncCardToFirestore(c))
+      const q = query(collection(firestore, "cards"), where("customerId", "==", customerId))
+      const snap = await getDocs(q)
+      const fbCards = snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))
+      setCards(fbCards)
     } catch (err: any) {
       setError(err.message)
     } finally {

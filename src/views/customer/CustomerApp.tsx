@@ -39,35 +39,18 @@ export default function CustomerApp({ onBack, initialMerchantId, initialSubpage 
     api.getMerchants().then((m) => setAllMerchants(m || [])).catch(() => {})
   }, [])
 
-  // User phone number last 7 digits prefix for personalized customer routing (domain/last7digits/page)
-  const userPhoneTag = profile?.phone
-    ? profile.phone.replace(/\D/g, "").slice(-7)
-    : user?.phoneNumber
-    ? user.phoneNumber.replace(/\D/g, "").slice(-7)
-    : null
-
-  function buildUserUrl(path: string) {
-    const cleanPath = path.startsWith("/") ? path : `/${path}`
-    if (userPhoneTag) {
-      return `/${userPhoneTag}${cleanPath === "/" ? "" : cleanPath}`
-    }
-    return cleanPath
-  }
-
   useEffect(() => {
     if (initialMerchantId && (!initialSubpage || initialSubpage === "card")) {
       setSelectedMerchantId(initialMerchantId)
       const m = allMerchants.find((x) => x.id === initialMerchantId)
       const slug = m ? generateMerchantSlug(m) : initialMerchantId
-      window.history.replaceState(null, "", buildUserUrl(`/${slug}`))
+      window.history.replaceState(null, "", `/${slug}`)
     } else if (initialSubpage && ["explore", "scan", "rewards", "profile"].includes(initialSubpage)) {
       setTab(initialSubpage as CustomerTab)
       setSelectedMerchantId(null)
-      window.history.replaceState(null, "", buildUserUrl(`/${initialSubpage}`))
-    } else if (userPhoneTag) {
-      window.history.replaceState(null, "", buildUserUrl(tab === "home" ? "" : `/${tab}`))
+      window.history.replaceState(null, "", `/${initialSubpage}`)
     }
-  }, [initialMerchantId, initialSubpage, userPhoneTag, allMerchants])
+  }, [initialMerchantId, initialSubpage, allMerchants])
 
   const customerId = profile?.id || user?.uid || null
 
@@ -88,18 +71,18 @@ export default function CustomerApp({ onBack, initialMerchantId, initialSubpage 
     setSelectedMerchantId(id)
     const m = allMerchants.find((x) => x.id === id)
     const slug = m ? generateMerchantSlug(m) : id
-    window.history.replaceState(null, "", buildUserUrl(`/${slug}`))
+    window.history.replaceState(null, "", `/${slug}`)
   }
 
   function handleBackFromCard() {
     setSelectedMerchantId(null)
-    window.history.replaceState(null, "", buildUserUrl(tab === "home" ? "" : `/${tab}`))
+    window.history.replaceState(null, "", tab === "home" ? "/" : `/${tab}`)
   }
 
   function handleSwitchTab(nextTab: CustomerTab) {
     setTab(nextTab)
     setSelectedMerchantId(null)
-    window.history.replaceState(null, "", buildUserUrl(nextTab === "home" ? "" : `/${nextTab}`))
+    window.history.replaceState(null, "", nextTab === "home" ? "/" : `/${nextTab}`)
   }
 
   const showCard = !!selectedMerchantId
