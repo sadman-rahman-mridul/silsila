@@ -40,5 +40,10 @@ service cloud.firestore {
     match /pendingApprovals/{approvalId} {
       allow read, write: if true;
     }
+
+    // Reward Programs Collection
+    match /rewardPrograms/{programId} {
+      allow read, write: if true;
+    }
   }
 }

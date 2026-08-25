@@ -37,6 +37,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const [error, setError] = useState<string | null>(null)
 
   // Real-time Seal Approval states
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null)
   const [requestingSeal, setRequestingSeal] = useState(false)
   const [approvalId, setApprovalId] = useState<string | null>(null)
   const [approvalStatus, setApprovalStatus] = useState<"idle" | "waiting" | "approved" | "rejected">("idle")
@@ -116,6 +117,24 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       }
 
       if (res && res.merchant) {
+        const fbPrograms = await firebaseService.getRewardPrograms(effectiveId).catch(() => [])
+        const progMap = new Map<string, any>()
+        if (res.programs) res.programs.forEach((p: any) => progMap.set(p.id, p))
+        if (res.program) progMap.set(res.program.id, res.program)
+        fbPrograms.forEach((p: any) => progMap.set(p.id, p))
+        const mergedProgs = Array.from(progMap.values())
+
+        if (mergedProgs.length === 0) {
+          mergedProgs.push({
+            id: `prog_${effectiveId}`,
+            merchantId: effectiveId,
+            target: res.merchant.rewardTarget || 5,
+            rewardText: res.merchant.rewardText || "১টি বিশেষ উপহার",
+            active: true,
+          })
+        }
+        res.programs = mergedProgs
+
         setData(res)
         if (res.card.voucherReady) {
           try {
@@ -313,10 +332,12 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
     )
   }
 
-  const { card, merchant, program, stampsHistory } = data
-  const target = card.target || program?.target || 5
+  const { card, merchant, program, programs, stampsHistory } = data
+  const activeProg = (programs || []).find((p: any) => p.id === selectedProgramId) || program || programs?.[0]
+  const target = activeProg?.target || card.target || 5
   const remaining = Math.max(0, target - card.stamps)
   const pct = Math.min(100, (card.stamps / target) * 100)
+  const currentRewardText = activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার"
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0] overflow-y-auto">
@@ -373,6 +394,39 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 </div>
               </div>
             </div>
+
+            {/* Reward Programs Switcher */}
+            {programs && programs.length > 1 && (
+              <div className="mb-4">
+                <p className="text-white/80 text-xs font-semibold uppercase tracking-wider mb-2">
+                  পুরস্কার কার্ডসমূহ (ট্যাপ করে সিলেক্ট করুন):
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                  {programs.map((p: any) => {
+                    const isSelected = activeProg?.id === p.id
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => setSelectedProgramId(p.id)}
+                        className={`flex-shrink-0 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 border ${
+                          isSelected
+                            ? "bg-[#F59E0B] text-[#1B4332] border-[#F59E0B] shadow-lg scale-[1.02]"
+                            : "bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-sm"
+                        }`}
+                      >
+                        <span className="text-base">🎁</span>
+                        <div className="text-left">
+                          <p className="leading-tight font-black">{p.rewardText || "পুরস্কার"}</p>
+                          <p className={`text-[10px] font-normal ${isSelected ? "text-[#1B4332]/80" : "text-white/70"}`}>
+                            {p.target}টি সিল প্রয়োজন
+                          </p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Stamp Card Component */}
             <div className="bg-white/10 backdrop-blur-md rounded-3xl p-5 border border-white/20 shadow-xl">

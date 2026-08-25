@@ -304,6 +304,46 @@ export const firebaseService = {
   },
 
   // ----------------------------------------------------
+  // REWARD PROGRAMS
+  // ----------------------------------------------------
+
+  async saveRewardProgram(program: {
+    id: string
+    merchantId: string
+    target: number
+    rewardText: string
+    expiryDays: number
+    active?: boolean
+    [key: string]: any
+  }) {
+    try {
+      await setDoc(
+        doc(firestore, "rewardPrograms", program.id),
+        {
+          ...program,
+          active: program.active ?? true,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      )
+    } catch (err) {
+      console.warn("Failed to save reward program to Firestore:", err)
+    }
+  },
+
+  async getRewardPrograms(merchantId: string): Promise<any[]> {
+    if (!merchantId) return []
+    try {
+      const q = query(collection(firestore, "rewardPrograms"), where("merchantId", "==", merchantId))
+      const snap = await getDocs(q)
+      return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))
+    } catch (err) {
+      console.warn("Failed to get reward programs from Firestore:", err)
+      return []
+    }
+  },
+
+  // ----------------------------------------------------
   // MERCHANT SUBSCRIPTIONS
   // ----------------------------------------------------
 

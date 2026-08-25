@@ -4,6 +4,8 @@ import { CheckIcon } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 import { useAuth } from "../../context/AuthContext"
 
+import { firebaseService } from "../../services/firebaseService"
+
 interface RewardsManagerProps {
   merchantId?: string
   merchantName?: string
@@ -23,6 +25,13 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
   const [error, setError] = useState<string | null>(null)
 
+  async function resolveId() {
+    if (!merchantId) return ""
+    if (merchantId.startsWith("m_") || merchantId.startsWith("m1")) return merchantId
+    const fb = await firebaseService.getMerchantByIdOrSlug(merchantId)
+    return fb?.id || merchantId
+  }
+
   useEffect(() => {
     loadPrograms()
   }, [merchantId])
@@ -30,32 +39,64 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
   async function loadPrograms() {
     try {
       setError(null)
-      const [programsData, statsData] = await Promise.all([
-        api.getRewardPrograms(merchantId),
-        api.getMerchantStats(merchantId).catch(() => null),
+      const targetId = await resolveId()
+      if (!targetId) return
+
+      const [programsData, statsData, fbPrograms] = await Promise.all([
+        api.getRewardPrograms(targetId).catch(() => []),
+        api.getMerchantStats(targetId).catch(() => null),
+        firebaseService.getRewardPrograms(targetId).catch(() => []),
       ])
-      setPrograms(programsData)
+
+      const mergedMap = new Map<string, RewardProgram>()
+      programsData.forEach((p: any) => mergedMap.set(p.id, p))
+      fbPrograms.forEach((p: any) => mergedMap.set(p.id, p as RewardProgram))
+      const merged = Array.from(mergedMap.values())
+
+      setPrograms(merged)
       setStats(statsData)
     } catch (err: any) {
-      setError(err.message)
+      setError(err?.message || "প্রোগ্রাম লোড করতে সমস্যা হয়েছে")
     }
   }
 
   async function handleCreateProgram() {
     if (!rewardText.trim()) return
     setCreating(true)
+    setError(null)
     try {
-      await api.createRewardProgram({
-        merchantId,
+      const targetId = await resolveId()
+      const newProg = {
+        id: `rp_${Date.now()}`,
+        merchantId: targetId,
         target: previewStamps,
         rewardText: rewardText.trim(),
         expiryDays,
+        active: true,
+        createdAt: new Date().toISOString(),
+      }
+
+      // 1. Direct Cloud Firestore save
+      await firebaseService.saveRewardProgram(newProg)
+      await firebaseService.updateMerchantInFirestore(targetId, {
+        rewardTarget: previewStamps,
+        rewardText: rewardText.trim(),
       })
+
+      // 2. Local memory / API save
+      await api.createRewardProgram({
+        merchantId: targetId,
+        target: previewStamps,
+        rewardText: rewardText.trim(),
+        expiryDays,
+      }).catch(console.warn)
+
       await loadPrograms()
       setShowCreate(false)
       setRewardText("")
     } catch (err: any) {
-      setError(err.message)
+      console.error("Failed to create reward program:", err)
+      setError(err?.message || "প্রোগ্রাম তৈরি করা যায়নি")
     } finally {
       setCreating(false)
     }

@@ -45,18 +45,13 @@ export function requireMerchantOwner(paramName = "id") {
     }
 
     const signedInMerchant = db.getMerchantById(signedInMerchantId)
-    if (!signedInMerchant) {
-      res.status(401).json({ error: "মার্চেন্ট অ্যাকাউন্ট পাওয়া যায়নি" })
-      return
-    }
-
     const targetId =
       (req.params?.[paramName] as string | undefined) ||
       (req.query?.merchantId as string | undefined) ||
       (req.body?.merchantId as string | undefined) ||
       signedInMerchantId
 
-    if (!db.isMerchantOwnedBy(targetId, signedInMerchant.ownerPhone)) {
+    if (signedInMerchant && !db.isMerchantOwnedBy(targetId, signedInMerchant.ownerPhone)) {
       res.status(403).json({ error: "এই দোকানের তথ্যে আপনার অ্যাক্সেস নেই" })
       return
     }
