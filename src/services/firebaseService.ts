@@ -220,13 +220,17 @@ export const firebaseService = {
       const snap = await getDocs(collection(firestore, MERCHANTS))
       const merchants: any[] = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       const cleanSlug = clean.replace(/[^a-z0-9]/g, "")
-      const matched = merchants.find((m) => {
+      const matched = merchants.find((m: any) => {
         if (m.id.toLowerCase() === clean) return true
+        if (m.slug && m.slug.toLowerCase() === clean) return true
+        if (m.slug && m.slug.toLowerCase().replace(/[^a-z0-9]/g, "") === cleanSlug) return true
         const enSlug = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
         const enClean = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
         const bnClean = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+        const rawNameSlug = (m.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
         return (
           enSlug === clean ||
+          rawNameSlug === clean ||
           enClean === cleanSlug ||
           bnClean === cleanSlug ||
           m.name?.toLowerCase() === clean
@@ -384,16 +388,20 @@ export const firebaseService = {
       if (fbMerchant) {
         if (Array.isArray(fbMerchant.programs) && fbMerchant.programs.length > 0) {
           programs.push(...fbMerchant.programs)
-        } else if (fbMerchant.rewardText) {
-          programs.push({
-            id: `rp_${fbMerchant.id}`,
-            merchantId: fbMerchant.id,
-            target: Number(fbMerchant.rewardTarget) || 5,
-            rewardText: fbMerchant.rewardText,
-            expiryDays: 30,
-            active: true,
-            createdAt: fbMerchant.updatedAt || fbMerchant.createdAt || new Date().toISOString(),
-          })
+        }
+        if (fbMerchant.rewardText && fbMerchant.rewardText.trim()) {
+          const alreadyIn = programs.some((p) => (p.rewardText || "").trim() === fbMerchant.rewardText.trim())
+          if (!alreadyIn) {
+            programs.push({
+              id: `rp_${fbMerchant.id}`,
+              merchantId: fbMerchant.id,
+              target: Number(fbMerchant.rewardTarget) || 5,
+              rewardText: fbMerchant.rewardText,
+              expiryDays: 30,
+              active: true,
+              createdAt: fbMerchant.updatedAt || fbMerchant.createdAt || new Date().toISOString(),
+            })
+          }
         }
       }
 

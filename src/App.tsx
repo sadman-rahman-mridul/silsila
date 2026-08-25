@@ -8,8 +8,25 @@ import { AuthProvider, useAuth } from "./context/AuthContext"
 
 type AppView = "landing" | "customer" | "merchant" | "merchant-onboarding" | "ops"
 
+function getScannedMerchant() {
+  if (typeof window === "undefined") return null
+  const params = new URLSearchParams(window.location.search)
+  const mParam = params.get("m") || params.get("merchantId")
+  if (mParam) return mParam
+
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
+  if (!path) return null
+  const firstSegment = path.split("/")[0].toLowerCase()
+  const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined"]
+  if (!reserved.includes(firstSegment)) {
+    return firstSegment
+  }
+  return null
+}
+
 function MainContent() {
   const { profile, updateSessionProfile, logout } = useAuth()
+  const [scannedMerchant] = useState<string | null>(getScannedMerchant)
 
   const [view, setView] = useState<AppView>(() => {
     if (typeof window !== "undefined") {
@@ -48,7 +65,7 @@ function MainContent() {
   }
 
   if (view === "customer") {
-    return <CustomerApp onBack={handleLogoutAndReturn} />
+    return <CustomerApp onBack={handleLogoutAndReturn} initialMerchantId={scannedMerchant} />
   }
 
   if (view === "merchant-onboarding") {
@@ -73,6 +90,7 @@ function MainContent() {
 
   return (
     <Landing
+      initialMerchantSlug={scannedMerchant}
       onEnter={(role, opts) => {
         if (role === "customer") setView("customer")
         else if (role === "merchant") setView(opts?.needsOnboarding ? "merchant-onboarding" : "merchant")

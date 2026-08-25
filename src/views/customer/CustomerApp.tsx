@@ -13,12 +13,13 @@ type CustomerTab = "home" | "explore" | "scan" | "rewards" | "profile"
 
 interface CustomerAppProps {
   onBack: () => void
+  initialMerchantId?: string | null
 }
 
-export default function CustomerApp({ onBack }: CustomerAppProps) {
+export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppProps) {
   const { user, profile } = useAuth()
   const [tab, setTab] = useState<CustomerTab>("home")
-  const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(null)
+  const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(() => initialMerchantId || null)
   const [readyRewardsCount, setReadyRewardsCount] = useState<number>(0)
 
   const customerId = profile?.id || user?.uid || null

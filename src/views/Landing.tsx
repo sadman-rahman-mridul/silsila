@@ -8,11 +8,12 @@ type Role = "customer" | "merchant"
 
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
+  initialMerchantSlug?: string | null
 }
 
-export default function Landing({ onEnter }: LandingProps) {
+export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) {
   const { setSessionProfile } = useAuth()
-  const [step, setStep] = useState<LandingStep>("choose")
+  const [step, setStep] = useState<LandingStep>(() => (initialMerchantSlug ? "phone" : "choose"))
   const [role, setRole] = useState<Role>("customer")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
