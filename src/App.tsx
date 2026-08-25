@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import React, { Component, useState, useEffect, type ErrorInfo, type ReactNode } from "react"
 import Landing from "./views/Landing"
 import CustomerApp from "./views/customer/CustomerApp"
 import MerchantApp from "./views/merchant/MerchantApp"
@@ -8,16 +8,75 @@ import { AuthProvider, useAuth } from "./context/AuthContext"
 
 type AppView = "landing" | "customer" | "merchant" | "merchant-onboarding" | "ops"
 
+interface ErrorBoundaryProps {
+  children: ReactNode
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean
+  error: Error | null
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null,
+  }
+
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error }
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("React Error Boundary Caught:", error, errorInfo)
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0] p-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-3xl mb-4 shadow-inner">
+            ⚠️
+          </div>
+          <h2 className="font-display font-bold text-[#1A1916] text-lg mb-1">
+            কিছু সমস্যা হয়েছে (An error occurred)
+          </h2>
+          <p className="text-[#6B6158] text-xs mb-6 max-w-xs leading-relaxed">
+            {this.state.error?.message || "পেজটি লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।"}
+          </p>
+          <div className="flex gap-3 w-full max-w-xs">
+            <button
+              onClick={() => {
+                window.location.href = "/"
+              }}
+              className="flex-1 py-3 bg-[#1B4332] text-white font-bold text-xs rounded-xl hover:bg-[#2D6A4F] transition-all cursor-pointer shadow-md"
+            >
+              হোমে ফিরে যান
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 py-3 bg-[#E9E5DC] text-[#1A1916] font-bold text-xs rounded-xl hover:bg-[#DCD7CD] transition-all cursor-pointer"
+            >
+              🔄 রিলোড
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 function getScannedMerchant() {
   if (typeof window === "undefined") return null
   const params = new URLSearchParams(window.location.search)
   const mParam = params.get("m") || params.get("merchantId")
-  if (mParam) return mParam
+  if (mParam) return mParam.trim()
 
   const path = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
   if (!path) return null
-  const firstSegment = path.split("/")[0].toLowerCase()
-  const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined"]
+  const firstSegment = path.split("/")[0].toLowerCase().trim()
+  const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined", "favicon.ico"]
   if (!reserved.includes(firstSegment)) {
     return firstSegment
   }
@@ -110,8 +169,10 @@ function MainContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <MainContent />
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
