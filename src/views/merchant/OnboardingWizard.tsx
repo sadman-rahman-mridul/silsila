@@ -84,6 +84,15 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
         onboarded: true,
       })
 
+      await firebaseService.saveRewardProgram({
+        id: `rp_${newId}`,
+        merchantId: newId,
+        target: rewardTarget,
+        rewardText: rewardText.trim(),
+        expiryDays,
+        active: true,
+      })
+
       // 2. Call backend API with safe fallback
       await api.createMerchant({
         id: newId,
