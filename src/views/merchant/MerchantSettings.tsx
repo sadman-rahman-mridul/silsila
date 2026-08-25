@@ -244,24 +244,32 @@ export default function MerchantSettings({
         ...(lat !== null ? { lat } : {}),
         ...(lng !== null ? { lng } : {}),
         geofenceM,
-        logoUrl: logoUrl || undefined,
-        logoInitials: logoInitials.trim() || businessName.slice(0, 2),
-        coverUrl: coverUrl || undefined,
-        instagram: instagram.trim() || undefined,
-        facebook: facebook.trim() || undefined,
-        whatsapp: whatsapp.trim() || undefined,
-        reviewLink: reviewLink.trim() || undefined,
+        logoUrl: logoUrl || "",
+        logoInitials: logoInitials.trim() || (businessName ? businessName.slice(0, 2) : "সি"),
+        coverUrl: coverUrl || "",
+        instagram: instagram.trim() || "",
+        facebook: facebook.trim() || "",
+        whatsapp: whatsapp.trim() || "",
+        reviewLink: reviewLink.trim() || "",
       }
 
-      const updated = await api.updateMerchant(merchantId, updateData)
+      // 1. Direct Cloud Firestore save (guaranteed source of truth)
       await firebaseService.updateMerchantInFirestore(merchantId, updateData)
 
-      setMerchant(updated)
-      if (onMerchantUpdated) onMerchantUpdated(updated)
+      // 2. Non-blocking API sync
+      api.updateMerchant(merchantId, updateData).catch(() => {})
+
+      const updatedObj: any = {
+        ...(merchant || {}),
+        ...updateData,
+        id: merchantId,
+      }
+      setMerchant(updatedObj)
+      if (onMerchantUpdated) onMerchantUpdated(updatedObj)
 
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save settings error:", err)
       alert("সংরক্ষণ ব্যর্থ হয়েছে, পুনরায় চেষ্টা করুন।")
     } finally {

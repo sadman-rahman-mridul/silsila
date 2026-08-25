@@ -194,14 +194,26 @@ export const firebaseService = {
 
   /** Push merchant profile/branding edits to the `merchants` document. */
   async updateMerchantInFirestore(merchantId: string, updates: Record<string, unknown>) {
+    if (!merchantId) return
     try {
+      let targetDocId = merchantId
+      const direct = await getDoc(doc(firestore, MERCHANTS, merchantId)).catch(() => null)
+      if (!direct || !direct.exists()) {
+        const found = await this.getMerchantByIdOrSlug(merchantId).catch(() => null)
+        if (found?.id) {
+          targetDocId = found.id
+        }
+      }
+
       const data: Record<string, unknown> = { ...updates, updatedAt: new Date().toISOString() }
       Object.keys(data).forEach((key) => {
         if (data[key] === undefined) delete data[key]
       })
-      await setDoc(doc(firestore, MERCHANTS, merchantId), data, { merge: true })
+      await setDoc(doc(firestore, MERCHANTS, targetDocId), data, { merge: true })
+      return true
     } catch (err) {
       console.warn("Failed to update merchant in Firestore:", err)
+      throw err
     }
   },
 

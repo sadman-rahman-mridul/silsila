@@ -31,7 +31,6 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
   async function loadMarketingData(id: string) {
     try {
       setError(null)
-      // 1. Check Cloud Firestore directly
       const m = await firebaseService.getMerchantByIdOrSlug(id).catch(() => null)
       if (m) {
         setInstagram(m.instagram || "")
@@ -41,7 +40,6 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
         return
       }
 
-      // 2. Fallback to API
       const res = await api.getMerchant(id).catch(() => null)
       if (res?.merchant) {
         setInstagram(res.merchant.instagram || "")
@@ -65,10 +63,7 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
         reviewLink: reviewLink.trim() || "",
       }
 
-      // 1. Save directly to Cloud Firestore
       await firebaseService.updateMerchantInFirestore(merchantId, updateData)
-
-      // 2. Non-blocking API sync
       api.updateMerchant(merchantId, updateData).catch(() => {})
 
       setSavedSuccess(true)
