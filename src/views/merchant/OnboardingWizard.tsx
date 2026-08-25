@@ -4,11 +4,12 @@ import { api } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES } from "../../constants/categories"
-import { CheckIcon, DownloadIcon, ShareIcon } from "../../components/Icons"
+import { CheckIcon, DownloadIcon, ShareIcon, LogOutIcon } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 
 interface OnboardingWizardProps {
   onComplete: (merchantId: string) => void
+  onBack?: () => void
 }
 
 const steps = [
@@ -25,7 +26,7 @@ const steps = [
  * location and reward all come from the owner, and the merchant record stays
  * un-onboarded until this wizard completes.
  */
-export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
+export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizardProps) {
   const { profile } = useAuth()
   const [step, setStep] = useState(1)
   const [bizName, setBizName] = useState("")
@@ -143,14 +144,25 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
       <div className="bg-[#1B4332] px-5 pt-12 pb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
-            <span className="text-[#1B4332] font-black text-sm">সি</span>
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
+              <span className="text-[#1B4332] font-black text-sm">সি</span>
+            </div>
+            <div>
+              <p className="text-white font-display font-bold">সিলসিলায় স্বাগতম!</p>
+              <p className="text-[#52B788] text-xs">৩ মিনিটে আপনার ডিজিটাল লয়্যালটি স্ট্যাম্প সেট আপ করুন</p>
+            </div>
           </div>
-          <div>
-            <p className="text-white font-display font-bold">সিলসিলায় স্বাগতম!</p>
-            <p className="text-[#52B788] text-xs">৩ মিনিটে আপনার ডিজিটাল লয়্যালটি স্ট্যাম্প সেট আপ করুন</p>
-          </div>
+          {onBack && (
+            <button
+              onClick={onBack}
+              title="লগআউট / শুরুতে ফিরুন"
+              className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95 flex-shrink-0"
+            >
+              <LogOutIcon size={16} />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-1">
