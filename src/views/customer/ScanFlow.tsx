@@ -149,33 +149,34 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
           if (mParam) return mParam
         }
 
-        // 3. silsila.ai.studio/[company-slug] or /s/[id]
-        if (raw.includes("silsila.ai.studio/") || raw.includes("/s/")) {
-          let slug = ""
-          if (raw.includes("silsila.ai.studio/")) {
-            slug = raw.split("silsila.ai.studio/")[1]?.split("?")[0]?.replace(/\/$/, "") || ""
-          } else if (raw.includes("/s/")) {
-            slug = raw.split("/s/")[1]?.split("?")[0]?.replace(/\/$/, "") || ""
-          }
+        // 3. Any dynamic host or custom domain path: [host]/[company-slug] or /s/[id]
+        if (raw.includes("/") || raw.startsWith("http")) {
+          try {
+            const urlObj = new URL(raw.startsWith("http") ? raw : `https://${raw}`)
+            const pathParts = urlObj.pathname.split("/").filter(Boolean)
+            const slug = pathParts[pathParts.length - 1]
 
-          if (slug) {
-            slug = decodeURIComponent(slug).toLowerCase().trim()
-            // Direct ID match
-            const byId = merchants.find((m) => m.id.toLowerCase() === slug)
-            if (byId) return byId.id
+            if (slug) {
+              const decoded = decodeURIComponent(slug).toLowerCase().trim()
+              // Direct ID match
+              const byId = merchants.find((m) => m.id.toLowerCase() === decoded)
+              if (byId) return byId.id
 
-            // Name or NameEn slug match
-            const byName = merchants.find((m) => {
-              const enSlug = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
-              const bnSlug = (m.name || "").toLowerCase().replace(/\s+/g, "-")
-              return (
-                enSlug === slug ||
-                bnSlug === slug ||
-                (m.nameEn && m.nameEn.toLowerCase().includes(slug)) ||
-                (m.name && m.name.toLowerCase().includes(slug))
-              )
-            })
-            if (byName) return byName.id
+              // Name or NameEn slug match
+              const byName = merchants.find((m) => {
+                const enSlug = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+                const bnSlug = (m.name || "").toLowerCase().replace(/\s+/g, "-")
+                return (
+                  enSlug === decoded ||
+                  bnSlug === decoded ||
+                  (m.nameEn && m.nameEn.toLowerCase().includes(decoded)) ||
+                  (m.name && m.name.toLowerCase().includes(decoded))
+                )
+              })
+              if (byName) return byName.id
+            }
+          } catch {
+            // ignore URL parse errors
           }
         }
 

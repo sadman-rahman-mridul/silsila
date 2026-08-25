@@ -267,7 +267,8 @@ export default function MerchantSettings({
     nameEn: businessNameEn,
     id: merchantId,
   })
-  const formattedQrLink = slug ? `silsila.ai.studio/${slug}` : ""
+  const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.netlify.app"
+  const formattedQrLink = slug ? `${host}/${slug}` : ""
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">

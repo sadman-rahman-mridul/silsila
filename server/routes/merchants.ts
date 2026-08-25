@@ -161,7 +161,7 @@ router.put("/:id", requireMerchantOwner("id"), (req, res) => {
 })
 
 // QR Code Generation for counter table-tents and scans (PRD E2.1, E5.4)
-// QR Link format: silsila.ai.studio/[company name]
+// Dynamic QR Link format: [current domain]/[company name]
 router.get("/:id/qr", async (req, res) => {
   const merchant = db.getMerchantById(req.params.id)
   if (!merchant) {
@@ -169,9 +169,11 @@ router.get("/:id/qr", async (req, res) => {
     return
   }
 
+  const host = (req.get("x-forwarded-host") || req.get("host") || "localhost:3000").split(",")[0].trim()
+  const proto = (req.get("x-forwarded-proto") || req.protocol || "http").split(",")[0].trim()
   const companySlug = getCompanySlug(merchant)
-  const formattedQrLink = `silsila.ai.studio/${companySlug}`
-  const fullScanUrl = `https://silsila.ai.studio/${companySlug}?m=${merchant.id}`
+  const formattedQrLink = `${host}/${companySlug}`
+  const fullScanUrl = `${proto}://${host}/${companySlug}?m=${merchant.id}`
 
   try {
     const qrDataUrl = await QRCode.toDataURL(fullScanUrl, {
@@ -188,12 +190,11 @@ router.get("/:id/qr", async (req, res) => {
       merchantName: merchant.name,
       companySlug,
       formattedQrLink,
-      scanUrl: fullScanUrl,
+      fullScanUrl,
       qrDataUrl,
     })
-  } catch (err) {
-    console.error("QR Generation Error:", err)
-    res.status(500).json({ error: "QR কোড তৈরিতে সমস্যা হয়েছে" })
+  } catch (err: any) {
+    res.status(500).json({ error: "QR তৈরি করতে ব্যর্থ হয়েছে" })
   }
 })
 

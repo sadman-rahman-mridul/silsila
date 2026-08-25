@@ -134,16 +134,19 @@ export default function MerchantDashboard({
   const [qrDownloadedToast, setQrDownloadedToast] = useState(false)
   const [dashboardQrDataUrl, setDashboardQrDataUrl] = useState<string>("")
 
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://silsilaqr.netlify.app"
+  const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.netlify.app"
+
   const merchantName = activeMerchant?.name || ""
   const merchantInitials = activeMerchant?.logoInitials || (merchantName ? merchantName.slice(0, 2) : "")
   const companySlug = activeMerchant ? generateMerchantSlug(activeMerchant) : ""
-  const qrDisplayLink = companySlug ? `silsila.ai.studio/${companySlug}` : ""
+  const qrDisplayLink = companySlug ? `${host}/${companySlug}` : ""
 
   // Generate QR Data URL whenever activeMerchant changes
   useEffect(() => {
     if (!merchantId) return
     const slug = companySlug || merchantId
-    const fullUrl = `https://silsila.ai.studio/${slug}?m=${merchantId}`
+    const fullUrl = `${origin}/${slug}?m=${merchantId}`
     QRCode.toDataURL(fullUrl, {
       width: 400,
       margin: 2,
@@ -155,14 +158,14 @@ export default function MerchantDashboard({
     })
       .then((url) => setDashboardQrDataUrl(url))
       .catch((err) => console.warn("Failed to generate dashboard QR:", err))
-  }, [merchantId, companySlug, activeMerchant?.logoColor])
+  }, [merchantId, companySlug, activeMerchant?.logoColor, origin])
 
   async function handleDownloadCounterQr() {
     if (!merchantId) return
     setDownloadingQr(true)
     try {
       const slug = companySlug || merchantId
-      const fullUrl = `https://silsila.ai.studio/${slug}?m=${merchantId}`
+      const fullUrl = `${origin}/${slug}?m=${merchantId}`
       const dataUrl = await QRCode.toDataURL(fullUrl, {
         width: 1200, // Ultra HD quality
         margin: 3,
@@ -193,7 +196,7 @@ export default function MerchantDashboard({
 
   function handleCopyStoreLink() {
     if (!companySlug) return
-    const fullUrl = `https://silsila.ai.studio/${companySlug}?m=${merchantId}`
+    const fullUrl = `${origin}/${companySlug}?m=${merchantId}`
     navigator.clipboard?.writeText(fullUrl)
     setCopiedLink(true)
     setTimeout(() => setCopiedLink(false), 2500)

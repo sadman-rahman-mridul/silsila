@@ -32,10 +32,13 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
   const currentMerchant = merchant
   const selectedMerchantId = merchant.id
 
-  // Link format: silsila.ai.studio/[company name]
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://silsilaqr.netlify.app"
+  const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.netlify.app"
+
+  // Dynamic link format: [domain]/[company name]
   const companySlug = generateMerchantSlug(currentMerchant)
-  const formattedQrDisplayLink = `silsila.ai.studio/${companySlug}`
-  const fullScanUrl = `https://silsila.ai.studio/${companySlug}?m=${encodeURIComponent(
+  const formattedQrDisplayLink = `${host}/${companySlug}`
+  const fullScanUrl = `${origin}/${companySlug}?m=${encodeURIComponent(
     selectedMerchantId
   )}&branch=${encodeURIComponent(branchName)}&counter=${encodeURIComponent(counterLabel)}`
 
@@ -312,7 +315,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
       // Footer
       ctx.fillStyle = "#B0A99E"
       ctx.font = "bold 20px 'Plus Jakarta Sans', sans-serif"
-      ctx.fillText("Powered by Silsila Loyalty Network · silsila.ai.studio", width / 2, height - 40)
+      ctx.fillText(`Powered by Silsila Loyalty Network · ${host}`, width / 2, height - 40)
 
       // Export Standee Blob
       canvas.toBlob((blob) => {
