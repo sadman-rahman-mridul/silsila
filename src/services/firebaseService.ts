@@ -243,6 +243,17 @@ export const firebaseService = {
     }
   },
 
+  /** Read all merchants from Firestore. */
+  async getMerchants(): Promise<Merchant[]> {
+    try {
+      const snap = await getDocs(collection(firestore, MERCHANTS))
+      return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Merchant[]
+    } catch (err) {
+      console.warn("Failed to get merchants from Firestore:", err)
+      return []
+    }
+  },
+
   /** Read one merchant document. */
   async getMerchantProfile(merchantId: string) {
     try {
@@ -590,14 +601,26 @@ export const firebaseService = {
 
         let cardRef: any = null
         let existingCard: any = null
+        let merchantRef: any = null
+        let merchantData: any = null
+
         if (resolution === "approved" && approvalData?.customerId && approvalData?.merchantId) {
           const customerId = approvalData.customerId
           const merchantId = approvalData.merchantId
           const cardId = `card_${customerId}_${merchantId}`
           cardRef = doc(firestore, "cards", cardId)
-          const cardSnap = await transaction.get(cardRef)
+          merchantRef = doc(firestore, MERCHANTS, merchantId)
+
+          const [cardSnap, mSnap] = await Promise.all([
+            transaction.get(cardRef),
+            transaction.get(merchantRef),
+          ])
+
           if (cardSnap.exists()) {
             existingCard = cardSnap.data() as any
+          }
+          if (mSnap.exists()) {
+            merchantData = mSnap.data() as any
           }
         }
 
@@ -615,11 +638,15 @@ export const firebaseService = {
           const merchantId = approvalData.merchantId
           const cardId = `card_${customerId}_${merchantId}`
           const currentStamps = Number(existingCard?.stamps) || 0
-          const target = Number(existingCard?.target) || Number(approvalData?.target) || 3
+          const target = Number(existingCard?.target) || Number(approvalData?.target) || Number(merchantData?.rewardTarget) || 5
+          const rewardText = approvalData.rewardText || existingCard?.rewardText || merchantData?.rewardText || "পুরস্কার"
           const newStamps = currentStamps + 1
           const voucherReady = newStamps >= target
           const cycleNo = existingCard?.cycleNo || 1
           const streakCount = (existingCard?.streakCount || 0) + 1
+
+          const merchantName = merchantData?.name || approvalData.merchantName || "দোকান"
+          const logoInitials = merchantData?.logoInitials || (merchantName ? merchantName.slice(0, 2) : "সি")
 
           transaction.set(
             cardRef,
@@ -627,15 +654,25 @@ export const firebaseService = {
               id: cardId,
               customerId,
               merchantId,
-              programId: approvalData.programId || `prog_${merchantId}`,
+              programId: approvalData.programId || `rp_${merchantId}`,
               stamps: newStamps,
               target,
-              rewardText: approvalData.rewardText || existingCard?.rewardText || "১টি বিশেষ উপহার",
+              rewardText,
               voucherReady,
               cycleNo,
               streakCount,
               lastVisit: nowIso,
               updatedAt: nowIso,
+              merchant: {
+                id: merchantId,
+                name: merchantName,
+                category: merchantData?.category || "ক্যাফে",
+                area: merchantData?.area || "ঢাকা",
+                logoInitials,
+                logoBg: merchantData?.logoBg || "#D8EDDF",
+                logoColor: merchantData?.logoColor || "#1B4332",
+                logoUrl: merchantData?.logoUrl || "",
+              },
             },
             { merge: true }
           )

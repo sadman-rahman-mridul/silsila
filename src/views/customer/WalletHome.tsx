@@ -11,6 +11,26 @@ interface WalletHomeProps {
   onLogout?: () => void
 }
 
+function formatVisitDate(iso?: string) {
+  if (!iso) return ""
+  try {
+    const d = new Date(iso)
+    if (isNaN(d.getTime())) return ""
+    const now = new Date()
+    const diffMs = now.getTime() - d.getTime()
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffHours < 1) return "এইমাত্র"
+    if (diffHours < 24 && d.getDate() === now.getDate()) return "আজকে"
+    if (diffDays === 1 || (diffHours < 48 && d.getDate() === now.getDate() - 1)) return "গতকাল"
+    if (diffDays < 30) return `${diffDays} দিন আগে`
+    return d.toLocaleDateString("bn-BD", { day: "numeric", month: "short" })
+  } catch {
+    return ""
+  }
+}
+
 export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: WalletHomeProps) {
   const { user, profile } = useAuth()
   const [cards, setCards] = useState<CustomerCard[]>([])
@@ -179,20 +199,24 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               const cleanMId = (card.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
               const found = availableMerchants.find((m) => {
                 if (m.id === card.merchantId) return true
+                if (m.slug && m.slug === card.merchantId) return true
                 const mClean = (m.id || "").toLowerCase().replace(/[^a-z0-9]/g, "")
                 const enClean = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
                 const bnClean = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-                return mClean === cleanMId || enClean === cleanMId || bnClean === cleanMId
+                const slugClean = (m.slug || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+                return mClean === cleanMId || enClean === cleanMId || bnClean === cleanMId || slugClean === cleanMId
               })
-              const merchant = card.merchant?.name ? card.merchant : (found || {
-                name: "CafeDhaka",
-                category: "ক্যাফে",
-                area: "ঢাকা",
-                logoInitials: "সিল",
-                logoBg: "#D8EDDF",
-                logoColor: "#1B4332",
-                verified: true,
-              })
+              const merchant = card.merchant?.name
+                ? card.merchant
+                : (found || {
+                    name: "দোকান",
+                    category: "লয়্যালটি",
+                    area: "",
+                    logoInitials: "সি",
+                    logoBg: "#D8EDDF",
+                    logoColor: "#1B4332",
+                    verified: false,
+                  })
               const target = card.target || 5
               const remaining = Math.max(0, target - card.stamps)
               const isNearComplete = remaining === 1
@@ -225,7 +249,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                         className="w-11 h-11 rounded-xl flex items-center justify-center font-display font-bold text-sm flex-shrink-0 shadow-xs"
                         style={{ background: merchant.logoBg || "#D8EDDF", color: merchant.logoColor || "#1B4332" }}
                       >
-                        {merchant.logoInitials || "সিল"}
+                        {merchant.logoInitials || (merchant.name ? merchant.name.slice(0, 2) : "সি")}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -237,7 +261,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                           )}
                         </div>
                         <p className={`text-xs mt-0.5 ${card.voucherReady ? "text-white/60" : "text-[#6B6158]"}`}>
-                          {merchant.category} · {merchant.area}
+                          {merchant.category} {merchant.area ? `· ${merchant.area}` : ""}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
@@ -256,18 +280,18 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     >
                       <p className={`text-xs ${card.voucherReady ? "text-white/70" : "text-[#6B6158]"}`}>
                         {card.voucherReady ? (
-                          <span className="font-medium">{card.rewardText || "১টি বিশেষ উপহার"}</span>
+                          <span className="font-medium">{card.rewardText || "পুরস্কার প্রস্তুত"}</span>
                         ) : isNearComplete ? (
                           <span className="text-[#F59E0B] font-semibold flex items-center gap-1">
                             <FireIcon size={12} className="inline" />
                             আর মাত্র ১টি সিল বাকি!
                           </span>
                         ) : (
-                          <>আর <span className="font-bold text-[#1B4332]">{remaining}টি</span> সিলে: {(card.rewardText || "উপহার").slice(0, 22)}...</>
+                          <>আর <span className="font-bold text-[#1B4332]">{remaining}টি</span> সিলে: {card.rewardText || "পুরস্কার"}</>
                         )}
                       </p>
-                      <p className={`text-xs ${card.voucherReady ? "text-white/50" : "text-[#B0A99E]"}`}>
-                        {card.lastVisit}
+                      <p className={`text-xs font-medium ${card.voucherReady ? "text-white/60" : "text-[#8A8175]"}`}>
+                        {formatVisitDate(card.lastVisit || card.updatedAt)}
                       </p>
                     </div>
 
