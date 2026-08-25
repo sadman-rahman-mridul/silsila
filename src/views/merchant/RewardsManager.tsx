@@ -102,6 +102,51 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
     }
   }
 
+  const [editingProgram, setEditingProgram] = useState<RewardProgram | null>(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+  async function handleUpdateProgram() {
+    if (!editingProgram || !editingProgram.rewardText.trim()) return
+    setSavingEdit(true)
+    setError(null)
+    try {
+      const targetId = await resolveId()
+      await firebaseService.saveRewardProgram({
+        ...editingProgram,
+        merchantId: targetId,
+      })
+      await firebaseService.updateMerchantInFirestore(targetId, {
+        rewardTarget: editingProgram.target,
+        rewardText: editingProgram.rewardText.trim(),
+      })
+      await loadPrograms()
+      setEditingProgram(null)
+    } catch (err: any) {
+      console.error("Failed to update program:", err)
+      setError(err?.message || "প্রোগ্রাম আপডেট করা যায়নি")
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
+  async function handleDeleteProgram(progId: string) {
+    setDeleting(true)
+    setError(null)
+    try {
+      const targetId = await resolveId()
+      await firebaseService.deleteRewardProgram(targetId, progId)
+      await loadPrograms()
+      setDeleteConfirmId(null)
+    } catch (err: any) {
+      console.error("Failed to delete program:", err)
+      setError(err?.message || "প্রোগ্রাম মুছে ফেলা যায়নি")
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
       <div className="bg-[#1B4332] px-5 pt-12 pb-6">
@@ -128,14 +173,82 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-[#1A1916] text-base">সক্রিয় প্রোগ্রামসমূহ</h2>
           <button
-            onClick={() => setShowCreate(!showCreate)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold transition-all active:scale-[0.98] shadow-sm"
+            onClick={() => {
+              setEditingProgram(null)
+              setShowCreate(!showCreate)
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold transition-all active:scale-[0.98] shadow-sm cursor-pointer"
           >
             + নতুন প্রোগ্রাম
           </button>
         </div>
 
-        {showCreate && (
+        {/* Edit Modal */}
+        {editingProgram && (
+          <div className="bg-white rounded-2xl card-shadow p-4 mb-4 animate-slide-up border-2 border-[#1B4332]">
+            <h3 className="font-display font-bold text-[#1A1916] mb-3">রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন</h3>
+
+            <div className="mb-4">
+              <label className="text-[#6B6158] text-xs font-medium block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <div className="flex gap-2">
+                {[3, 5, 7, 8, 10].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setEditingProgram({ ...editingProgram, target: n })}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      editingProgram.target === n
+                        ? "bg-[#1B4332] text-white shadow-sm"
+                        : "bg-[#F7F5F0] text-[#6B6158] border border-[#E9E5DC]"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">পুরস্কারের বিবরণ</label>
+              <input
+                type="text"
+                value={editingProgram.rewardText}
+                onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
+                placeholder="যেমন: ১টি স্পেশাল হট কফি ফ্রি"
+                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332] font-medium"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">মেয়াদ (দিন)</label>
+              <input
+                type="number"
+                value={editingProgram.expiryDays}
+                onChange={(e) => setEditingProgram({ ...editingProgram, expiryDays: Number(e.target.value) })}
+                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-2.5 text-[#1A1916] text-sm outline-none font-medium"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setEditingProgram(null)}
+                className="flex-1 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs"
+              >
+                বাতিল
+              </button>
+              <button
+                onClick={handleUpdateProgram}
+                disabled={savingEdit || !editingProgram.rewardText.trim()}
+                className="flex-[2] py-2.5 rounded-xl bg-[#1B4332] text-white font-display font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40"
+              >
+                <CheckIcon size={15} />
+                {savingEdit ? "সংরক্ষণ হচ্ছে..." : "আপডেট সংরক্ষণ করুন"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Create Modal */}
+        {showCreate && !editingProgram && (
           <div className="bg-white rounded-2xl card-shadow p-4 mb-4 animate-slide-up border border-[#52B788]/40">
             <h3 className="font-display font-bold text-[#1A1916] mb-3">নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন</h3>
 
@@ -252,10 +365,46 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                     </p>
                   </div>
                 </div>
-                <span className="bg-[#D8EDDF] text-[#1B4332] text-[11px] px-2.5 py-1 rounded-full font-bold">
-                  সক্রিয়
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setShowCreate(false)
+                      setEditingProgram(program)
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-[#F0EDE6] hover:bg-[#E2DDD2] text-[#1B4332] transition-colors text-xs font-bold cursor-pointer flex items-center gap-1"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirmId(program.id)}
+                    className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
+
+              {/* Delete confirmation inline */}
+              {deleteConfirmId === program.id && (
+                <div className="mb-3 p-3.5 bg-red-50 rounded-xl border border-red-200 animate-slide-up">
+                  <p className="text-xs font-bold text-red-700 mb-2.5">Are you sure you want to delete this program?</p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setDeleteConfirmId(null)}
+                      className="px-3.5 py-1.5 bg-white border border-[#E9E5DC] text-[#6B6158] rounded-lg text-xs font-bold hover:bg-gray-50 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProgram(program.id)}
+                      disabled={deleting}
+                      className="px-3.5 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                    >
+                      {deleting ? "Deleting..." : "Yes, Delete"}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#E9E5DC] text-center">
                 <div>

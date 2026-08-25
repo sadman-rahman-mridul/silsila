@@ -343,6 +343,31 @@ export const firebaseService = {
     }
   },
 
+  async deleteRewardProgram(merchantId: string, programId: string) {
+    try {
+      const fbMerchant = await this.getMerchantByIdOrSlug(merchantId)
+      const targetDocId = fbMerchant?.id || merchantId
+
+      let existingPrograms = Array.isArray(fbMerchant?.programs) ? [...fbMerchant.programs] : []
+      existingPrograms = existingPrograms.filter((p: any) => p.id !== programId)
+
+      const remainingProgram = existingPrograms[0]
+
+      await setDoc(
+        doc(firestore, MERCHANTS, targetDocId),
+        {
+          programs: existingPrograms,
+          rewardTarget: remainingProgram?.target || 5,
+          rewardText: remainingProgram?.rewardText || "",
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      )
+    } catch (err) {
+      console.warn("Failed to delete reward program from Firestore:", err)
+    }
+  },
+
   async getRewardPrograms(merchantId: string): Promise<any[]> {
     if (!merchantId) return []
     try {
@@ -446,10 +471,36 @@ export const firebaseService = {
 
   subscribePendingApprovals(merchantId: string, callback: (approvals: PendingApproval[]) => void) {
     if (!merchantId) return () => {}
-    try {
-      const clean = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+    let unsubSnapshot: any = null
+
+    const tokens = new Set<string>()
+    const raw = merchantId.toLowerCase().trim()
+    tokens.add(raw)
+    tokens.add(raw.replace(/[^a-z0-9]/g, ""))
+
+    async function initListener() {
+      try {
+        const fb = await firebaseService.getMerchantByIdOrSlug(merchantId)
+        if (fb) {
+          if (fb.id) {
+            tokens.add(fb.id.toLowerCase())
+            tokens.add(fb.id.toLowerCase().replace(/[^a-z0-9]/g, ""))
+          }
+          if (fb.name) {
+            tokens.add(fb.name.toLowerCase().replace(/[^a-z0-9]/g, ""))
+          }
+          if (fb.nameEn) {
+            tokens.add(fb.nameEn.toLowerCase().replace(/[^a-z0-9]/g, ""))
+          }
+        }
+      } catch (err) {
+        console.warn("Token build warning:", err)
+      }
+
+      tokens.delete("")
+
       const q = collection(firestore, "pendingApprovals")
-      return onSnapshot(
+      unsubSnapshot = onSnapshot(
         q,
         (snapshot) => {
           const list = snapshot.docs
@@ -457,22 +508,20 @@ export const firebaseService = {
             .filter((a) => {
               if (a.resolution && a.resolution !== "pending") return false
               const aId = (a.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+              const aRaw = (a.merchantId || "").toLowerCase()
               const aName = (a.merchantName || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-              return (
-                a.merchantId === merchantId ||
-                aId === clean ||
-                aName === clean ||
-                aId.includes(clean) ||
-                clean.includes(aId)
-              )
+              return tokens.has(aRaw) || tokens.has(aId) || tokens.has(aName)
             }) as PendingApproval[]
           callback(list)
         },
         (err) => console.warn("Approvals Firestore listener warning:", err)
       )
-    } catch (err) {
-      console.error("Failed to subscribe to approvals:", err)
-      return () => {}
+    }
+
+    initListener()
+
+    return () => {
+      if (typeof unsubSnapshot === "function") unsubSnapshot()
     }
   },
 
