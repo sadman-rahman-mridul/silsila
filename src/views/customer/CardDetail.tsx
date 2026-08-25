@@ -45,6 +45,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const [minimizedWaiting, setMinimizedWaiting] = useState(false)
   const [approvalMessage, setApprovalMessage] = useState<string>("")
   const pollingTimerRef = useRef<any>(null)
+  const swipeHandlers = useSwipeBack(onBack)
 
   const customerId = profile?.id || user?.uid || null
 
@@ -357,8 +358,6 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const remaining = Math.max(0, target - card.stamps)
   const pct = Math.min(100, (card.stamps / target) * 100)
   const currentRewardText = activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার"
-
-  const swipeHandlers = useSwipeBack(onBack)
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0] overflow-y-auto" {...swipeHandlers}>
