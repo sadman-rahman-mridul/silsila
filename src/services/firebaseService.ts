@@ -198,6 +198,40 @@ export const firebaseService = {
     }
   },
 
+  /** Read one merchant document by ID or slug. */
+  async getMerchantByIdOrSlug(idOrSlug: string) {
+    if (!idOrSlug) return null
+    const clean = idOrSlug.toLowerCase().trim()
+    try {
+      // 1. Direct ID lookup
+      const direct = await getDoc(doc(firestore, MERCHANTS, idOrSlug)).catch(() => null)
+      if (direct && direct.exists()) {
+        return { id: direct.id, ...(direct.data() as any) }
+      }
+
+      // 2. Query all merchants in Firestore
+      const snap = await getDocs(collection(firestore, MERCHANTS))
+      const merchants: any[] = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      const cleanSlug = clean.replace(/[^a-z0-9]/g, "")
+      const matched = merchants.find((m) => {
+        if (m.id.toLowerCase() === clean) return true
+        const enSlug = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+        const enClean = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+        const bnClean = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+        return (
+          enSlug === clean ||
+          enClean === cleanSlug ||
+          bnClean === cleanSlug ||
+          m.name?.toLowerCase() === clean
+        )
+      })
+      return matched || null
+    } catch (err) {
+      console.warn("Failed to get merchant by id or slug:", err)
+      return null
+    }
+  },
+
   /** Read one merchant document. */
   async getMerchantProfile(merchantId: string) {
     try {

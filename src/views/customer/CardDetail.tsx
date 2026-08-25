@@ -64,25 +64,70 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   }, [merchantId, customerId])
 
   async function loadCardDetail() {
-    if (!customerId) return
+    if (!customerId || !merchantId) {
+      setLoading(false)
+      return
+    }
     try {
       setLoading(true)
       setError(null)
-      const res = await api.getCardDetail(customerId, merchantId)
-      setData(res)
-      if (res.card.voucherReady) {
-        try {
-          confetti({
-            particleCount: 50,
-            spread: 60,
-            origin: { y: 0.7 },
-          })
-        } catch {
-          // ignore
+
+      // 1. Try local/backend API
+      let res: any = await api.getCardDetail(customerId, merchantId).catch(() => null)
+
+      // 2. Direct Cloud Firestore fallback (works seamlessly on Vercel / serverless restarts)
+      if (!res || !res.merchant) {
+        const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId)
+        if (fbMerchant) {
+          const effectiveId = fbMerchant.id
+          res = await api.getCardDetail(customerId, effectiveId).catch(() => null)
+
+          if (!res) {
+            const target = fbMerchant.rewardTarget || 5
+            res = {
+              card: {
+                id: `card_${customerId}_${effectiveId}`,
+                customerId,
+                merchantId: effectiveId,
+                programId: `prog_${effectiveId}`,
+                stamps: 0,
+                cycleNo: 1,
+                streakCount: 0,
+                lastVisit: new Date().toISOString(),
+                target,
+                rewardText: fbMerchant.rewardText || "বিনামূল্যে পুরস্কার",
+                voucherReady: false,
+                merchant: fbMerchant,
+              },
+              merchant: fbMerchant,
+              program: {
+                id: `prog_${effectiveId}`,
+                merchantId: effectiveId,
+                target,
+                rewardText: fbMerchant.rewardText || "বিনামূল্যে পুরস্কার",
+                expiryDays: 30,
+                active: true,
+              },
+              programs: [],
+              stampsHistory: [],
+            }
+          }
         }
       }
+
+      if (res && res.merchant) {
+        setData(res)
+        if (res.card.voucherReady) {
+          try {
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } })
+          } catch {}
+        }
+      } else {
+        setError("এই দোকানের কার্ডের তথ্য খুঁজে পাওয়া যায়নি")
+      }
     } catch (err: any) {
-      setError(err.message)
+      console.error("CardDetail load error:", err)
+      setError(err?.message || "কার্ড লোড করতে সমস্যা হয়েছে")
     } finally {
       setLoading(false)
     }
@@ -226,11 +271,44 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0]">
-        <span className="text-3xl animate-spin mb-3">⏳</span>
-        <p className="text-[#6B6158] text-sm font-medium">কার্ডের তথ্য লোড হচ্ছে...</p>
+        <div className="w-12 h-12 rounded-2xl bg-[#1B4332]/10 flex items-center justify-center text-2xl animate-spin mb-3">
+          ⏳
+        </div>
+        <p className="text-[#1B4332] font-display font-bold text-sm">কার্ডের তথ্য লোড হচ্ছে...</p>
+        <p className="text-[#6B6158] text-xs mt-1">অনুগ্রহ করে একটু অপেক্ষা করুন</p>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0] p-6 text-center">
+        <div className="w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-3xl mb-4 shadow-inner">
+          ⚠️
+        </div>
+        <h2 className="font-display font-bold text-[#1A1916] text-lg mb-1">
+          {error || "দোকানের তথ্য পাওয়া যায়নি"}
+        </h2>
+        <p className="text-[#6B6158] text-xs mb-6 max-w-xs leading-relaxed">
+          দোকানটির কিউআর কোড সঠিক নাও হতে পারে অথবা নেটওয়ার্ক সমস্যা হতে পারে।
+        </p>
+        <div className="flex gap-3 w-full max-w-xs">
+          <button
+            onClick={onBack}
+            className="flex-1 py-3 bg-[#E9E5DC] text-[#1A1916] font-bold text-xs rounded-xl hover:bg-[#DCD7CD] transition-all cursor-pointer"
+          >
+            ← ফিরে যান
+          </button>
+          <button
+            onClick={loadCardDetail}
+            className="flex-1 py-3 bg-[#1B4332] text-white font-bold text-xs rounded-xl hover:bg-[#2D6A4F] transition-all cursor-pointer shadow-md"
+          >
+            🔄 পুনরায় চেষ্টা
+          </button>
+        </div>
       </div>
     )
   }

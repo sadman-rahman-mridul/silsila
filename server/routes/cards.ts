@@ -73,14 +73,24 @@ router.get("/detail", (req, res) => {
     return
   }
 
-  const merchant = db.getMerchantById(merchantId)
+  let merchant = db.getMerchantById(merchantId)
+  if (!merchant) {
+    const cleanSlug = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+    merchant = db.getMerchants().find((m) => {
+      const en = (m.nameEn || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+      const bn = (m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+      return m.id.toLowerCase() === merchantId.toLowerCase() || en === cleanSlug || bn === cleanSlug
+    })
+  }
+
   if (!merchant) {
     res.status(404).json({ error: "মার্চেন্ট পাওয়া যায়নি" })
     return
   }
 
-  const card = db.getOrCreateCard(customerId, merchantId)
-  const programs = db.getProgramsByMerchant(merchantId)
+  const effectiveMerchantId = merchant.id
+  const card = db.getOrCreateCard(customerId, effectiveMerchantId)
+  const programs = db.getProgramsByMerchant(effectiveMerchantId)
   const program = db.getProgramById(card.programId) || programs[0]
   const stamps = db.getStampsForCard(card.id)
   const vouchers = db.getVouchersForCustomer(customerId)
