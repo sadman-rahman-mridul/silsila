@@ -26,7 +26,15 @@ function getScannedMerchant() {
 
 function MainContent() {
   const { profile, updateSessionProfile, logout } = useAuth()
-  const [scannedMerchant] = useState<string | null>(getScannedMerchant)
+  const [scannedMerchant, setScannedMerchant] = useState<string | null>(getScannedMerchant)
+
+  useEffect(() => {
+    function handlePop() {
+      setScannedMerchant(getScannedMerchant())
+    }
+    window.addEventListener("popstate", handlePop)
+    return () => window.removeEventListener("popstate", handlePop)
+  }, [])
 
   const [view, setView] = useState<AppView>(() => {
     if (typeof window !== "undefined") {

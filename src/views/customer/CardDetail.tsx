@@ -49,28 +49,30 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const customerId = profile?.id || user?.uid || null
 
   useEffect(() => {
-    if (!customerId) return
+    if (!merchantId) return
     loadCardDetail()
 
-    // Live updates for this customer's card at this merchant.
-    const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
-      const cleanM = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
-      const matchingCard = firestoreCards.find((c) => {
-        const cId = (c.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-        return c.merchantId === merchantId || cId === cleanM
+    if (customerId) {
+      // Live updates for this customer's card at this merchant.
+      const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
+        const cleanM = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
+        const matchingCard = firestoreCards.find((c) => {
+          const cId = (c.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return c.merchantId === merchantId || cId === cleanM
+        })
+        if (!matchingCard) return
+        setData((prev) => (prev ? { ...prev, card: { ...prev.card, ...matchingCard } } : prev))
       })
-      if (!matchingCard) return
-      setData((prev) => (prev ? { ...prev, card: { ...prev.card, ...matchingCard } } : prev))
-    })
 
-    return () => {
-      if (typeof unsubscribe === "function") unsubscribe()
-      if (pollingTimerRef.current) clearInterval(pollingTimerRef.current)
+      return () => {
+        if (typeof unsubscribe === "function") unsubscribe()
+        if (pollingTimerRef.current) clearInterval(pollingTimerRef.current)
+      }
     }
   }, [merchantId, customerId])
 
   async function loadCardDetail() {
-    if (!customerId || !merchantId) {
+    if (!merchantId) {
       setLoading(false)
       return
     }
@@ -86,14 +88,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
       // 1. Try local API and Firestore Card
       const [apiRes, fbCard, fbPrograms] = await Promise.all([
-        api.getCardDetail(customerId, resolvedMerchantId).catch(() => null),
-        firebaseService.getCustomerCard(customerId, resolvedMerchantId).catch(() => null),
+        customerId ? api.getCardDetail(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
+        customerId ? firebaseService.getCustomerCard(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
         firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => []),
       ])
 
       const merchant = fbMerchant || apiRes?.merchant || {
         id: resolvedMerchantId,
-        name: "CafeDhaka",
+        name: resolvedMerchantId,
         area: "ঢাকা",
         category: "ক্যাফে",
       }
@@ -114,8 +116,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       const defaultReward = activeProgramsList[0]?.rewardText || merchant.rewardText || "পুরস্কার"
 
       const card = {
-        id: fbCard?.id || apiRes?.card?.id || `card_${customerId}_${resolvedMerchantId}`,
-        customerId,
+        id: fbCard?.id || apiRes?.card?.id || (customerId ? `card_${customerId}_${resolvedMerchantId}` : `preview_${resolvedMerchantId}`),
+        customerId: customerId || "guest",
         merchantId: resolvedMerchantId,
         programId: fbCard?.programId || activeProgramsList[0]?.id || `prog_${resolvedMerchantId}`,
         stamps: fbCard?.stamps ?? apiRes?.card?.stamps ?? 0,
@@ -131,7 +133,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       setData({
         card,
         merchant,
-        program: activeProgramsList[0],
+        program: activeProgramsList[0] || { id: "p1", merchantId: resolvedMerchantId, target: defaultTarget, rewardText: defaultReward, active: true },
         programs: activeProgramsList,
         stampsHistory: apiRes?.stampsHistory || [],
       })

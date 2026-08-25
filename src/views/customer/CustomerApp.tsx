@@ -25,6 +25,12 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
   const customerId = profile?.id || user?.uid || null
 
   useEffect(() => {
+    if (initialMerchantId) {
+      setSelectedMerchantId(initialMerchantId)
+    }
+  }, [initialMerchantId])
+
+  useEffect(() => {
     if (!customerId) return
     // Reward tab badge follows this customer's live cards.
     const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (cards) => {
