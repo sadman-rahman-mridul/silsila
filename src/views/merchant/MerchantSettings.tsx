@@ -232,6 +232,13 @@ export default function MerchantSettings({
 
   async function handleSave() {
     setSaving(true)
+    const targetId = merchantId || merchant?.id || profile?.merchantId || profile?.id || ""
+    if (!targetId) {
+      setSaving(false)
+      alert("মার্চেন্ট আইডি পাওয়া যায়নি। পুনরায় লগইন করুন।")
+      return
+    }
+
     try {
       const updateData = {
         name: businessName.trim() || "",
@@ -254,15 +261,15 @@ export default function MerchantSettings({
       }
 
       // 1. Direct Cloud Firestore save (guaranteed source of truth)
-      await firebaseService.updateMerchantInFirestore(merchantId, updateData)
+      await firebaseService.updateMerchantInFirestore(targetId, updateData)
 
       // 2. Non-blocking API sync
-      api.updateMerchant(merchantId, updateData).catch(() => {})
+      api.updateMerchant(targetId, updateData).catch(() => {})
 
       const updatedObj: any = {
         ...(merchant || {}),
         ...updateData,
-        id: merchantId,
+        id: targetId,
       }
       setMerchant(updatedObj)
       if (onMerchantUpdated) onMerchantUpdated(updatedObj)
@@ -419,12 +426,6 @@ export default function MerchantSettings({
             )}
           </button>
         </div>
-
-        {formattedQrLink && (
-          <div className="mt-3 inline-flex items-center gap-1.5 bg-white/10 rounded-xl px-3 py-1 text-white/80 text-xs font-mono">
-            <span>🔗 {formattedQrLink}</span>
-          </div>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-24 pt-4 space-y-4">
