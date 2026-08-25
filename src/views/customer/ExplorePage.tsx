@@ -222,19 +222,26 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                   <p className="text-xs text-[#6B6158] mb-3">{merchant.address}</p>
 
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-[#F0F7F2] rounded-xl px-3 py-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (onSelectMerchant) onSelectMerchant(merchant.id)
+                      }}
+                      className="flex-1 bg-[#F0F7F2] hover:bg-[#D8EDDF] rounded-xl px-3.5 py-2.5 flex items-center justify-between transition-all cursor-pointer text-left active:scale-[0.98]"
+                    >
                       <div>
                         <p className="text-[#1B4332] text-xs font-bold">লয়্যালটি কার্ড দেখুন</p>
                         <p className="text-[#6B6158] text-[11px] mt-0.5">স্ট্যাম্প সংগ্রহ করতে ক্লিক করুন</p>
                       </div>
-                      <span className="text-[#1B4332] font-bold text-xs group-hover:translate-x-0.5 transition-transform">→</span>
-                    </div>
+                      <span className="text-[#1B4332] font-bold text-sm group-hover:translate-x-0.5 transition-transform">→</span>
+                    </button>
                     <a
                       href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
                       target="_blank"
                       rel="noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="px-3.5 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] hover:bg-[#F7F5F0] text-xs font-bold transition-all"
+                      className="px-3.5 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] hover:bg-[#F7F5F0] text-xs font-bold transition-all cursor-pointer"
                     >
                       ম্যাপ
                     </a>

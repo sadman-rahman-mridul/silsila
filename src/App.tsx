@@ -5,6 +5,7 @@ import MerchantApp from "./views/merchant/MerchantApp"
 import OnboardingWizard from "./views/merchant/OnboardingWizard"
 import OpsConsole from "./views/ops/OpsConsole"
 import { AuthProvider, useAuth } from "./context/AuthContext"
+import { LanguageProvider } from "./context/LanguageContext"
 
 type AppView = "landing" | "customer" | "merchant" | "merchant-onboarding" | "ops"
 
@@ -170,9 +171,11 @@ function MainContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <MainContent />
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <MainContent />
+        </AuthProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   )
 }

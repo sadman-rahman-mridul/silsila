@@ -3,6 +3,7 @@ import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
+import { useLanguage } from "../../context/LanguageContext"
 import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon, ChevronLeftIcon } from "../../components/Icons"
 
 interface ProfilePageProps {
@@ -11,15 +12,12 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
   const { user, profile, logout } = useAuth()
+  const { language, setLanguage, toggleLanguage, t } = useLanguage()
   const swipeHandlers = useSwipeBack(onBack)
-  const [lang, setLang] = useState<"বাংলা" | "English">(() => {
-    return (localStorage.getItem("silsila_lang") as any) || "বাংলা"
-  })
+  const lang = language === "en" ? "English" : "বাংলা"
 
   function handleToggleLang() {
-    const next = lang === "বাংলা" ? "English" : "বাংলা"
-    setLang(next)
-    localStorage.setItem("silsila_lang", next)
+    toggleLanguage()
   }
   const [notifications, setNotifications] = useState(true)
   const [showDeleteModal, setShowDeleteModal] = useState(false)

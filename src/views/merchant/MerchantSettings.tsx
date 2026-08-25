@@ -3,6 +3,7 @@ import { api, type Merchant, generateMerchantSlug } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
+import { useLanguage } from "../../context/LanguageContext"
 import {
   MapPinIcon,
   ClockIcon,
@@ -79,13 +80,11 @@ export default function MerchantSettings({
   const [pinSuccess, setPinSuccess] = useState("")
 
   // Language preference
-  const [currentLang, setCurrentLang] = useState<"বাংলা" | "English">(() => {
-    return (localStorage.getItem("silsila_lang") as any) || "বাংলা"
-  })
+  const { language, setLanguage } = useLanguage()
+  const currentLang = language === "en" ? "English" : "বাংলা"
 
   function handleSetLanguage(l: "বাংলা" | "English") {
-    setCurrentLang(l)
-    localStorage.setItem("silsila_lang", l)
+    setLanguage(l === "English" ? "en" : "bn")
   }
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
