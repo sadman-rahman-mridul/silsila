@@ -73,6 +73,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       setLoading(true)
       setError(null)
 
+      let resolvedMerchantId = merchantId
+
       // 1. Try local/backend API
       let res: any = await api.getCardDetail(customerId, merchantId).catch(() => null)
 
@@ -80,17 +82,17 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       if (!res || !res.merchant) {
         const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId)
         if (fbMerchant) {
-          const effectiveId = fbMerchant.id
-          res = await api.getCardDetail(customerId, effectiveId).catch(() => null)
+          resolvedMerchantId = fbMerchant.id
+          res = await api.getCardDetail(customerId, resolvedMerchantId).catch(() => null)
 
           if (!res) {
             const target = fbMerchant.rewardTarget || 5
             res = {
               card: {
-                id: `card_${customerId}_${effectiveId}`,
+                id: `card_${customerId}_${resolvedMerchantId}`,
                 customerId,
-                merchantId: effectiveId,
-                programId: `prog_${effectiveId}`,
+                merchantId: resolvedMerchantId,
+                programId: `prog_${resolvedMerchantId}`,
                 stamps: 0,
                 cycleNo: 1,
                 streakCount: 0,
@@ -102,8 +104,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               },
               merchant: fbMerchant,
               program: {
-                id: `prog_${effectiveId}`,
-                merchantId: effectiveId,
+                id: `prog_${resolvedMerchantId}`,
+                merchantId: resolvedMerchantId,
                 target,
                 rewardText: fbMerchant.rewardText || "বিনামূল্যে পুরস্কার",
                 expiryDays: 30,
@@ -117,7 +119,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
       }
 
       if (res && res.merchant) {
-        const fbPrograms = await firebaseService.getRewardPrograms(effectiveId).catch(() => [])
+        resolvedMerchantId = res.merchant.id || resolvedMerchantId
+        const fbPrograms = await firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => [])
         const progMap = new Map<string, any>()
         if (res.programs) res.programs.forEach((p: any) => progMap.set(p.id, p))
         if (res.program) progMap.set(res.program.id, res.program)
@@ -126,8 +129,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
         if (mergedProgs.length === 0) {
           mergedProgs.push({
-            id: `prog_${effectiveId}`,
-            merchantId: effectiveId,
+            id: `prog_${resolvedMerchantId}`,
+            merchantId: resolvedMerchantId,
             target: res.merchant.rewardTarget || 5,
             rewardText: res.merchant.rewardText || "১টি বিশেষ উপহার",
             active: true,
