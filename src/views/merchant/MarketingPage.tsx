@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react"
 import { api } from "../../services/api"
-import { InstagramIcon, FacebookIcon, ExternalLinkIcon } from "../../components/Icons"
+import { firebaseService } from "../../services/firebaseService"
+import { useSwipeBack } from "../../hooks/useSwipeBack"
+import { InstagramIcon, FacebookIcon, ExternalLinkIcon, CheckIcon, RefreshIcon } from "../../components/Icons"
 import { useAuth } from "../../context/AuthContext"
 
 interface MarketingPageProps {
   merchantId?: string
+  onBack?: () => void
 }
 
-export default function MarketingPage({ merchantId: propId }: MarketingPageProps) {
+export default function MarketingPage({ merchantId: propId, onBack }: MarketingPageProps) {
   const { profile } = useAuth()
   const merchantId = propId || profile?.merchantId || profile?.id || ""
   const [instagram, setInstagram] = useState("")
@@ -16,41 +19,69 @@ export default function MarketingPage({ merchantId: propId }: MarketingPageProps
   const [reviewLink, setReviewLink] = useState("")
   const [saving, setSaving] = useState(false)
   const [savedSuccess, setSavedSuccess] = useState(false)
-
   const [error, setError] = useState<string | null>(null)
 
+  const swipeHandlers = useSwipeBack(onBack)
+
   useEffect(() => {
-    api
-      .getMerchant(merchantId)
-      .then((res) => {
+    if (!merchantId) return
+    loadMarketingData(merchantId)
+  }, [merchantId])
+
+  async function loadMarketingData(id: string) {
+    try {
+      setError(null)
+      // 1. Check Cloud Firestore directly
+      const m = await firebaseService.getMerchantByIdOrSlug(id).catch(() => null)
+      if (m) {
+        setInstagram(m.instagram || "")
+        setFacebook(m.facebook || "")
+        setWhatsapp(m.whatsapp || "")
+        setReviewLink(m.reviewLink || "")
+        return
+      }
+
+      // 2. Fallback to API
+      const res = await api.getMerchant(id).catch(() => null)
+      if (res?.merchant) {
         setInstagram(res.merchant.instagram || "")
         setFacebook(res.merchant.facebook || "")
         setWhatsapp(res.merchant.whatsapp || "")
         setReviewLink(res.merchant.reviewLink || "")
-      })
-      .catch((err) => setError(err.message))
-  }, [merchantId])
+      }
+    } catch (err: any) {
+      console.warn("Marketing load error:", err)
+    }
+  }
 
   async function handleSaveMarketing() {
     setSaving(true)
+    setError(null)
     try {
-      await api.updateMerchant(merchantId, {
-        instagram,
-        facebook,
-        whatsapp,
-        reviewLink,
-      })
+      const updateData = {
+        instagram: instagram.trim() || "",
+        facebook: facebook.trim() || "",
+        whatsapp: whatsapp.trim() || "",
+        reviewLink: reviewLink.trim() || "",
+      }
+
+      // 1. Save directly to Cloud Firestore
+      await firebaseService.updateMerchantInFirestore(merchantId, updateData)
+
+      // 2. Non-blocking API sync
+      api.updateMerchant(merchantId, updateData).catch(() => {})
+
       setSavedSuccess(true)
-      setTimeout(() => setSavedSuccess(false), 2500)
+      setTimeout(() => setSavedSuccess(false), 3000)
     } catch (err: any) {
-      setError(err.message)
+      setError(err?.message || "সংরক্ষণ ব্যর্থ হয়েছে")
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
+    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
       <div className="bg-[#1B4332] px-5 pt-12 pb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -60,9 +91,21 @@ export default function MarketingPage({ merchantId: propId }: MarketingPageProps
           <button
             onClick={handleSaveMarketing}
             disabled={saving}
-            className="px-4 py-2 bg-[#F59E0B] text-[#1B4332] font-black text-xs rounded-xl shadow-sm active:scale-95 transition-all cursor-pointer"
+            className="px-4 py-2 bg-[#F59E0B] text-[#1B4332] font-black text-xs rounded-xl shadow-sm active:scale-95 transition-all cursor-pointer flex items-center gap-1"
           >
-            {saving ? "Saving..." : savedSuccess ? "Saved ✓" : "Save"}
+            {saving ? (
+              <>
+                <RefreshIcon size={12} className="animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : savedSuccess ? (
+              <>
+                <CheckIcon size={12} />
+                <span>Saved ✓</span>
+              </>
+            ) : (
+              <span>Save</span>
+            )}
           </button>
         </div>
       </div>
