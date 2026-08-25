@@ -61,6 +61,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
       // 1. Direct Cloud Firestore save
       await firebaseService.saveMerchantProfile({
         id: newId,
+        slug,
         name: bizName.trim(),
         nameEn: "",
         category,
@@ -72,7 +73,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
         rewardText: rewardText.trim(),
         programs: [
           {
-            id: `prog_${newId}`,
+            id: `rp_${newId}`,
             merchantId: newId,
             target: rewardTarget,
             rewardText: rewardText.trim(),

@@ -42,18 +42,27 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
       const targetId = await resolveId()
       if (!targetId) return
 
-      const [programsData, statsData, fbPrograms] = await Promise.all([
-        api.getRewardPrograms(targetId).catch(() => []),
-        api.getMerchantStats(targetId).catch(() => null),
+      const [fbPrograms, statsData, apiPrograms] = await Promise.all([
         firebaseService.getRewardPrograms(targetId).catch(() => []),
+        api.getMerchantStats(targetId).catch(() => null),
+        api.getRewardPrograms(targetId).catch(() => []),
       ])
 
-      const mergedMap = new Map<string, RewardProgram>()
-      programsData.forEach((p: any) => mergedMap.set(p.id, p))
-      fbPrograms.forEach((p: any) => mergedMap.set(p.id, p as RewardProgram))
-      const merged = Array.from(mergedMap.values())
+      // Firestore is the single source of truth; fallback to API only if empty
+      const rawPrograms = fbPrograms && fbPrograms.length > 0 ? fbPrograms : (apiPrograms || [])
 
-      setPrograms(merged)
+      // Deduplicate by target + rewardText to prevent any duplicate cards
+      const seen = new Set<string>()
+      const uniquePrograms: RewardProgram[] = []
+      for (const p of rawPrograms) {
+        const key = `${p.target}_${(p.rewardText || "").trim().toLowerCase()}`
+        if (!seen.has(key)) {
+          seen.add(key)
+          uniquePrograms.push(p)
+        }
+      }
+
+      setPrograms(uniquePrograms)
       setStats(statsData)
     } catch (err: any) {
       setError(err?.message || "প্রোগ্রাম লোড করতে সমস্যা হয়েছে")

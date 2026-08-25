@@ -82,15 +82,22 @@ export default function MerchantSettings({
   async function loadMerchantDetails(id: string) {
     setLoading(true)
     try {
-      const res = await api.getMerchant(id)
-      if (res.merchant) {
-        const m = res.merchant
+      // 1. Try Firestore first (single source of truth)
+      let m: any = await firebaseService.getMerchantByIdOrSlug(id).catch(() => null)
+
+      // 2. Fallback to API if not in Firestore
+      if (!m) {
+        const res = await api.getMerchant(id).catch(() => null)
+        if (res?.merchant) m = res.merchant
+      }
+
+      if (m) {
         setMerchant(m)
         setBusinessName(m.name || "")
         setBusinessNameEn(m.nameEn || "")
         setCategory(m.category || "ক্যাফে")
         setAddress(m.address || "")
-        setPhone(m.phone || "")
+        setPhone(m.phone || m.ownerPhone || "")
         setHours(m.hours || "")
         setIsOpen(m.isOpen ?? true)
         setLat(m.lat || null)
@@ -262,12 +269,14 @@ export default function MerchantSettings({
     }
   }
 
-  const slug = generateMerchantSlug({
-    name: businessName,
-    nameEn: businessNameEn,
-    id: merchantId,
-  })
-  const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.netlify.app"
+  const slug =
+    (merchant as any)?.slug ||
+    generateMerchantSlug({
+      name: businessName || merchant?.name || "",
+      nameEn: businessNameEn || merchant?.nameEn || "",
+      id: merchantId,
+    })
+  const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.vercel.app"
   const formattedQrLink = slug ? `${host}/${slug}` : ""
 
   return (
@@ -411,73 +420,6 @@ export default function MerchantSettings({
               placeholder="যেমন: কহ"
               className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#1A1916] outline-none focus:border-[#1B4332]"
             />
-          </div>
-
-          {/* Live Preview */}
-          <div className="pt-3 border-t border-[#E9E5DC]">
-            <p className="text-xs font-bold text-[#1A1916] mb-2.5">লাইভ প্রিভিউ:</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Customer Card Preview */}
-              <div className="bg-[#F7F5F0] rounded-2xl p-3 border border-[#E9E5DC]">
-                <p className="text-[10px] font-bold text-[#6B6158] uppercase tracking-wider mb-2">
-                  কাস্টমার কার্ড
-                </p>
-                <div className="bg-white rounded-xl p-3 card-shadow border border-[#E9E5DC]">
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs border overflow-hidden flex-shrink-0"
-                      style={{
-                        backgroundColor: merchant?.logoBg || "#D8EDDF",
-                        color: merchant?.logoColor || "#1B4332",
-                        borderColor: merchant?.logoColor || "#1B4332",
-                      }}
-                    >
-                      {logoUrl ? (
-                        <img src={logoUrl} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        logoInitials
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-[#1A1916] text-xs truncate">{businessName || "দোকানের নাম"}</p>
-                      <p className="text-[10px] text-[#52B788] font-bold">৩/৫ সিল সংগ্রহীত</p>
-                    </div>
-                  </div>
-                  <StampGrid filled={3} total={5} size="sm" />
-                </div>
-              </div>
-
-              {/* Counter Badge Preview */}
-              <div className="bg-[#F7F5F0] rounded-2xl p-3 border border-[#E9E5DC]">
-                <p className="text-[10px] font-bold text-[#6B6158] uppercase tracking-wider mb-2">
-                  কাউন্টার ব্যাজ
-                </p>
-                <div className="bg-white rounded-xl p-3 card-shadow border border-[#E9E5DC] flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm border-2 overflow-hidden shadow-xs flex-shrink-0"
-                    style={{
-                      backgroundColor: merchant?.logoBg || "#D8EDDF",
-                      color: merchant?.logoColor || "#1B4332",
-                      borderColor: merchant?.logoColor || "#1B4332",
-                    }}
-                  >
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      logoInitials
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1 overflow-hidden">
-                    <p className="font-bold text-[#1A1916] text-xs truncate">{businessName || "দোকানের নাম"}</p>
-                    {formattedQrLink && (
-                      <p className="text-[10px] font-mono text-[#1B4332] font-bold truncate break-all mt-0.5">
-                        {formattedQrLink}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
