@@ -97,6 +97,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
       await firebaseService.saveMerchantProfile({
         id: newId,
         name: bizName.trim(),
+        nameEn: "",
         category,
         area,
         address,
@@ -104,6 +105,18 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
         lng,
         ownerPhone: profile?.phone || "",
         ownerName: profile?.name || "",
+        rewardTarget,
+        rewardText: rewardText.trim(),
+        programs: [
+          {
+            id: `prog_${newId}`,
+            merchantId: newId,
+            target: rewardTarget,
+            rewardText: rewardText.trim(),
+            expiryDays,
+            active: true,
+          },
+        ],
         onboarded: true,
       })
 
