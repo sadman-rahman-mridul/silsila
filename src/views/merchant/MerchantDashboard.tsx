@@ -106,10 +106,10 @@ export default function MerchantDashboard({
 
   async function handleApprove(id: string) {
     setApproved((p) => [...p, id])
+    setApprovals((prev) => prev.filter((x) => x.id !== id))
     try {
-      await api.resolveApproval(id, "approved", "staff_owner")
-      firebaseService.resolveApprovalInFirestore(id, "approved")
-      setTimeout(() => setApprovals((a) => a.filter((x) => x.id !== id)), 500)
+      await firebaseService.resolveApprovalInFirestore(id, "approved")
+      await api.resolveApproval(id, "approved", "staff_owner").catch(console.warn)
     } catch (err) {
       console.error("Approve failed:", err)
     }
@@ -117,10 +117,10 @@ export default function MerchantDashboard({
 
   async function handleReject(id: string) {
     setRejected((p) => [...p, id])
+    setApprovals((prev) => prev.filter((x) => x.id !== id))
     try {
-      await api.resolveApproval(id, "rejected", "staff_owner")
-      firebaseService.resolveApprovalInFirestore(id, "rejected")
-      setTimeout(() => setApprovals((a) => a.filter((x) => x.id !== id)), 500)
+      await firebaseService.resolveApprovalInFirestore(id, "rejected")
+      await api.resolveApproval(id, "rejected", "staff_owner").catch(console.warn)
     } catch (err) {
       console.error("Reject failed:", err)
     }

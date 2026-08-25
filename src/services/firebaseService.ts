@@ -499,23 +499,20 @@ export const firebaseService = {
 
       tokens.delete("")
 
-      const q = collection(firestore, "pendingApprovals")
       unsubSnapshot = onSnapshot(
         q,
         (snapshot) => {
-          const list = snapshot.docs
+          const rawList = snapshot.docs
             .map((d) => ({ id: d.id, ...(d.data() as any) }))
-            .filter((a) => {
               if (a.resolution && a.resolution !== "pending") return false
               const aId = (a.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
               const aRaw = (a.merchantId || "").toLowerCase()
               const aName = (a.merchantName || "").toLowerCase().replace(/[^a-z0-9]/g, "")
               return tokens.has(aRaw) || tokens.has(aId) || tokens.has(aName)
             }) as PendingApproval[]
-          callback(list)
-        },
-        (err) => console.warn("Approvals Firestore listener warning:", err)
-      )
+
+          // Deduplicate: Keep ONLY the latest pending request per customer
+          const customerMap = new Map<string, PendingApproval>()
     }
 
     initListener()

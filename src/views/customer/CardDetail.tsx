@@ -721,9 +721,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   </button>
 
                   <button
-                    onClick={() => {
+                    onClick={async () => {
+                      const idToCancel = approvalId
                       setApprovalStatus("idle")
                       if (pollingTimerRef.current) clearInterval(pollingTimerRef.current)
+                      if (idToCancel) {
+                        await firebaseService.resolveApprovalInFirestore(idToCancel, "rejected")
+                      }
                     }}
                     className="w-full py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] hover:bg-[#F7F5F0] font-medium text-xs transition-colors cursor-pointer"
                   >
