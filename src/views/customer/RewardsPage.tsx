@@ -55,7 +55,6 @@ export default function RewardsPage() {
 
   const activeVouchers = vouchers.filter((v) => v.status === "active")
   const redeemedVouchers = vouchers.filter((v) => v.status === "redeemed")
-  const totalSavedApprox = redeemedVouchers.length * 150
 
   function copyCode(code: string) {
     navigator.clipboard?.writeText(code)
@@ -78,8 +77,8 @@ export default function RewardsPage() {
             <p className="text-white/60 text-xs mt-1 font-medium">দাবিযোগ্য</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{redeemedVouchers.length > 0 ? `৳${totalSavedApprox}` : "০"}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">সাশ্রয় করেছেন</p>
+            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{redeemedVouchers.length}</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">ব্যবহৃত</p>
           </div>
         </div>
       </div>
