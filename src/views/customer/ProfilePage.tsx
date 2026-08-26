@@ -21,6 +21,7 @@ interface ProfilePageProps {
 }
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
+  const { user, profile, logout, updateSessionProfile } = useAuth()
   const { language, isBn, toggleLanguage, setLanguage } = useLanguage()
   const swipeHandlers = useSwipeBack(onBack)
   const lang = isBn ? "বাংলা" : "English"

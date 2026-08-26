@@ -6,7 +6,6 @@ import { firebaseService } from "../services/firebaseService"
 import { GlobeIcon } from "../components/Icons"
 
 type LandingStep = "choose" | "phone" | "login_pin" | "register_pin" | "otp"
-type Role = "customer" | "merchant"
 
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
@@ -22,8 +21,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   const [pin, setPin] = useState("")
   const [showPin, setShowPin] = useState(false)
   const [consentGiven, setConsentGiven] = useState(true)
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [infoMsg, setInfoMsg] = useState<string | null>(null)
 
@@ -45,7 +42,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     setIsExistingAccount(false)
     setExistingUserName(null)
     setCachedAccount(null)
-    setOtp(["", "", "", "", "", ""])
     setShowNameModal(false)
     setStep("phone")
   }
@@ -277,7 +273,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   async function handleSaveNewUserName() {
     if (!modalName.trim()) {
       setError(isBn ? "অনুগ্রহ করে আপনার নামটি লিখুন" : "Please enter your name")
-      return
     }
 
     setLoading(true)
@@ -325,7 +320,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           role: "merchant",
           merchantId: accountId,
           ownedMerchantIds: [accountId],
-          onboarded: false,
           createdAt: new Date().toISOString(),
         }
         setSessionProfile(profile, `token_merchant_${accountId}`)
@@ -367,7 +361,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         onboarded: hasCompletedOnboarding,
         createdAt: merchant.createdAt,
       }
-
       await firebaseService.saveMerchantProfile({
         id: merchant.id,
         ownerPhone: phone,
@@ -500,7 +493,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-[#1B4332] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                 <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 9l1.5-6h15L21 9" />
-                  <path d="M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0" />
+                  <path d="M3 9a3 3 0 006 0 3 3 0 006 0" />
                   <path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                   <line x1="10" y1="16" x2="14" y2="16" />
                 </svg>
@@ -829,40 +822,41 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
         {/* STEP 4: OTP VERIFICATION */}
         {step === "otp" && (
-          <div className="w-full max-w-sm animate-slide-up">
+          <div className="w-full animate-slide-up">
             <button
-              onClick={() => setStep(isExistingAccount ? "login_password" : "register_password")}
-              className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+              onClick={() => { setStep("phone"); setError(null); }}
+              className="text-white/70 text-xs mb-3 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
-              {isBn ? "← ফিরে যান" : "← Back"}
+              {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl" onPaste={handlePasteOtp}>
-              <h2 className="text-white font-display font-bold text-2xl mb-1">
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl" onPaste={handlePasteOtp}>
+              <h2 className="text-white font-display font-bold text-xl mb-1">
                 {isBn ? "OTP কোড দিন" : "Enter OTP Code"}
               </h2>
-              <p className="text-white/70 text-sm mb-6">
+              <p className="text-white/70 text-xs mb-4">
                 {isBn
                   ? `+৮৮০ ${phone}-তে পাঠানো ৬ সংখ্যার কোড লিখুন`
                   : `Enter the 6-digit code sent to +880 ${phone}`}
               </p>
 
-              <div className="flex gap-2 mb-6 justify-center">
+              <div className="flex justify-between gap-1.5 mb-5">
                 {otp.map((digit, i) => (
                   <input
                     key={i}
                     id={`otp-${i}`}
                     type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        handleVerifyOtp()
+                        if (otp.every((d) => d !== "")) handleVerifyOtp()
                       } else {
                         handleOtpKeyDown(i, e)
                       }
                     }}
-                    onPaste={handlePasteOtp}
                     className="w-11 h-13 text-center bg-white/10 border-2 rounded-xl text-white text-xl font-bold outline-none transition-all focus:border-[#F59E0B] focus:bg-white/20"
                     style={{ borderColor: digit ? "#52B788" : "rgba(255,255,255,0.2)" }}
                   />
@@ -871,8 +865,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
               <button
                 onClick={() => handleVerifyOtp()}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-lg"
+                disabled={loading || otp.some((d) => !d)}
+                className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer shadow-lg hover:brightness-105"
               >
                 {loading
                   ? isBn ? "যাচাই করা হচ্ছে..." : "Verifying..."
@@ -894,64 +888,58 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       {/* NEW USER NAME MODAL */}
       {showNameModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#1B4332] border border-white/20 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl text-center animate-slide-up">
-            <div className="w-16 h-16 rounded-2xl bg-[#52B788]/20 border border-[#52B788]/30 flex items-center justify-center mx-auto mb-4 text-3xl">
+          <div className="bg-[#1B4332] border border-white/20 rounded-3xl p-6 max-w-xs w-full shadow-2xl text-center animate-slide-up">
+            <div className="w-14 h-14 rounded-2xl bg-[#52B788]/20 border border-[#52B788]/30 flex items-center justify-center mx-auto mb-3 text-2xl">
               ✨
             </div>
-            
-            <h3 className="font-display font-black text-2xl text-white mb-2">
-              {isBn ? "সিলসিলায় স্বাগতম!" : "Welcome to Silsila!"}
+            <h3 className="font-display font-black text-xl text-white mb-1">
+              {isBn ? "আপনার নাম দিন" : "What is your name?"}
             </h3>
-            
-            <p className="text-white/70 text-sm mb-6 leading-relaxed">
-              {isBn
-                ? "নতুন অ্যাকাউন্ট তৈরি করতে অনুগ্রহ করে আপনার নাম দিন।"
-                : "Please enter your name to complete registration."}
+            <p className="text-white/70 text-xs mb-4">
+              {role === "merchant"
+                ? isBn ? "আপনার স্টোর বা ব্র্যান্ডের নাম" : "Your Store or Brand name"
+                : isBn ? "লয়্যালটি কার্ডে প্রদর্শনের জন্য" : "For your loyalty card"}
             </p>
 
-            <div className="mb-5 text-left">
-              <label className="block text-white/80 text-xs font-semibold mb-1.5 uppercase tracking-wider">
-                {isBn ? "আপনার নাম" : "Your Name"}
-              </label>
-              <input
-                type="text"
-                autoFocus
-                value={modalName}
-                onChange={(e) => setModalName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && modalName.trim() && !loading) {
-                    handleSaveNewUserName()
-                  }
-                }}
-                placeholder={isBn ? "যেমন: Sadman / সাদমান" : "e.g. Sadman"}
-                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] focus:bg-white/15 transition-all text-base"
-              />
-            </div>
+            <input
+              type="text"
+              autoFocus
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && userName.trim()) {
+                  handleCompleteRegistration()
+                }
+              }}
+              placeholder={role === "merchant" ? (isBn ? "স্টোরের নাম" : "Store Name") : (isBn ? "আপনার নাম" : "Your Name")}
+              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] mb-4 text-center text-base"
+            />
 
             <button
-              onClick={handleSaveNewUserName}
-              disabled={loading || !modalName.trim()}
-              className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg hover:brightness-105 cursor-pointer"
+              onClick={handleCompleteRegistration}
+              disabled={loading || !userName.trim()}
+              className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] shadow-lg transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer hover:brightness-105"
             >
               {loading
-                ? isBn ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "Creating Account..."
-                : isBn ? "অ্যাকাউন্ট চালু করুন ✓" : "Launch Account ✓"}
+                ? isBn ? "সম্পন্ন হচ্ছে..." : "Finishing..."
+                : isBn ? "শুরু করুন ✓" : "Get Started ✓"}
             </button>
           </div>
         </div>
       )}
 
-      <div className="pb-8 px-6 text-center">
-        <p className="text-white/30 text-xs leading-relaxed">
+      {/* Footer Legal & Version */}
+      <div className="py-4 text-center relative z-10">
+        <p className="text-[11px] text-white/40">
           {isBn ? (
             <>
-              সিলসিলা প্ল্যাটফর্মে প্রবেশের মাধ্যমে আপনি আমাদের{" "}
-              <span className="underline text-white/50">গোপনীয়তা নীতি (PDPA 2026)</span> মেনে নিচ্ছেন।
+              সিলসিলা প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের{" "}
+              <span className="underline text-white/60">গোপনীয়তা নীতি (PDPA ২০২৬)</span> মেনে নিচ্ছেন।
             </>
           ) : (
             <>
               By accessing the Silsila platform, you agree to our{" "}
-              <span className="underline text-white/50">Privacy Policy (PDPA 2026)</span>.
+              <span className="underline text-white/60">Privacy Policy (PDPA 2026)</span>.
             </>
           )}
         </p>
