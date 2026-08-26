@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { api, type OpsMetrics } from "../../services/api"
 import { categoryLabel } from "../../constants/categories"
-import { CheckIcon, XIcon, SearchIcon, LogOutIcon } from "../../components/Icons"
+import { CheckIcon, XIcon, SearchIcon, LogOutIcon, GlobeIcon } from "../../components/Icons"
+import { useLanguage } from "../../context/LanguageContext"
 
 type OpsTab = "merchants" | "fraud" | "cluster"
 
@@ -10,6 +11,7 @@ interface OpsConsoleProps {
 }
 
 export default function OpsConsole({ onBack }: OpsConsoleProps) {
+  const { isBn, toggleLanguage } = useLanguage()
   const [tab, setTab] = useState<OpsTab>("merchants")
   const [metrics, setMetrics] = useState<OpsMetrics | null>(null)
   const [fraudSignals, setFraudSignals] = useState<any[]>([])
@@ -82,28 +84,55 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
-              <span className="text-[#1B4332] font-black text-sm">সি</span>
+              <span className="text-[#1B4332] font-black text-sm">{isBn ? "সি" : "S"}</span>
             </div>
             <div>
-              <h1 className="font-display font-bold text-white text-lg leading-none">অপারেশনস কনসোল (Ops)</h1>
+              <h1 className="font-display font-bold text-white text-lg leading-none">
+                {isBn ? "অপারেশনস কনসোল (Ops)" : "Operations Console (Ops)"}
+              </h1>
               <p className="text-white/40 text-[11px] mt-0.5">Silsila Network Admin</p>
             </div>
           </div>
-          <button
-            onClick={onBack}
-            className="flex items-center gap-1 text-white/60 hover:text-white text-xs bg-white/5 px-2.5 py-1.5 rounded-lg transition-colors"
-          >
-            <LogOutIcon size={13} /> বের হন
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleLanguage}
+              className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer border border-white/15 flex items-center gap-1"
+            >
+              <GlobeIcon size={12} className="text-[#34D399]" />
+              <span className="font-mono text-[10px] uppercase text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
+            </button>
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1 text-white/60 hover:text-white text-xs bg-white/5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+            >
+              <LogOutIcon size={13} /> {isBn ? "বের হন" : "Exit"}
+            </button>
+          </div>
         </div>
 
         {/* Network-wide KPI cards, computed from live merchant activity */}
         <div className="mt-4 grid grid-cols-4 gap-2">
           {[
-            { label: "মোট মার্চেন্ট", value: metrics?.clusterStats.total ?? 0, sub: "অনবোর্ডেড" },
-            { label: "সাপ্তাহিক সিল", value: metrics?.clusterStats.totalStampsWeek ?? 0, sub: "গত ৭ দিন" },
-            { label: "ইউনিক কাস্টমার", value: metrics?.clusterStats.uniqueCustomersCluster ?? 0, sub: "সর্বমোট" },
-            { label: "গড় রিপিট রেট", value: `${metrics?.clusterStats.avgRepeatRate ?? 0}%`, sub: "৩০ দিনে" },
+            {
+              label: isBn ? "মোট মার্চেন্ট" : "Total Merchants",
+              value: metrics?.clusterStats.total ?? 0,
+              sub: isBn ? "অনবোর্ডেড" : "Onboarded",
+            },
+            {
+              label: isBn ? "সাপ্তাহিক সিল" : "Weekly Stamps",
+              value: metrics?.clusterStats.totalStampsWeek ?? 0,
+              sub: isBn ? "গত ৭ দিন" : "Past 7 days",
+            },
+            {
+              label: isBn ? "ইউনিক কাস্টমার" : "Unique Users",
+              value: metrics?.clusterStats.uniqueCustomersCluster ?? 0,
+              sub: isBn ? "সর্বমোট" : "Total",
+            },
+            {
+              label: isBn ? "গড় রিপিট রেট" : "Avg Repeat Rate",
+              value: `${metrics?.clusterStats.avgRepeatRate ?? 0}%`,
+              sub: isBn ? "৩০ দিনে" : "30 days",
+            },
           ].map((s) => (
             <div key={s.label} className="bg-white/5 rounded-xl p-2.5 text-center border border-white/5">
               <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{s.value}</p>
@@ -118,11 +147,15 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 tab === t ? "bg-[#F59E0B] text-[#1B4332] shadow-sm" : "bg-white/5 text-white/60 hover:bg-white/10"
               }`}
             >
-              {t === "merchants" ? "মার্চেন্ট নেটওয়ার্ক" : t === "fraud" ? "ফ্রড ও রিস্ক সিগনাল" : "ক্লাস্টার ১ এনালাইসিস"}
+              {t === "merchants"
+                ? isBn ? "মার্চেন্ট নেটওয়ার্ক" : "Merchant Network"
+                : t === "fraud"
+                ? isBn ? "ফ্রড ও রিস্ক সিগনাল" : "Fraud & Risk Signals"
+                : isBn ? "ক্লাস্টার এনালাইসিস" : "Cluster Analysis"}
             </button>
           ))}
         </div>
@@ -136,7 +169,8 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
         )}
         {loading && (
           <div className="p-6 text-center text-xs text-white/50">
-            <span className="inline-block animate-spin mr-1">⏳</span> মেট্রিক্স রিফ্রেশ হচ্ছে...
+            <span className="inline-block animate-spin mr-1">⏳</span>{" "}
+            {isBn ? "মেট্রিক্স রিফ্রেশ হচ্ছে..." : "Refreshing metrics..."}
           </div>
         )}
 
@@ -146,7 +180,7 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
               <div>
                 <h2 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse" />
-                  অনুমোদনের অপেক্ষায় ({pendingMerchants.length})
+                  {isBn ? `অনুমোদনের অপেক্ষায় (${pendingMerchants.length})` : `Pending Approvals (${pendingMerchants.length})`}
                 </h2>
                 <div className="space-y-2">
                   {pendingMerchants.map((m) => (
@@ -157,22 +191,22 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
                           <p className="text-white/60 text-xs mt-0.5">{m.owner} · {m.phone}</p>
                           <p className="text-white/40 text-[11px] mt-0.5">
                             {[categoryLabel(m.category), m.area].filter(Boolean).join(" · ")}
-                            {m.submittedAt ? ` · আবেদন ${new Date(m.submittedAt).toLocaleDateString("bn-BD")}` : ""}
+                            {m.submittedAt ? ` · ${new Date(m.submittedAt).toLocaleDateString()}` : ""}
                           </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleSuspend(m.id)}
-                          className="flex-1 py-2 rounded-xl border border-white/10 text-white/60 text-xs font-semibold flex items-center justify-center gap-1.5 hover:border-red-500/40 hover:text-red-400"
+                          className="flex-1 py-2 rounded-xl border border-white/10 text-white/60 text-xs font-semibold flex items-center justify-center gap-1.5 hover:border-red-500/40 hover:text-red-400 cursor-pointer"
                         >
-                          <XIcon size={14} /> প্রত্যাখ্যান
+                          <XIcon size={14} /> {isBn ? "প্রত্যাখ্যান" : "Reject"}
                         </button>
                         <button
                           onClick={() => handleApprove(m.id)}
-                          className="flex-[2] py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#2D6A4F]"
+                          className="flex-[2] py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#2D6A4F] cursor-pointer"
                         >
-                          <CheckIcon size={14} /> অনুমোদন দিন
+                          <CheckIcon size={14} /> {isBn ? "অনুমোদন দিন" : "Approve"}
                         </button>
                       </div>
                     </div>
@@ -183,14 +217,16 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-white/60 text-xs font-bold uppercase tracking-wider flex-1">সক্রিয় মার্চেন্ট তালিকা</h2>
+                <h2 className="text-white/60 text-xs font-bold uppercase tracking-wider flex-1">
+                  {isBn ? "সক্রিয় মার্চেন্ট তালিকা" : "Active Merchant List"}
+                </h2>
                 <div className="relative">
                   <SearchIcon size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="খুঁজুন..."
+                    placeholder={isBn ? "খুঁজুন..." : "Search..."}
                     className="bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-1.5 text-white text-xs outline-none w-32 focus:border-white/30"
                   />
                 </div>
@@ -205,35 +241,39 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
                           <div className="flex items-center gap-2 mb-1">
                             <p className="font-bold text-white text-sm">{m.name}</p>
                             <span className={`text-[11px] font-semibold ${statusColor}`}>
-                              {m.status === "active" ? "● সক্রিয়" : m.status === "at_risk" ? "● ঝুঁকিতে" : "● নিষ্ক্রিয়"}
+                              {m.status === "active"
+                                ? isBn ? "● সক্রিয়" : "● Active"
+                                : m.status === "at_risk"
+                                ? isBn ? "● ঝুঁকিতে" : "● At Risk"
+                                : isBn ? "● নিষ্ক্রিয়" : "● Inactive"}
                             </span>
                           </div>
                           <p className="text-white/40 text-xs">
-                            {m.area || "—"} · শেষ সিল:{" "}
-                            {m.lastStamp ? new Date(m.lastStamp).toLocaleDateString("bn-BD") : "কখনো নয়"}
+                            {m.area || "—"} · {isBn ? "শেষ সিল: " : "Last stamp: "}
+                            {m.lastStamp ? new Date(m.lastStamp).toLocaleDateString() : (isBn ? "কখনো নয়" : "Never")}
                           </p>
                           <div className="flex items-center gap-4 mt-2">
                             <div>
                               <span className="font-display font-black text-[#F59E0B] text-sm">{m.stampsWeek}</span>
-                              <span className="text-white/40 text-xs"> সিল/সপ্তাহ</span>
+                              <span className="text-white/40 text-xs">{isBn ? " সিল/সপ্তাহ" : " stamps/wk"}</span>
                             </div>
                             <div>
                               <span className="font-display font-black text-white text-sm">{m.customers}</span>
-                              <span className="text-white/40 text-xs"> কাস্টমার</span>
+                              <span className="text-white/40 text-xs">{isBn ? " কাস্টমার" : " customers"}</span>
                             </div>
                             <div>
                               <span className={`font-display font-black text-sm ${m.repeatRate >= 50 ? "text-[#52B788]" : "text-[#F59E0B]"}`}>
                                 {m.repeatRate}%
                               </span>
-                              <span className="text-white/40 text-xs"> রিপিট</span>
+                              <span className="text-white/40 text-xs">{isBn ? " রিপিট" : " repeat"}</span>
                             </div>
                           </div>
                         </div>
                         <button
                           onClick={() => handleSuspend(m.id)}
-                          className="px-2.5 py-1 rounded-lg border border-white/10 text-white/40 text-xs hover:border-red-500/40 hover:text-red-400"
+                          className="px-2.5 py-1 rounded-lg border border-white/10 text-white/40 text-xs hover:border-red-500/40 hover:text-red-400 cursor-pointer"
                         >
-                          স্থগিত
+                          {isBn ? "স্থগিত" : "Suspend"}
                         </button>
                       </div>
                     </div>

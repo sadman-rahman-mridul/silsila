@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import QRCode from "qrcode"
 import { api, type PendingApproval, type RewardProgram, type Merchant, generateMerchantSlug } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import {
   CheckIcon,
@@ -36,6 +37,7 @@ export default function MerchantDashboard({
   onLogout,
 }: MerchantDashboardProps) {
   const { profile } = useAuth()
+  const { isBn } = useLanguage()
 
   const [ownedMerchants, setOwnedMerchants] = useState<Merchant[]>([])
   const [activeMerchant, setActiveMerchant] = useState<Merchant | null>(null)
@@ -292,7 +294,7 @@ export default function MerchantDashboard({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="কাস্টমারের নাম বা ফোন নম্বর দিয়ে খুঁজুন..."
+              placeholder={isBn ? "কাস্টমারের নাম বা ফোন নম্বর দিয়ে খুঁজুন..." : "Search by customer name or phone..."}
               className="flex-1 bg-transparent text-white text-xs font-medium placeholder-white/40 outline-none"
             />
             {searchQuery && (
@@ -315,7 +317,7 @@ export default function MerchantDashboard({
             className="px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] font-black text-xs flex items-center gap-1.5 shadow-lg glow-amber cursor-pointer hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
           >
             <GiftIcon size={16} />
-            <span>ভাউচার রিডিম</span>
+            <span>{isBn ? "ভাউচার রিডিম" : "Redeem Voucher"}</span>
           </button>
         </div>
 
@@ -324,26 +326,30 @@ export default function MerchantDashboard({
           <div>
             <div className="flex items-center justify-between mb-3 px-1">
               <h2 className="font-display font-bold text-white text-base flex items-center gap-2 drop-shadow-xs">
-                <span>অনুমোদন প্রয়োজন</span>
+                <span>{isBn ? "অনুমোদন প্রয়োজন" : "Approvals Needed"}</span>
                 <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black px-2 py-0.5 rounded-full flex items-center justify-center shadow-md">
                   {filteredApprovals.length}{searchQuery ? ` / ${approvals.length}` : ""}
                 </span>
               </h2>
-              <span className="text-white/60 text-xs font-medium">মেয়াদ: ৩০ মিনিট</span>
+              <span className="text-white/60 text-xs font-medium">
+                {isBn ? "মেয়াদ: ৩০ মিনিট" : "Valid: 30 mins"}
+              </span>
             </div>
 
             {filteredApprovals.length === 0 ? (
               <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
                 <SearchIcon size={28} className="text-white/40 mx-auto mb-2" />
                 <p className="font-display font-bold text-white text-sm">
-                  "{searchQuery}" দিয়ে কোনো অনুরোধ পাওয়া যায়নি
+                  {isBn ? `"${searchQuery}" দিয়ে কোনো অনুরোধ পাওয়া যায়নি` : `No requests found for "${searchQuery}"`}
                 </p>
-                <p className="text-white/50 text-xs mt-1">নাম বা সঠিক ফোন নম্বর দিয়ে আবার চেষ্টা করুন</p>
+                <p className="text-white/50 text-xs mt-1">
+                  {isBn ? "নাম বা সঠিক ফোন নম্বর দিয়ে আবার চেষ্টা করুন" : "Try searching with name or exact phone number"}
+                </p>
                 <button
                   onClick={() => setSearchQuery("")}
                   className="mt-3 px-4 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
                 >
-                  ফিল্টার মুছুন
+                  {isBn ? "ফিল্টার মুছুন" : "Clear Filter"}
                 </button>
               </div>
             ) : (
@@ -366,7 +372,7 @@ export default function MerchantDashboard({
                       <div className="p-4">
                         <div className="flex items-start gap-3 mb-4">
                           <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#34D399] flex-shrink-0">
-                            {approval.customerName?.slice(0, 1) || "ক"}
+                            {approval.customerName?.slice(0, 1) || (isBn ? "ক" : "C")}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-display font-bold text-white text-lg leading-tight truncate">
@@ -374,10 +380,12 @@ export default function MerchantDashboard({
                             </p>
                             <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-white/40 text-[11px]">{approval.scannedAt || "এইমাত্র"}</span>
+                              <span className="text-white/40 text-[11px]">
+                                {approval.scannedAt || (isBn ? "এইমাত্র" : "Just now")}
+                              </span>
                               <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                                 <MapPinIcon size={11} />
-                                <span>{dist}মি. দূরত্বে</span>
+                                <span>{isBn ? `${dist}মি. দূরত্বে` : `${dist}m away`}</span>
                               </span>
                             </div>
                           </div>
@@ -385,11 +393,11 @@ export default function MerchantDashboard({
 
                         {isApproved ? (
                           <div className="flex items-center justify-center gap-2 py-3 bg-[#10B981]/20 border border-[#10B981]/40 rounded-2xl text-[#34D399] font-bold">
-                            ✓ সিল দেওয়া সম্পন্ন!
+                            {isBn ? "✓ সিল দেওয়া সম্পন্ন!" : "✓ Stamp Granted!"}
                           </div>
                         ) : isRejected ? (
                           <div className="flex items-center justify-center gap-2 py-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 font-medium">
-                            প্রত্যাখ্যান করা হয়েছে
+                            {isBn ? "প্রত্যাখ্যান করা হয়েছে" : "Rejected"}
                           </div>
                         ) : (
                           <div className="flex gap-3">
@@ -398,14 +406,14 @@ export default function MerchantDashboard({
                               className="flex-1 py-3.5 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-center gap-1.5 text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-300 cursor-pointer text-xs"
                             >
                               <XIcon size={16} />
-                              <span>বাতিল</span>
+                              <span>{isBn ? "বাতিল" : "Reject"}</span>
                             </button>
                             <button
                               onClick={() => handleApprove(approval.id)}
                               className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
                             >
                               <CheckIcon size={18} />
-                              <span className="font-display text-base">সিল দিন ✓</span>
+                              <span className="font-display text-base">{isBn ? "সিল দিন ✓" : "Grant Stamp ✓"}</span>
                             </button>
                           </div>
                         )}
@@ -423,9 +431,13 @@ export default function MerchantDashboard({
             <div className="w-14 h-14 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#34D399]">
               <ShieldCheckIcon size={30} />
             </div>
-            <p className="font-display font-bold text-white text-base">সব অনুমোদন সম্পন্ন</p>
+            <p className="font-display font-bold text-white text-base">
+              {isBn ? "সব অনুমোদন সম্পন্ন" : "All Caught Up"}
+            </p>
             <p className="text-white/60 text-xs mt-1 leading-relaxed">
-              কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে
+              {isBn
+                ? "কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে"
+                : "Customer scans at counter will appear here in real time"}
             </p>
           </div>
         )}
@@ -434,8 +446,12 @@ export default function MerchantDashboard({
         {program && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-emerald-500/20">
             <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <h2 className="font-display font-bold text-white text-sm">সক্রিয় লয়্যালটি প্রোগ্রাম</h2>
-              <span className="bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 text-xs px-2.5 py-0.5 rounded-full font-bold">সক্রিয়</span>
+              <h2 className="font-display font-bold text-white text-sm">
+                {isBn ? "সক্রিয় লয়্যালটি প্রোগ্রাম" : "Active Loyalty Program"}
+              </h2>
+              <span className="bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                {isBn ? "সক্রিয়" : "Active"}
+              </span>
             </div>
             <div className="p-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
@@ -444,7 +460,9 @@ export default function MerchantDashboard({
               <div className="flex-1">
                 <p className="text-white font-bold text-sm">{program.rewardText}</p>
                 <p className="text-white/60 text-xs mt-0.5">
-                  {program.target}টি সিলে সম্পূর্ণ — {program.expiryDays} দিনের মেয়াদ
+                  {isBn
+                    ? `${program.target}টি সিলে সম্পূর্ণ — ${program.expiryDays} দিনের মেয়াদ`
+                    : `Complete at ${program.target} stamps — ${program.expiryDays} days validity`}
                 </p>
               </div>
             </div>
@@ -458,7 +476,9 @@ export default function MerchantDashboard({
               <div className="w-7 h-7 rounded-xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center">
                 <QRIcon size={16} />
               </div>
-              <h2 className="font-display font-bold text-white text-sm">কাউন্টার QR কোড</h2>
+              <h2 className="font-display font-bold text-white text-sm">
+                {isBn ? "কাউন্টার QR কোড" : "Counter QR Code"}
+              </h2>
             </div>
             {qrDisplayLink && (
               <span className="text-[#34D399] text-[11px] font-mono font-bold">
@@ -478,23 +498,27 @@ export default function MerchantDashboard({
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <div className="text-gray-400 text-xs font-mono">তৈরি হচ্ছে...</div>
+                  <div className="text-gray-400 text-xs font-mono">
+                    {isBn ? "তৈরি হচ্ছে..." : "Generating..."}
+                  </div>
                 )}
               </div>
 
               <div className="flex-1 space-y-2 text-center sm:text-left">
                 <p className="font-bold text-white text-sm">
-                  {merchantName || "আপনার দোকান"} QR কোড
+                  {merchantName || (isBn ? "আপনার দোকান" : "Your Store")} {isBn ? "QR কোড" : "QR Code"}
                 </p>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  কাস্টমারদের স্ক্যান করতে এটি ক্যাশ কাউন্টারে প্রিন্ট করে রাখুন।
+                  {isBn
+                    ? "কাস্টমারদের স্ক্যান করতে এটি ক্যাশ কাউন্টারে প্রিন্ট করে রাখুন।"
+                    : "Print and place this at your cash counter for customers to scan."}
                 </p>
 
                 {/* Toast notification */}
                 {qrDownloadedToast && (
                   <div className="bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 justify-center sm:justify-start animate-fade-in backdrop-blur-md">
                     <CheckIcon size={14} />
-                    <span>QR কোড সফলভাবে ডাউনলোড হয়েছে!</span>
+                    <span>{isBn ? "QR কোড সফলভাবে ডাউনলোড হয়েছে!" : "QR Code downloaded successfully!"}</span>
                   </div>
                 )}
 
@@ -505,7 +529,15 @@ export default function MerchantDashboard({
                     className="px-4 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     <DownloadIcon size={14} />
-                    <span>{downloadingQr ? "ডাউনলোড হচ্ছে..." : "QR ডাউনলোড (HD PNG)"}</span>
+                    <span>
+                      {downloadingQr
+                        ? isBn
+                          ? "ডাউনলোড হচ্ছে..."
+                          : "Downloading..."
+                        : isBn
+                        ? "QR ডাউনলোড (HD PNG)"
+                        : "Download QR (HD PNG)"}
+                    </span>
                   </button>
 
                   <button
@@ -513,7 +545,15 @@ export default function MerchantDashboard({
                     className="px-3.5 py-2.5 border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 backdrop-blur-md"
                   >
                     {copiedLink ? <CheckIcon size={14} className="text-[#34D399]" /> : <CopyIcon size={14} />}
-                    <span>{copiedLink ? "লিংক কপি হয়েছে!" : "লিংক কপি"}</span>
+                    <span>
+                      {copiedLink
+                        ? isBn
+                          ? "লিংক কপি হয়েছে!"
+                          : "Link Copied!"
+                        : isBn
+                        ? "লিংক কপি"
+                        : "Copy Link"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -532,8 +572,12 @@ export default function MerchantDashboard({
                   <GiftIcon size={20} />
                 </div>
                 <div>
-                  <h2 className="font-display font-black text-white text-lg">ভাউচার রিডিম করুন</h2>
-                  <p className="text-xs text-white/60">গ্রাহকের ভাউচার কোড যাচাই ও রিডিম</p>
+                  <h2 className="font-display font-black text-white text-lg">
+                    {isBn ? "ভাউচার রিডিম করুন" : "Redeem Voucher"}
+                  </h2>
+                  <p className="text-xs text-white/60">
+                    {isBn ? "গ্রাহকের ভাউচার কোড যাচাই ও রিডিম" : "Verify and redeem customer vouchers"}
+                  </p>
                 </div>
               </div>
               <button
@@ -553,7 +597,7 @@ export default function MerchantDashboard({
             <div className="space-y-3.5">
               <div>
                 <label className="text-xs text-white/70 font-semibold block mb-1.5">
-                  ভাউচার কোড (যেমন: SL-M1-5X9K)
+                  {isBn ? "ভাউচার কোড (যেমন: SL-M1-5X9K)" : "Voucher Code (e.g. SL-M1-5X9K)"}
                 </label>
                 <div className="relative">
                   <input
@@ -586,12 +630,12 @@ export default function MerchantDashboard({
                 {lookingUpVoucher ? (
                   <>
                     <RefreshIcon size={16} className="animate-spin" />
-                    <span>যাচাই করা হচ্ছে...</span>
+                    <span>{isBn ? "যাচাই করা হচ্ছে..." : "Verifying..."}</span>
                   </>
                 ) : (
                   <>
                     <SearchIcon size={16} />
-                    <span>ভাউচার কোড যাচাই করুন</span>
+                    <span>{isBn ? "ভাউচার কোড যাচাই করুন" : "Verify Voucher Code"}</span>
                   </>
                 )}
               </button>
@@ -613,7 +657,7 @@ export default function MerchantDashboard({
               {voucherResult && (
                 <div className="bg-[#071D13] border border-[#34D399]/40 rounded-2xl p-4 animate-slide-up space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                    <span className="text-xs text-white/50">স্ট্যাটাস</span>
+                    <span className="text-xs text-white/50">{isBn ? "স্ট্যাটাস" : "Status"}</span>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                         voucherResult.redeemed
@@ -621,24 +665,29 @@ export default function MerchantDashboard({
                           : "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30"
                       }`}
                     >
-                      {voucherResult.redeemed ? "ইতিমধ্যে ব্যবহৃত" : "সক্রিয় ও বৈধ ✓"}
+                      {voucherResult.redeemed
+                        ? (isBn ? "ইতিমধ্যে ব্যবহৃত" : "Already Redeemed")
+                        : (isBn ? "সক্রিয় ও বৈধ ✓" : "Active & Valid ✓")}
                     </span>
                   </div>
 
                   <div className="text-center py-1">
-                    <p className="text-[11px] text-white/50 uppercase font-semibold">পুরস্কার</p>
+                    <p className="text-[11px] text-white/50 uppercase font-semibold">
+                      {isBn ? "পুরস্কার" : "Reward"}
+                    </p>
                     <p className="font-display font-black text-xl text-[#F59E0B] mt-0.5">
-                      {voucherResult.rewardText || "১টি বিশেষ উপহার"}
+                      {voucherResult.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
                     </p>
                     <p className="text-xs text-white/70 mt-1">
-                      কাস্টমার: <strong className="text-white">{voucherResult.customerName || "কাস্টমার"}</strong>
+                      {isBn ? "কাস্টমার: " : "Customer: "}
+                      <strong className="text-white">{voucherResult.customerName || (isBn ? "কাস্টমার" : "Customer")}</strong>
                       {voucherResult.customerPhone ? ` (${voucherResult.customerPhone})` : ""}
                     </p>
                   </div>
 
                   {voucherResult.redeemed ? (
                     <div className="py-2.5 bg-red-500/15 border border-red-500/30 rounded-xl text-center text-red-300 text-xs font-bold">
-                      ⚠️ এই ভাউচারটি পূর্বে ব্যবহার করা হয়েছে!
+                      {isBn ? "⚠️ এই ভাউচারটি পূর্বে ব্যবহার করা হয়েছে!" : "⚠️ This voucher was already redeemed!"}
                     </div>
                   ) : (
                     <button
@@ -649,12 +698,12 @@ export default function MerchantDashboard({
                       {redeeming ? (
                         <>
                           <RefreshIcon size={16} className="animate-spin" />
-                          <span>রিডিম নিশ্চিত করা হচ্ছে...</span>
+                          <span>{isBn ? "রিডিম নিশ্চিত করা হচ্ছে..." : "Confirming redemption..."}</span>
                         </>
                       ) : (
                         <>
                           <CheckIcon size={18} />
-                          <span>উপহার প্রদান ও রিডিম সম্পন্ন করুন ✓</span>
+                          <span>{isBn ? "উপহার প্রদান ও রিডিম সম্পন্ন করুন ✓" : "Give Reward & Complete Redeem ✓"}</span>
                         </>
                       )}
                     </button>

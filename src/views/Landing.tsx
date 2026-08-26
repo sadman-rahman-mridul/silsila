@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { api, ApiError } from "../services/api"
 import { useAuth, type UserProfile } from "../context/AuthContext"
+import { useLanguage } from "../context/LanguageContext"
 import { firebaseService } from "../services/firebaseService"
+import { GlobeIcon } from "../components/Icons"
 
 type LandingStep = "choose" | "phone" | "login_password" | "register_password" | "otp"
 type Role = "customer" | "merchant"
@@ -13,6 +15,7 @@ interface LandingProps {
 
 export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) {
   const { setSessionProfile } = useAuth()
+  const { isBn, toggleLanguage } = useLanguage()
   const [step, setStep] = useState<LandingStep>(() => (initialMerchantSlug ? "phone" : "choose"))
   const [role, setRole] = useState<Role>("customer")
   const [phone, setPhone] = useState("")
@@ -53,11 +56,11 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   async function handlePhoneNext() {
     const clean = phone.replace(/\D/g, "")
     if (clean.length < 10) {
-      setError("সঠিক ১১ ডিজিটের মোবাইল নম্বর প্রদান করুন")
+      setError(isBn ? "সঠিক ১১ ডিজিটের মোবাইল নম্বর প্রদান করুন" : "Please provide a valid 11-digit mobile number")
       return
     }
     if (!consentGiven) {
-      setError("এগিয়ে যেতে ডেটা সুরক্ষা সম্মতিতে টিক দিন")
+      setError(isBn ? "এগিয়ে যেতে ডেটা সুরক্ষা সম্মতিতে টিক দিন" : "Please accept the data privacy policy to proceed")
       return
     }
 
@@ -80,12 +83,20 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         // Phone matches an existing user in Firestore -> ask for Password (with OTP option below)
         setStep("login_password")
         if (name) {
-          setInfoMsg(`স্বাগতম ${name}! আপনার অ্যাকাউন্টের পাসওয়ার্ড লিখুন।`)
+          setInfoMsg(
+            isBn
+              ? `স্বাগতম ${name}! আপনার অ্যাকাউন্টের পাসওয়ার্ড লিখুন।`
+              : `Welcome back, ${name}! Please enter your password.`
+          )
         }
       } else {
         // Phone doesn't match any Firestore account -> ask to start Registration by writing password
         setStep("register_password")
-        setInfoMsg("এই নম্বরে কোনো অ্যাকাউন্ট নেই। অনুগ্রহ করে রেজিস্ট্রেশন করতে একটি পাসওয়ার্ড তৈরি করুন।")
+        setInfoMsg(
+          isBn
+            ? "এই নম্বরে কোনো অ্যাকাউন্ট নেই। অনুগ্রহ করে রেজিস্ট্রেশন করতে একটি পাসওয়ার্ড তৈরি করুন।"
+            : "No account found for this number. Please set a password to register."
+        )
       }
     } catch (err: any) {
       console.error("Lookup error:", err)
@@ -98,7 +109,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   // STEP 3A: Existing User Login with Password
   async function handleExistingPasswordLogin() {
     if (!password.trim()) {
-      setError("অনুগ্রহ করে আপনার পাসওয়ার্ড লিখুন")
+      setError(isBn ? "অনুগ্রহ করে আপনার পাসওয়ার্ড লিখুন" : "Please enter your password")
       return
     }
 
@@ -120,18 +131,30 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             merchant: role === "merchant" ? cachedAccount : undefined,
             merchants: role === "merchant" ? [cachedAccount] : undefined,
           }
-          await finalizeLogin(resObj, storedName || "ব্যবহারকারী")
+          await finalizeLogin(resObj, storedName || (isBn ? "ব্যবহারকারী" : "User"))
           return
         } else if (cachedAccount.password && cachedAccount.password !== password.trim()) {
-          setError("ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
+          setError(
+            isBn
+              ? "ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+              : "Incorrect password! Please try again or log in with OTP below."
+          )
           return
         }
       }
 
-      setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
+      setError(
+        isBn
+          ? "পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+          : "Incorrect password. Please try again or log in with OTP below."
+      )
     } catch (err: any) {
       console.error("Password login error:", err)
-      setError("পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।")
+      setError(
+        isBn
+          ? "পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+          : "Incorrect password. Please try again or log in with OTP below."
+      )
     } finally {
       setLoading(false)
     }
@@ -140,20 +163,24 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   // STEP 3B: New User Registration -> Send OTP verification first
   async function handleNewUserRegisterSubmit() {
     if (password.trim().length < 4) {
-      setError("পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে")
+      setError(isBn ? "পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে" : "Password must be at least 4 characters")
       return
     }
 
     setError(null)
     setInfoMsg(null)
-    await handleSendOtp("নিবন্ধন যাচাই করতে আপনার ফোনে ৬-সংখ্যার OTP কোড পাঠানো হয়েছে।")
+    await handleSendOtp(
+      isBn
+        ? "নিবন্ধন যাচাই করতে আপনার ফোনে ৬-সংখ্যার OTP কোড পাঠানো হয়েছে।"
+        : "A 6-digit OTP code has been sent to verify your registration."
+    )
   }
 
   // Send OTP
   async function handleSendOtp(customSuccessMsg?: string) {
     const clean = phone.replace(/\D/g, "")
     if (clean.length < 10) {
-      setError("সঠিক ১১ ডিজিটের মোবাইল নম্বর প্রদান করুন")
+      setError(isBn ? "সঠিক ১১ ডিজিটের মোবাইল নম্বর প্রদান করুন" : "Please enter a valid 11-digit mobile number")
       return
     }
     setLoading(true)
@@ -165,7 +192,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       await api.sendOtp(clean, role)
       setInfoMsg(
         customSuccessMsg ||
-          `আপনার মোবাইল নম্বরে ৬ সংখ্যার OTP কোড পাঠানো হয়েছে (+৮৮০ ${clean})।`
+          (isBn
+            ? `আপনার মোবাইল নম্বরে ৬ সংখ্যার OTP কোড পাঠানো হয়েছে (+৮৮০ ${clean})।`
+            : `A 6-digit OTP code has been sent to (+880 ${clean}).`)
       )
       setStep("otp")
       setTimeout(() => document.getElementById("otp-0")?.focus(), 150)
@@ -174,7 +203,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       setError(
         err instanceof ApiError
           ? err.message
-          : "মোবাইল নম্বরে OTP পাঠানো যায়নি। দয়া করে নেটওয়ার্ক চেক করে পুনরায় চেষ্টা করুন।"
+          : isBn
+          ? "মোবাইল নম্বরে OTP পাঠানো যায়নি। দয়া করে নেটওয়ার্ক চেক করে পুনরায় চেষ্টা করুন।"
+          : "Failed to send OTP. Please check your network and try again."
       )
     } finally {
       setLoading(false)
@@ -200,7 +231,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   async function handleVerifyOtp(overrideOtp?: string) {
     const fullOtp = overrideOtp || otp.join("")
     if (fullOtp.length < 6) {
-      setError("৬ ডিজিটের OTP কোড লিখুন")
+      setError(isBn ? "৬ ডিজিটের OTP কোড লিখুন" : "Please enter the 6-digit OTP code")
       return
     }
     setLoading(true)
@@ -228,7 +259,13 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       }
     } catch (err: any) {
       console.error("Verification error:", err)
-      setError(err instanceof ApiError ? err.message : "যাচাইকরণে ত্রুটি হয়েছে। সঠিক OTP প্রদান করুন।")
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : isBn
+          ? "যাচাইকরণে ত্রুটি হয়েছে। সঠিক OTP প্রদান করুন।"
+          : "Verification error. Please enter the correct OTP."
+      )
     } finally {
       setLoading(false)
     }
@@ -236,7 +273,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
   async function handleSaveNewUserName() {
     if (!modalName.trim()) {
-      setError("অনুগ্রহ করে আপনার নামটি লিখুন")
+      setError(isBn ? "অনুগ্রহ করে আপনার নামটি লিখুন" : "Please enter your name")
       return
     }
 
@@ -297,7 +334,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       api.registerWithPassword(cleanPhone, password.trim(), finalName, role).catch(() => {})
     } catch (err: any) {
       console.error("Failed to save new profile:", err)
-      setError(err?.message || "প্রোফাইল সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।")
+      setError(
+        err?.message ||
+          (isBn ? "প্রোফাইল সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।" : "Failed to save profile. Please try again.")
+      )
     } finally {
       setLoading(false)
     }
@@ -307,7 +347,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     if (role === "merchant") {
       const merchant = res.merchant
       if (!merchant?.id) {
-        setError("মার্চেন্ট অ্যাকাউন্ট পাওয়া যায়নি। আবার চেষ্টা করুন।")
+        setError(isBn ? "মার্চেন্ট অ্যাকাউন্ট পাওয়া যায়নি। আবার চেষ্টা করুন।" : "Merchant account not found. Please try again.")
         return
       }
 
@@ -385,6 +425,19 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
   return (
     <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] flex flex-col relative overflow-hidden">
+      {/* Top Bar Quick Language Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          onClick={toggleLanguage}
+          className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/15 flex items-center gap-1.5 active:scale-95 shadow-md"
+        >
+          <GlobeIcon size={14} className="text-[#34D399]" />
+          <span className="font-mono text-xs font-black uppercase text-[#34D399]">
+            {isBn ? "English" : "বাংলা"}
+          </span>
+        </button>
+      </div>
+
       {/* Ambient background glow orb */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#52B788]/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -394,10 +447,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             <span className="text-4xl">🔖</span>
           </div>
           <h1 className="font-display text-5xl font-black text-white tracking-tight leading-none mb-2 drop-shadow-md">
-            সিলসিলা
+            {isBn ? "সিলসিলা" : "Silsila"}
           </h1>
           <p className="text-[#34D399] text-base font-semibold tracking-wide mt-1 drop-shadow-sm">
-            আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!
+            {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your Brand's Digital Loyalty Card!"}
           </p>
         </div>
 
@@ -429,7 +482,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
               </div>
-              <span className="text-[#1B4332] font-display font-black text-lg tracking-tight">Customer</span>
+              <span className="text-[#1B4332] font-display font-black text-lg tracking-tight">
+                {isBn ? "কাস্টমার" : "Customer"}
+              </span>
             </button>
 
             {/* Merchant Button */}
@@ -445,7 +500,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   <line x1="10" y1="16" x2="14" y2="16" />
                 </svg>
               </div>
-              <span className="text-white font-display font-black text-lg tracking-tight">Merchant</span>
+              <span className="text-white font-display font-black text-lg tracking-tight">
+                {isBn ? "মার্চেন্ট" : "Merchant"}
+              </span>
             </button>
           </div>
         )}
@@ -457,28 +514,34 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               onClick={() => setStep("choose")}
               className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
-              ← ফিরে যান
+              {isBn ? "← ফিরে যান" : "← Back"}
             </button>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white font-display font-bold text-2xl">
-                  {role === "customer" ? "Customer" : "Merchant"}
+                  {role === "customer"
+                    ? isBn ? "কাস্টমার" : "Customer"
+                    : isBn ? "মার্চেন্ট" : "Merchant"}
                 </h2>
                 <span className="px-3 py-1 bg-white/15 rounded-full text-xs font-semibold text-white/80">
-                  {role === "customer" ? "কাস্টমার" : "মার্চেন্ট"}
+                  {role === "customer"
+                    ? isBn ? "কাস্টমার" : "Customer"
+                    : isBn ? "মার্চেন্ট" : "Merchant"}
                 </span>
               </div>
 
               <p className="text-white/80 text-xs mb-4 leading-relaxed">
-                আপনার ১১ ডিজিটের মোবাইল নম্বর দিন
+                {isBn ? "আপনার ১১ ডিজিটের মোবাইল নম্বর দিন" : "Enter your 11-digit mobile number"}
               </p>
 
               {/* Phone Number Field */}
               <div className="mb-5">
-                <label className="block text-white/80 text-xs font-semibold mb-1.5">মোবাইল নম্বর (+৮৮০)</label>
+                <label className="block text-white/80 text-xs font-semibold mb-1.5">
+                  {isBn ? "মোবাইল নম্বর (+৮৮০)" : "Mobile Number (+880)"}
+                </label>
                 <div className="flex gap-2">
                   <div className="bg-white/10 border border-white/20 rounded-xl px-3.5 py-3 text-white font-medium text-sm flex items-center">
-                    +৮৮০
+                    +880
                   </div>
                   <input
                     type="tel"
@@ -505,7 +568,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   className="mt-0.5 rounded text-[#1B4332] focus:ring-0 cursor-pointer"
                 />
                 <span>
-                  বাংলাদেশ ব্যক্তিগত ডেটা সুরক্ষা আইন ২০২৬ অনুযায়ী আমার লয়্যালটি স্ট্যাম্প সংরক্ষণে সম্মতি প্রদান করছি।
+                  {isBn
+                    ? "বাংলাদেশ ব্যক্তিগত ডেটা সুরক্ষা আইন ২০২৬ অনুযায়ী আমার লয়্যালটি স্ট্যাম্প সংরক্ষণে সম্মতি প্রদান করছি।"
+                    : "I consent to the collection and storage of my loyalty stamp information under Bangladesh Data Privacy Regulations (PDPA 2026)."}
                 </span>
               </label>
 
@@ -519,7 +584,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   color: phone.length >= 10 && consentGiven ? "#1B4332" : "white",
                 }}
               >
-                {loading ? "যাচাই করা হচ্ছে..." : "এগিয়ে যান →"}
+                {loading
+                  ? isBn ? "যাচাই করা হচ্ছে..." : "Verifying..."
+                  : isBn ? "এগিয়ে যান →" : "Continue →"}
               </button>
             </div>
           </div>
@@ -532,32 +599,36 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               onClick={() => { setStep("phone"); setError(null); }}
               className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
-              ← নম্বর পরিবর্তন করুন
+              {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-white font-display font-bold text-2xl">
-                  {existingUserName ? `স্বাগতম, ${existingUserName}!` : "লগইন করুন"}
+                  {existingUserName
+                    ? (isBn ? `স্বাগতম, ${existingUserName}!` : `Welcome, ${existingUserName}!`)
+                    : (isBn ? "লগইন করুন" : "Log In")}
                 </h2>
                 <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-[11px] font-bold">
-                  বিদ্যমান অ্যাকাউন্ট
+                  {isBn ? "বিদ্যমান অ্যাকাউন্ট" : "Existing Account"}
                 </span>
               </div>
 
               <p className="text-white/70 text-xs mb-4">
-                📱 +৮৮০ {phone}
+                📱 +880 {phone}
               </p>
 
               {/* Password Field */}
               <div className="mb-5">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-white/80 text-xs font-semibold">আপনার পাসওয়ার্ড</label>
+                  <label className="block text-white/80 text-xs font-semibold">
+                    {isBn ? "আপনার পাসওয়ার্ড" : "Your Password"}
+                  </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer"
                   >
-                    {showPassword ? "লুকান" : "দেখুন"}
+                    {showPassword ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
                   </button>
                 </div>
                 <input
@@ -570,7 +641,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                       handleExistingPasswordLogin()
                     }
                   }}
-                  placeholder="পাসওয়ার্ড লিখুন"
+                  placeholder={isBn ? "পাসওয়ার্ড লিখুন" : "Enter password"}
                   className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base"
                 />
               </div>
@@ -581,7 +652,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 disabled={loading || !password.trim()}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
-                {loading ? "লগইন হচ্ছে..." : "লগইন করুন ✓"}
+                {loading
+                  ? isBn ? "লগইন হচ্ছে..." : "Logging In..."
+                  : isBn ? "লগইন করুন ✓" : "Log In ✓"}
               </button>
 
               {/* Secondary Option: Request OTP */}
@@ -592,7 +665,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   disabled={loading}
                   className="text-xs font-semibold text-white/80 hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
                 >
-                  📲 অথবা OTP কোড দিয়ে লগইন করুন
+                  {isBn ? "📲 অথবা OTP কোড দিয়ে লগইন করুন" : "📲 Or log in with OTP code"}
                 </button>
               </div>
             </div>
@@ -606,36 +679,40 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               onClick={() => { setStep("phone"); setError(null); }}
               className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
-              ← নম্বর পরিবর্তন করুন
+              {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-white font-display font-bold text-2xl">
-                  নতুন রেজিস্ট্রেশন
+                  {isBn ? "নতুন রেজিস্ট্রেশন" : "New Registration"}
                 </h2>
                 <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-[11px] font-bold">
-                  নতুন অ্যাকাউন্ট
+                  {isBn ? "নতুন অ্যাকাউন্ট" : "New Account"}
                 </span>
               </div>
 
               <p className="text-white/70 text-xs mb-4">
-                📱 +৮৮০ {phone}
+                📱 +880 {phone}
               </p>
 
               <div className="p-3 bg-white/5 border border-white/10 rounded-2xl mb-4 text-xs text-white/80 leading-relaxed">
-                এই নম্বরে কোনো অ্যাকাউন্ট নেই। নতুন অ্যাকাউন্ট তৈরি করতে আপনার পছন্দের একটি পাসওয়ার্ড সেট করুন।
+                {isBn
+                  ? "এই নম্বরে কোনো অ্যাকাউন্ট নেই। নতুন অ্যাকাউন্ট তৈরি করতে আপনার পছন্দের একটি পাসওয়ার্ড সেট করুন।"
+                  : "No account found with this number. Please choose a password to create your account."}
               </div>
 
               {/* Password Field */}
               <div className="mb-5">
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-white/80 text-xs font-semibold">নতুন পাসওয়ার্ড তৈরি করুন</label>
+                  <label className="block text-white/80 text-xs font-semibold">
+                    {isBn ? "নতুন পাসওয়ার্ড তৈরি করুন" : "Create New Password"}
+                  </label>
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer"
                   >
-                    {showPassword ? "লুকান" : "দেখুন"}
+                    {showPassword ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
                   </button>
                 </div>
                 <input
@@ -648,7 +725,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                       handleNewUserRegisterSubmit()
                     }
                   }}
-                  placeholder="পাসওয়ার্ড লিখুন (কমপক্ষে ৪ অক্ষর)"
+                  placeholder={isBn ? "পাসওয়ার্ড লিখুন (কমপক্ষে ৪ অক্ষর)" : "Enter password (at least 4 chars)"}
                   className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base"
                 />
               </div>
@@ -659,7 +736,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 disabled={loading || password.trim().length < 4}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
-                {loading ? "OTP পাঠানো হচ্ছে..." : "OTP পাঠান ও এগিয়ে যান →"}
+                {loading
+                  ? isBn ? "OTP পাঠানো হচ্ছে..." : "Sending OTP..."
+                  : isBn ? "OTP পাঠান ও এগিয়ে যান →" : "Send OTP & Proceed →"}
               </button>
             </div>
           </div>
@@ -672,12 +751,16 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               onClick={() => setStep(isExistingAccount ? "login_password" : "register_password")}
               className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
-              ← ফিরে যান
+              {isBn ? "← ফিরে যান" : "← Back"}
             </button>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl" onPaste={handlePasteOtp}>
-              <h2 className="text-white font-display font-bold text-2xl mb-1">OTP কোড দিন</h2>
+              <h2 className="text-white font-display font-bold text-2xl mb-1">
+                {isBn ? "OTP কোড দিন" : "Enter OTP Code"}
+              </h2>
               <p className="text-white/70 text-sm mb-6">
-                +৮৮০ {phone}-তে পাঠানো ৬ সংখ্যার কোড লিখুন
+                {isBn
+                  ? `+৮৮০ ${phone}-তে পাঠানো ৬ সংখ্যার কোড লিখুন`
+                  : `Enter the 6-digit code sent to +880 ${phone}`}
               </p>
 
               <div className="flex gap-2 mb-6 justify-center">
@@ -708,7 +791,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 disabled={loading}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-lg"
               >
-                {loading ? "যাচাই করা হচ্ছে..." : "যাচাই করে প্রবেশ করুন ✓"}
+                {loading
+                  ? isBn ? "যাচাই করা হচ্ছে..." : "Verifying..."
+                  : isBn ? "যাচাই করে প্রবেশ করুন ✓" : "Verify & Sign In ✓"}
               </button>
 
               <button
@@ -716,7 +801,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 disabled={loading}
                 className="w-full mt-3 py-2 text-white/60 text-xs hover:text-white transition-colors cursor-pointer"
               >
-                পুনরায় OTP পাঠান
+                {isBn ? "পুনরায় OTP পাঠান" : "Resend OTP"}
               </button>
             </div>
           </div>
@@ -732,16 +817,18 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             </div>
             
             <h3 className="font-display font-black text-2xl text-white mb-2">
-              সিলসিলায় স্বাগতম!
+              {isBn ? "সিলসিলায় স্বাগতম!" : "Welcome to Silsila!"}
             </h3>
             
             <p className="text-white/70 text-sm mb-6 leading-relaxed">
-              নতুন অ্যাকাউন্ট তৈরি করতে অনুগ্রহ করে আপনার নাম দিন।
+              {isBn
+                ? "নতুন অ্যাকাউন্ট তৈরি করতে অনুগ্রহ করে আপনার নাম দিন।"
+                : "Please enter your name to complete registration."}
             </p>
 
             <div className="mb-5 text-left">
               <label className="block text-white/80 text-xs font-semibold mb-1.5 uppercase tracking-wider">
-                আপনার নাম
+                {isBn ? "আপনার নাম" : "Your Name"}
               </label>
               <input
                 type="text"
@@ -753,7 +840,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                     handleSaveNewUserName()
                   }
                 }}
-                placeholder="যেমন: Sadman / সাদমান"
+                placeholder={isBn ? "যেমন: Sadman / সাদমান" : "e.g. Sadman"}
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] focus:bg-white/15 transition-all text-base"
               />
             </div>
@@ -763,7 +850,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               disabled={loading || !modalName.trim()}
               className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg hover:brightness-105 cursor-pointer"
             >
-              {loading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "অ্যাকাউন্ট চালু করুন ✓"}
+              {loading
+                ? isBn ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "Creating Account..."
+                : isBn ? "অ্যাকাউন্ট চালু করুন ✓" : "Launch Account ✓"}
             </button>
           </div>
         </div>
@@ -771,8 +860,17 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
       <div className="pb-8 px-6 text-center">
         <p className="text-white/30 text-xs leading-relaxed">
-          সিলসিলা প্ল্যাটফর্মে প্রবেশের মাধ্যমে আপনি আমাদের{" "}
-          <span className="underline text-white/50">গোপনীয়তা নীতি (PDPA 2026)</span> মেনে নিচ্ছেন।
+          {isBn ? (
+            <>
+              সিলসিলা প্ল্যাটফর্মে প্রবেশের মাধ্যমে আপনি আমাদের{" "}
+              <span className="underline text-white/50">গোপনীয়তা নীতি (PDPA 2026)</span> মেনে নিচ্ছেন।
+            </>
+          ) : (
+            <>
+              By accessing the Silsila platform, you agree to our{" "}
+              <span className="underline text-white/50">Privacy Policy (PDPA 2026)</span>.
+            </>
+          )}
         </p>
       </div>
     </div>

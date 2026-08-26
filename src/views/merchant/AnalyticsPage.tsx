@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { api, type MerchantStats, type MerchantCustomer, emptyMerchantStats } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import {
   TrendingUpIcon,
   UsersIcon,
@@ -19,6 +20,7 @@ interface AnalyticsPageProps {
 
 export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) {
   const { profile } = useAuth()
+  const { isBn } = useLanguage()
   const merchantId =
     activeMerchantId || profile?.merchantId || (profile?.role === "merchant" ? profile?.id : "") || ""
   const [stats, setStats] = useState<MerchantStats>(emptyMerchantStats)
@@ -68,10 +70,16 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
       ? stats.retentionFunnel.map((row) => ({
           label:
             row.visit === 0
-              ? "কার্ড সম্পন্ন (পুরস্কার)"
+              ? isBn
+                ? "কার্ড সম্পন্ন (পুরস্কার)"
+                : "Card Completed (Reward)"
               : row.visit === 1
-              ? "১ম ভিজিট (অনবোর্ড)"
-              : row.visit + (row.visit === 2 ? "য়" : row.visit === 3 ? "য়" : "র্থ") + " ভিজিট",
+              ? isBn
+                ? "১ম ভিজিট (অনবোর্ড)"
+                : "1st Visit (Onboarded)"
+              : isBn
+              ? `${row.visit}য় ভিজিট`
+              : `Visit #${row.visit}`,
           value: row.customers,
           pct: row.pct,
         }))
@@ -85,38 +93,50 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
     <div className="flex flex-col h-full bg-transparent">
       {/* Header */}
       <div className="px-5 pt-4 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">রিপোর্ট ও পরিসংখ্যান</h1>
-        <p className="text-[#34D399] text-xs font-semibold">লাইভ মেট্রিক্স ও পারফরম্যান্স ডেটা</p>
+        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">
+          {isBn ? "রিপোর্ট ও পরিসংখ্যান" : "Analytics & Reports"}
+        </h1>
+        <p className="text-[#34D399] text-xs font-semibold">
+          {isBn ? "লাইভ মেট্রিক্স ও পারফরম্যান্স ডেটা" : "Live metrics & performance data"}
+        </p>
 
         {/* 4-Stat tiles */}
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {[
             {
-              label: "আজকের মোট স্ক্যান",
+              label: isBn ? "আজকের মোট স্ক্যান" : "Today's Scans",
               value: stats.scansToday,
               icon: <TrendingUpIcon size={14} />,
-              change: stats.weeklyChange ? "+" + stats.weeklyChange + "% এই সপ্তাহে" : "আজকের কাউন্টার",
+              change: stats.weeklyChange
+                ? `+${stats.weeklyChange}% ${isBn ? "এই সপ্তাহে" : "this week"}`
+                : isBn
+                ? "আজকের কাউন্টার"
+                : "Today at counter",
               up: stats.weeklyChange >= 0,
             },
             {
-              label: "ইউনিক কাস্টমার",
+              label: isBn ? "ইউনিক কাস্টমার" : "Unique Customers",
               value: stats.uniqueCustomers,
               icon: <UsersIcon size={14} />,
-              change: stats.newThisWeek ? "+" + stats.newThisWeek + " নতুন" : "মোট নিবন্ধিত",
+              change: stats.newThisWeek
+                ? `+${stats.newThisWeek} ${isBn ? "নতুন" : "new"}`
+                : isBn
+                ? "মোট নিবন্ধিত"
+                : "Total registered",
               up: true,
             },
             {
-              label: "রিপিট রেট",
+              label: isBn ? "রিপিট রেট" : "Repeat Rate",
               value: stats.repeatRate + "%",
               icon: <TrendingUpIcon size={14} />,
-              change: "পুনরাবৃত্তি গ্রাহক",
+              change: isBn ? "পুনরাবৃত্তি গ্রাহক" : "Returning customers",
               up: true,
             },
             {
-              label: "পুরস্কার রিডিম",
+              label: isBn ? "পুরস্কার রিডিম" : "Rewards Redeemed",
               value: stats.rewardsRedeemed,
               icon: <GiftIcon size={14} />,
-              change: "রিওয়ার্ড সম্পন্ন",
+              change: isBn ? "রিওয়ার্ড সম্পন্ন" : "Completed rewards",
               up: true,
             },
           ].map((s) => (
@@ -138,7 +158,7 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         {loading && (
           <div className="py-6 text-center text-xs text-white/70 flex items-center justify-center gap-2">
             <RefreshIcon size={16} className="animate-spin text-[#34D399]" />
-            <span>ডেটা লোড হচ্ছে...</span>
+            <span>{isBn ? "ডেটা লোড হচ্ছে..." : "Loading data..."}</span>
           </div>
         )}
 
@@ -147,9 +167,13 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
             <div className="w-14 h-14 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#34D399]">
               <BarChartIcon size={28} />
             </div>
-            <p className="font-display font-bold text-white text-lg">এখনো কোনো ডেটা নেই</p>
+            <p className="font-display font-bold text-white text-lg">
+              {isBn ? "এখনো কোনো ডেটা নেই" : "No Data Yet"}
+            </p>
             <p className="text-white/60 text-xs mt-2">
-              কাস্টমাররা আপনার QR কোড স্ক্যান করলে এখানে রিপোর্ট দেখা যাবে।
+              {isBn
+                ? "কাস্টমাররা আপনার QR কোড স্ক্যান করলে এখানে রিপোর্ট দেখা যাবে।"
+                : "Reports will appear here once customers start scanning your QR code."}
             </p>
           </div>
         )}
@@ -160,9 +184,11 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <BarChartIcon size={18} className="text-[#34D399]" />
-                <h2 className="font-display font-bold text-white text-base">সাপ্তাহিক সিল ট্রেন্ড</h2>
+                <h2 className="font-display font-bold text-white text-base">
+                  {isBn ? "সাপ্তাহিক সিল ট্রেন্ড" : "Weekly Stamp Trend"}
+                </h2>
               </div>
-              <span className="text-white/40 text-xs">গত ৭ দিন</span>
+              <span className="text-white/40 text-xs">{isBn ? "গত ৭ দিন" : "Past 7 days"}</span>
             </div>
             <div className="flex items-end gap-1.5 h-32">
               {weeklyData.map((d, i) => (
@@ -180,16 +206,18 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
             </div>
             <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
               <span>
-                মোট: <strong className="text-[#34D399]">{stats.stampsThisWeek}</strong> সিল এই সপ্তাহে
+                {isBn ? "মোট: " : "Total: "}
+                <strong className="text-[#34D399]">{stats.stampsThisWeek}</strong>{" "}
+                {isBn ? "সিল এই সপ্তাহে" : "stamps this week"}
               </span>
               <span>
-                গড়:{" "}
+                {isBn ? "গড়: " : "Avg: "}
                 <strong className="text-[#34D399]">
                   {weeklyData.length > 0
                     ? (weeklyData.reduce((s, d) => s + d.stamps, 0) / weeklyData.length).toFixed(1)
                     : 0}
                 </strong>
-                /দিন
+                {isBn ? "/দিন" : "/day"}
               </span>
             </div>
           </div>
@@ -200,10 +228,14 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20 text-white">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUpIcon size={18} className="text-[#34D399]" />
-              <h2 className="font-display font-bold text-white text-base">কাস্টমার রিটেনশন ফানেল</h2>
+              <h2 className="font-display font-bold text-white text-base">
+                {isBn ? "কাস্টমার রিটেনশন ফানেল" : "Customer Retention Funnel"}
+              </h2>
             </div>
             <p className="text-white/60 text-xs mb-4">
-              কত শতাংশ কাস্টমার পরবর্তী ভিজিটে ফিরে আসছেন
+              {isBn
+                ? "কত শতাংশ কাস্টমার পরবর্তী ভিজিটে ফিরে আসছেন"
+                : "Percentage of customers returning on subsequent visits"}
             </p>
             <div className="space-y-3">
               {retentionData.map((d, i) => (
@@ -211,7 +243,9 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-white text-sm font-medium">{d.label}</p>
                     <div className="flex items-center gap-2">
-                      <span className="font-display font-bold text-[#34D399]">{d.value} জন</span>
+                      <span className="font-display font-bold text-[#34D399]">
+                        {d.value} {isBn ? "জন" : "users"}
+                      </span>
                       <span className="text-white/40 text-xs">({d.pct}%)</span>
                     </div>
                   </div>
@@ -239,7 +273,9 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
             <div className="mt-4 p-3 bg-[#071D13] rounded-2xl border border-emerald-500/20 flex items-center gap-2">
               <CheckIcon size={14} className="text-[#34D399] flex-shrink-0" />
               <p className="text-[#34D399] text-xs font-bold">
-                {stats.repeatRate}% কাস্টমার দ্বিতীয়বার আসছেন
+                {isBn
+                  ? `${stats.repeatRate}% কাস্টমার দ্বিতীয়বার আসছেন`
+                  : `${stats.repeatRate}% customers return for a 2nd visit`}
               </p>
             </div>
           </div>
@@ -250,7 +286,9 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20 text-white">
             <div className="flex items-center gap-2 mb-3">
               <TrophyIcon size={18} className="text-[#F59E0B]" />
-              <h2 className="font-display font-bold text-white text-base">শীর্ষ বিশ্বস্ত কাস্টমার</h2>
+              <h2 className="font-display font-bold text-white text-base">
+                {isBn ? "শীর্ষ বিশ্বস্ত কাস্টমার" : "Top Loyal Customers"}
+              </h2>
             </div>
             <div className="space-y-3">
               {topCustomers.map((c, i) => {
@@ -268,14 +306,16 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
                       )}
                     </div>
                     <div className="w-9 h-9 rounded-xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-bold text-xs text-[#34D399]">
-                      {c.name ? c.name.slice(0, 1) : "ক"}
+                      {c.name ? c.name.slice(0, 1) : (isBn ? "ক" : "C")}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{c.name}</p>
-                      <p className="text-xs text-white/50">{c.totalVisits || c.stamps} বার মোট ভিজিট</p>
+                      <p className="text-xs text-white/50">
+                        {c.totalVisits || c.stamps} {isBn ? "বার মোট ভিজিট" : "total visits"}
+                      </p>
                     </div>
                     <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-2.5 py-1 rounded-full font-bold">
-                      {c.stamps} সিল
+                      {c.stamps} {isBn ? "সিল" : "Stamps"}
                     </span>
                   </div>
                 )

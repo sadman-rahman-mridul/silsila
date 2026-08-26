@@ -3,7 +3,7 @@ import { api, type RewardProgram, type MerchantStats } from "../../services/api"
 import { CheckIcon, GiftIcon } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 import { useAuth } from "../../context/AuthContext"
-
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 
 interface RewardsManagerProps {
@@ -13,6 +13,7 @@ interface RewardsManagerProps {
 
 export default function RewardsManager({ merchantId: propId, merchantName: propName }: RewardsManagerProps) {
   const { profile } = useAuth()
+  const { isBn } = useLanguage()
   const merchantId = propId || profile?.merchantId || profile?.id || ""
   const merchantName = propName || profile?.name || ""
   const [programs, setPrograms] = useState<RewardProgram[]>([])
@@ -159,28 +160,34 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
   return (
     <div className="flex flex-col h-full bg-transparent">
       <div className="px-5 pt-4 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">লয়্যালটি ও পুরস্কার</h1>
-        <p className="text-[#34D399] text-xs font-semibold">ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি</p>
+        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">
+          {isBn ? "লয়্যালটি ও পুরস্কার" : "Loyalty & Rewards"}
+        </h1>
+        <p className="text-[#34D399] text-xs font-semibold">
+          {isBn ? "ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি" : "Digital stamp cards & reward rules"}
+        </p>
 
         <div className="mt-4 flex gap-2.5">
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
             <p className="font-display font-black text-[#F59E0B] text-2xl leading-none">{stats?.rewardsRedeemed || 0}</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">রিডিম হয়েছে</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিডিম হয়েছে" : "Redeemed"}</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
             <p className="font-display font-black text-[#34D399] text-2xl leading-none">{stats?.repeatRate ?? 0}%</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">রিপিট রেট</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিপিট রেট" : "Repeat Rate"}</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
             <p className="font-display font-black text-white text-2xl leading-none">{programs.length}</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">সক্রিয় প্রোগ্রাম</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "সক্রিয় প্রোগ্রাম" : "Active Programs"}</p>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-white text-base drop-shadow-xs">সক্রিয় প্রোগ্রামসমূহ</h2>
+          <h2 className="font-display font-bold text-white text-base drop-shadow-xs">
+            {isBn ? "সক্রিয় প্রোগ্রামসমূহ" : "Active Programs"}
+          </h2>
           <button
             onClick={() => {
               setEditingProgram(null)
@@ -188,17 +195,21 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             }}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black transition-all active:scale-[0.98] shadow-lg glow-emerald cursor-pointer"
           >
-            + নতুন প্রোগ্রাম
+            {isBn ? "+ নতুন প্রোগ্রাম" : "+ New Program"}
           </button>
         </div>
 
         {/* Edit Modal */}
         {editingProgram && (
           <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
-            <h3 className="font-display font-bold text-white mb-3">রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন</h3>
+            <h3 className="font-display font-bold text-white mb-3">
+              {isBn ? "রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন" : "Edit Reward Program"}
+            </h3>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
+              </label>
               <div className="flex gap-2">
                 {[3, 5, 7, 8, 10].map((n) => (
                   <button
@@ -217,18 +228,22 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">পুরস্কারের বিবরণ</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
+              </label>
               <input
                 type="text"
                 value={editingProgram.rewardText}
                 onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
-                placeholder="যেমন: ১টি স্পেশাল হট কফি ফ্রি"
+                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
                 className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">মেয়াদ (দিন)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
+              </label>
               <input
                 type="number"
                 value={editingProgram.expiryDays}
@@ -242,7 +257,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 onClick={() => setEditingProgram(null)}
                 className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
               >
-                বাতিল
+                {isBn ? "বাতিল" : "Cancel"}
               </button>
               <button
                 onClick={handleUpdateProgram}
@@ -250,7 +265,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
               >
                 <CheckIcon size={15} />
-                {savingEdit ? "সংরক্ষণ হচ্ছে..." : "আপডেট সংরক্ষণ করুন"}
+                {savingEdit ? (isBn ? "সংরক্ষণ হচ্ছে..." : "Saving...") : (isBn ? "আপডেট সংরক্ষণ করুন" : "Save Changes")}
               </button>
             </div>
           </div>
@@ -259,10 +274,14 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
         {/* Create Modal */}
         {showCreate && !editingProgram && (
           <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
-            <h3 className="font-display font-bold text-white mb-3">নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন</h3>
+            <h3 className="font-display font-bold text-white mb-3">
+              {isBn ? "নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন" : "Create New Reward Program"}
+            </h3>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
+              </label>
               <div className="flex gap-2">
                 {[3, 5, 7, 8, 10].map((n) => (
                   <button
@@ -281,18 +300,22 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">পুরস্কারের বিবরণ</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
+              </label>
               <input
                 type="text"
                 value={rewardText}
                 onChange={(e) => setRewardText(e.target.value)}
-                placeholder="যেমন: ১টি স্পেশাল হট কফি ফ্রি"
+                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
                 className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">মেয়াদ (দিন)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
+              </label>
               <input
                 type="number"
                 value={expiryDays}
@@ -302,7 +325,9 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">লাইভ কাস্টমার প্রিভিউ</label>
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "লাইভ কাস্টমার প্রিভিউ" : "Live Customer Preview"}
+              </label>
               <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
                 <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
                   <div className="flex items-center gap-3 mb-2">
@@ -311,14 +336,16 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                     </div>
                     <div>
                       <p className="font-display font-bold text-white text-xs">
-                        {merchantName || "আপনার দোকান"}
+                        {merchantName || (isBn ? "আপনার দোকান" : "Your Store")}
                       </p>
-                      <p className="text-white/50 text-[10px]">০/{previewStamps} সিল</p>
+                      <p className="text-white/50 text-[10px]">
+                        0/{previewStamps} {isBn ? "সিল" : "Stamps"}
+                      </p>
                     </div>
                   </div>
                   <StampGrid filled={0} total={previewStamps} size="sm" />
                   <p className="text-[#34D399] font-bold text-xs mt-2">
-                    {rewardText || "পুরস্কারের বিবরণ লিখুন"}
+                    {rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
                   </p>
                 </div>
               </div>
@@ -329,7 +356,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 onClick={() => setShowCreate(false)}
                 className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
               >
-                বাতিল
+                {isBn ? "বাতিল" : "Cancel"}
               </button>
               <button
                 onClick={handleCreateProgram}
@@ -337,7 +364,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
               >
                 <CheckIcon size={15} />
-                {creating ? "চালু হচ্ছে..." : "প্রোগ্রাম চালু করুন"}
+                {creating ? (isBn ? "চালু হচ্ছে..." : "Launching...") : (isBn ? "প্রোগ্রাম চালু করুন" : "Launch Program")}
               </button>
             </div>
           </div>
@@ -352,9 +379,11 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
         {programs.length === 0 && !showCreate && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
             <GiftIcon size={36} className="text-[#F59E0B] mx-auto mb-2" />
-            <p className="font-display font-bold text-white">কোনো প্রোগ্রাম নেই</p>
+            <p className="font-display font-bold text-white">{isBn ? "কোনো প্রোগ্রাম নেই" : "No Programs Found"}</p>
             <p className="text-white/60 text-xs mt-1">
-              "নতুন প্রোগ্রাম" চেপে আপনার প্রথম স্ট্যাম্প কার্ড চালু করুন।
+              {isBn
+                ? '"নতুন প্রোগ্রাম" চেপে আপনার প্রথম স্ট্যাম্প কার্ড চালু করুন।'
+                : 'Tap "New Program" to launch your first loyalty card.'}
             </p>
           </div>
         )}
@@ -370,7 +399,9 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                   <div>
                     <p className="font-display font-bold text-white text-sm">{program.rewardText}</p>
                     <p className="text-[#34D399] text-xs font-semibold mt-0.5">
-                      {program.target}টি সিলে · {program.expiryDays} দিনের মেয়াদ
+                      {isBn
+                        ? `${program.target}টি সিলে · ${program.expiryDays} দিনের মেয়াদ`
+                        : `${program.target} stamps · ${program.expiryDays} days validity`}
                     </p>
                   </div>
                 </div>
@@ -396,20 +427,22 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
               {/* Delete confirmation inline */}
               {deleteConfirmId === program.id && (
                 <div className="mb-3 p-3.5 bg-red-500/20 rounded-2xl border border-red-400/40 animate-slide-up backdrop-blur-md">
-                  <p className="text-xs font-bold text-red-200 mb-2.5">Are you sure you want to delete this program?</p>
+                  <p className="text-xs font-bold text-red-200 mb-2.5">
+                    {isBn ? "আপনি কি নিশ্চিতভাবে এই প্রোগ্রামটি মুছে ফেলতে চান?" : "Are you sure you want to delete this program?"}
+                  </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setDeleteConfirmId(null)}
                       className="px-3.5 py-1.5 bg-white/10 border border-white/20 text-white rounded-xl text-xs font-bold hover:bg-white/20 cursor-pointer"
                     >
-                      Cancel
+                      {isBn ? "বাতিল" : "Cancel"}
                     </button>
                     <button
                       onClick={() => handleDeleteProgram(program.id)}
                       disabled={deleting}
                       className="px-3.5 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 disabled:opacity-50 cursor-pointer shadow-md"
                     >
-                      {deleting ? "Deleting..." : "Yes, Delete"}
+                      {deleting ? (isBn ? "মুছে ফেলা হচ্ছে..." : "Deleting...") : (isBn ? "হ্যাঁ, মুছুন" : "Yes, Delete")}
                     </button>
                   </div>
                 </div>
@@ -418,19 +451,19 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center">
                 <div>
                   <p className="font-display font-black text-white text-base">{stats?.activeCards ?? 0}</p>
-                  <p className="text-white/40 text-[10px] font-medium">চলমান কার্ড</p>
+                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "চলমান কার্ড" : "Active Cards"}</p>
                 </div>
                 <div>
                   <p className="font-display font-black text-[#34D399] text-base">
                     {stats?.rewardsRedeemed ?? 0}
                   </p>
-                  <p className="text-white/40 text-[10px] font-medium">সম্পন্ন রিডিম</p>
+                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "সম্পন্ন রিডিম" : "Redeemed"}</p>
                 </div>
                 <div>
                   <p className="font-display font-black text-[#F59E0B] text-base">
                     {stats?.stampsThisWeek ?? 0}
                   </p>
-                  <p className="text-white/40 text-[10px] font-medium">এই সপ্তাহের সিল</p>
+                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "এই সপ্তাহের সিল" : "Stamps This Week"}</p>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { api } from "../../services/api"
 import { CheckIcon, RefreshIcon } from "../../components/Icons"
+import { useLanguage } from "../../context/LanguageContext"
 
 interface StaffPinCardProps {
   merchantId: string
@@ -8,14 +9,8 @@ interface StaffPinCardProps {
 
 type Stage = "idle" | "enter_pin" | "verify_otp"
 
-/**
- * Staff Mode PIN management.
- *
- * Every merchant sets their own 4-digit PIN for counter staff. Creating or
- * changing it always requires an OTP sent to the registered owner phone, so
- * possession of an unlocked console is not enough to take over staff access.
- */
 export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
+  const { isBn } = useLanguage()
   const [stage, setStage] = useState<Stage>("idle")
   const [hasPin, setHasPin] = useState(false)
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
@@ -54,11 +49,11 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
 
   async function handleRequestOtp() {
     if (!/^\d{4}$/.test(pin)) {
-      setError("পিন অবশ্যই ৪ সংখ্যার হতে হবে")
+      setError(isBn ? "পিন অবশ্যই ৪ সংখ্যার হতে হবে" : "PIN must be exactly 4 digits")
       return
     }
     if (pin !== confirmPin) {
-      setError("দুইবার লেখা পিন মিলছে না")
+      setError(isBn ? "দুইবার লেখা পিন মিলছে না" : "PINs do not match")
       return
     }
 
@@ -77,14 +72,22 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
 
   async function handleConfirm() {
     if (otp.length < 6) {
-      setError("৬ ডিজিটের OTP কোড লিখুন")
+      setError(isBn ? "৬ ডিজিটের OTP কোড লিখুন" : "Enter 6-digit OTP code")
       return
     }
     setBusy(true)
     setError(null)
     try {
       await api.setStaffPin(merchantId, pin, otp)
-      setNotice(hasPin ? "স্টাফ মোড পিন পরিবর্তন হয়েছে ✓" : "স্টাফ মোড পিন তৈরি হয়েছে ✓")
+      setNotice(
+        hasPin
+          ? isBn
+            ? "স্টাফ মোড পিন পরিবর্তন হয়েছে ✓"
+            : "Staff PIN updated ✓"
+          : isBn
+          ? "স্টাফ মোড পিন তৈরি হয়েছে ✓"
+          : "Staff PIN created ✓"
+      )
       resetFlow()
       await loadStatus()
       setTimeout(() => setNotice(null), 4000)
@@ -100,10 +103,12 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       <div className="flex items-start justify-between gap-3 mb-3 pb-2 border-b border-[#E9E5DC]">
         <div>
           <h2 className="font-display font-bold text-[#1A1916] text-base flex items-center gap-2">
-            স্টাফ মোড পিন
+            {isBn ? "স্টাফ মোড পিন" : "Staff Mode PIN"}
           </h2>
           <p className="text-xs text-[#6B6158] mt-0.5">
-            কাউন্টার স্টাফ এই ৪ সংখ্যার পিন দিয়ে অনুমোদন স্ক্রিন খুলবেন
+            {isBn
+              ? "কাউন্টার স্টাফ এই ৪ সংখ্যার পিন দিয়ে অনুমোদন স্ক্রিন খুলবেন"
+              : "Counter staff will use this 4-digit PIN to access approvals"}
           </p>
         </div>
         <span
@@ -111,7 +116,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
             hasPin ? "text-[#1B4332] bg-[#D8EDDF]" : "text-[#B45309] bg-[#FEF3C7]"
           }`}
         >
-          {hasPin ? "সেট করা আছে" : "সেট করা হয়নি"}
+          {hasPin ? (isBn ? "সেট করা আছে" : "Active") : (isBn ? "সেট করা হয়নি" : "Not Set")}
         </span>
       </div>
 
@@ -131,13 +136,15 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
         <div className="space-y-3">
           {hasPin ? (
             <p className="text-xs text-[#6B6158]">
-              পিন সক্রিয় আছে
-              {updatedAt && ` · সর্বশেষ পরিবর্তন ${new Date(updatedAt).toLocaleDateString("bn-BD")}`}
-              । নিরাপত্তার কারণে পিনটি কোথাও দেখানো হয় না।
+              {isBn
+                ? `পিন সক্রিয় আছে${updatedAt ? ` · সর্বশেষ পরিবর্তন ${new Date(updatedAt).toLocaleDateString("bn-BD")}` : ""}। নিরাপত্তার কারণে পিনটি কোথাও দেখানো হয় না।`
+                : `PIN is active${updatedAt ? ` · Last updated ${new Date(updatedAt).toLocaleDateString()}` : ""}. For security, the PIN is never displayed.`}
             </p>
           ) : (
             <p className="text-xs text-[#6B6158]">
-              এখনো কোনো পিন সেট করা হয়নি। পিন সেট না করা পর্যন্ত স্টাফ মোড খোলা যাবে না।
+              {isBn
+                ? "এখনো কোনো পিন সেট করা হয়নি। পিন সেট না করা পর্যন্ত স্টাফ মোড খোলা যাবে না।"
+                : "No PIN has been set yet. Staff mode cannot be accessed until a PIN is created."}
             </p>
           )}
 
@@ -145,7 +152,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
             onClick={() => setStage("enter_pin")}
             className="w-full py-3 rounded-xl bg-[#1B4332] hover:bg-[#143427] text-white font-bold text-xs transition-all active:scale-[0.98] cursor-pointer"
           >
-            {hasPin ? "পিন পরিবর্তন করুন" : "নতুন পিন তৈরি করুন"}
+            {hasPin ? (isBn ? "পিন পরিবর্তন করুন" : "Change PIN") : (isBn ? "নতুন পিন তৈরি করুন" : "Create New PIN")}
           </button>
         </div>
       )}
@@ -153,7 +160,9 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       {stage === "enter_pin" && (
         <div className="space-y-3">
           <div>
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">নতুন ৪ সংখ্যার পিন</label>
+            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+              {isBn ? "নতুন ৪ সংখ্যার পিন" : "New 4-digit PIN"}
+            </label>
             <input
               type="password"
               inputMode="numeric"
@@ -166,7 +175,9 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
           </div>
 
           <div>
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">পিন পুনরায় লিখুন</label>
+            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+              {isBn ? "পিন পুনরায় লিখুন" : "Re-enter PIN"}
+            </label>
             <input
               type="password"
               inputMode="numeric"
@@ -179,8 +190,9 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
           </div>
 
           <p className="text-[11px] text-[#6B6158] bg-[#F0F7F2] border border-[#52B788]/30 rounded-xl px-3 py-2">
-            নিশ্চিত করতে মালিকের নম্বরে
-            {ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} একটি OTP পাঠানো হবে।
+            {isBn
+              ? `নিশ্চিত করতে মালিকের নম্বরে${ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} একটি OTP পাঠানো হবে।`
+              : `An OTP will be sent to the owner's phone${ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} to confirm.`}
           </p>
 
           <div className="flex gap-2">
@@ -188,7 +200,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               onClick={resetFlow}
               className="flex-1 py-3 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs cursor-pointer"
             >
-              বাতিল
+              {isBn ? "বাতিল" : "Cancel"}
             </button>
             <button
               onClick={handleRequestOtp}
@@ -196,7 +208,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               className="flex-[2] py-3 rounded-xl bg-[#F59E0B] text-[#1B4332] font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {busy ? <RefreshIcon size={14} className="animate-spin" /> : null}
-              OTP পাঠান
+              {isBn ? "OTP পাঠান" : "Send OTP"}
             </button>
           </div>
         </div>
@@ -206,7 +218,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
         <div className="space-y-3">
           <div>
             <label className="text-[#6B6158] text-xs font-semibold block mb-1">
-              মালিকের নম্বরে পাঠানো ৬ সংখ্যার OTP
+              {isBn ? "মালিকের নম্বরে পাঠানো ৬ সংখ্যার OTP" : "6-digit OTP sent to owner's phone"}
             </label>
             <input
               type="tel"
@@ -225,7 +237,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               onClick={resetFlow}
               className="flex-1 py-3 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs cursor-pointer"
             >
-              বাতিল
+              {isBn ? "বাতিল" : "Cancel"}
             </button>
             <button
               onClick={handleConfirm}
@@ -233,7 +245,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               className="flex-[2] py-3 rounded-xl bg-[#1B4332] text-white font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {busy ? <RefreshIcon size={14} className="animate-spin" /> : <CheckIcon size={14} />}
-              পিন নিশ্চিত করুন
+              {isBn ? "পিন নিশ্চিত করুন" : "Confirm PIN"}
             </button>
           </div>
 
@@ -242,7 +254,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
             disabled={busy}
             className="w-full py-2 text-[#6B6158] text-xs hover:text-[#1A1916] transition-colors cursor-pointer"
           >
-            আবার OTP পাঠান
+            {isBn ? "আবার OTP পাঠান" : "Resend OTP"}
           </button>
         </div>
       )}

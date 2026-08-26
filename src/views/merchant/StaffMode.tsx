@@ -13,6 +13,7 @@ import {
   SparklesIcon,
 } from "../../components/Icons"
 import { firebaseService } from "../../services/firebaseService"
+import { useLanguage } from "../../context/LanguageContext"
 
 interface StaffModeProps {
   onExit: () => void
@@ -24,6 +25,7 @@ interface StaffModeProps {
 type StaffStep = "pin" | "approvals"
 
 export default function StaffMode({ onExit, merchantId: propId, activeMerchantId, merchantName }: StaffModeProps) {
+  const { isBn } = useLanguage()
   const merchantId = propId || activeMerchantId || ""
   const [step, setStep] = useState<StaffStep>("pin")
   const [activeTab, setActiveTab] = useState<"approvals" | "redeem">("approvals")
@@ -78,11 +80,11 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
         setStep("approvals")
         setPin("")
       } else {
-        setPinError("ভুল PIN — আবার চেষ্টা করুন")
+        setPinError(isBn ? "ভুল PIN — আবার চেষ্টা করুন" : "Invalid PIN — please try again")
         setPin("")
       }
     } catch (err: any) {
-      setPinError(err.message || "PIN যাচাই করা যায়নি")
+      setPinError(err.message || (isBn ? "PIN যাচাই করা যায়নি" : "Could not verify PIN"))
       setPin("")
     } finally {
       setChecking(false)
@@ -116,7 +118,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
   async function handleLookupVoucher(codeToLookup?: string) {
     const code = (codeToLookup || voucherCodeInput).trim()
     if (!code) {
-      setVoucherError("অনুগ্রহ করে ভাউচার কোড লিখুন")
+      setVoucherError(isBn ? "অনুগ্রহ করে ভাউচার কোড লিখুন" : "Please enter a voucher code")
       return
     }
     setLookingUpVoucher(true)
@@ -141,10 +143,14 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
       if (matched) {
         setVoucherResult(matched)
       } else {
-        setVoucherError(`"${code}" কোডের কোনো ভাউচার পাওয়া যায়নি। কোডটি সঠিক কিনা যাচাই করুন।`)
+        setVoucherError(
+          isBn
+            ? `"${code}" কোডের কোনো ভাউচার পাওয়া যায়নি। কোডটি সঠিক কিনা যাচাই করুন।`
+            : `No voucher found with code "${code}". Please check if code is correct.`
+        )
       }
     } catch (err: any) {
-      setVoucherError(err?.message || "ভাউচার যাচাই করতে সমস্যা হয়েছে")
+      setVoucherError(err?.message || (isBn ? "ভাউচার যাচাই করতে সমস্যা হয়েছে" : "Error verifying voucher"))
     } finally {
       setLookingUpVoucher(false)
     }
@@ -161,18 +167,26 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
       // 2. Sync to API backend
       await api.redeemVoucher(voucherResult.code, merchantId, "1234").catch(() => null)
 
-      setRedeemSuccess(`🎉 "${voucherResult.rewardText || "উপহার"}" সফলভাবে রিডিম সম্পন্ন হয়েছে!`)
+      setRedeemSuccess(
+        isBn
+          ? `🎉 "${voucherResult.rewardText || "উপহার"}" সফলভাবে রিডিম সম্পন্ন হয়েছে!`
+          : `🎉 "${voucherResult.rewardText || "Reward"}" redeemed successfully!`
+      )
       setVoucherResult((prev: any) => (prev ? { ...prev, redeemed: true } : null))
       setTimeout(() => {
         setVoucherResult(null)
         setVoucherCodeInput("")
       }, 4000)
     } catch (err: any) {
-      setVoucherError(err?.message || "রিডিম করতে সমস্যা হয়েছে")
+      setVoucherError(err?.message || (isBn ? "রিডিম করতে সমস্যা হয়েছে" : "Error redeeming voucher"))
     } finally {
       setRedeeming(false)
     }
   }
+
+  const pinDigits = isBn
+    ? ["১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯", "", "০", "⌫"]
+    : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"]
 
   if (step === "pin") {
     return (
@@ -182,8 +196,12 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center mx-auto mb-3 shadow-lg glow-amber text-[#0A2318]">
               <LockIcon size={26} />
             </div>
-            <h1 className="font-display font-black text-white text-xl">কাউন্টার স্টাফ মোড</h1>
-            <p className="text-white/60 text-xs mt-1">৪ সংখ্যার স্টাফ PIN দিন</p>
+            <h1 className="font-display font-black text-white text-xl">
+              {isBn ? "কাউন্টার স্টাফ মোড" : "Counter Staff Mode"}
+            </h1>
+            <p className="text-white/60 text-xs mt-1">
+              {isBn ? "৪ সংখ্যার স্টাফ PIN দিন" : "Enter 4-digit Staff PIN"}
+            </p>
           </div>
 
           <div className="flex justify-center gap-2.5 mb-6">
@@ -210,13 +228,15 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
           )}
 
           <div className="grid grid-cols-3 gap-2.5">
-            {["১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯", "", "০", "⌫"].map((d, i) => (
+            {pinDigits.map((d, i) => (
               <button
                 key={i}
                 onClick={() => {
                   if (d === "⌫") setPin((p) => p.slice(0, -1))
                   else if (d !== "") {
-                    const num = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"].indexOf(d).toString()
+                    const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+                    const idx = bnDigits.indexOf(d)
+                    const num = idx !== -1 ? idx.toString() : d
                     handlePinDigit(num)
                   }
                 }}
@@ -237,7 +257,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             onClick={onExit}
             className="w-full mt-5 py-2.5 rounded-xl text-white/50 text-xs font-bold hover:text-white transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
           >
-            <span>← মালিকের ভিউতে ফিরুন</span>
+            <span>{isBn ? "← মালিকের ভিউতে ফিরুন" : "← Back to Owner View"}</span>
           </button>
         </div>
       </div>
@@ -250,15 +270,19 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
       <div className="px-5 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">স্টাফ মোড{merchantName ? " · " + merchantName : ""}</p>
-            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">কাউন্টার কন্ট্রোল</h1>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">
+              {isBn ? "স্টাফ মোড" : "Staff Mode"}{merchantName ? " · " + merchantName : ""}
+            </p>
+            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">
+              {isBn ? "কাউন্টার কন্ট্রোল" : "Counter Control"}
+            </h1>
           </div>
           <button
             onClick={() => setStep("pin")}
             className="px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1.5"
           >
             <LockIcon size={12} />
-            <span>লক করুন</span>
+            <span>{isBn ? "লক করুন" : "Lock"}</span>
           </button>
         </div>
 
@@ -273,7 +297,9 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             }`}
           >
             <ShieldCheckIcon size={14} />
-            <span>সিল অনুমোদন {approvals.length > 0 ? `(${approvals.length})` : ""}</span>
+            <span>
+              {isBn ? "সিল অনুমোদন" : "Stamp Approvals"} {approvals.length > 0 ? `(${approvals.length})` : ""}
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("redeem")}
@@ -284,7 +310,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             }`}
           >
             <GiftIcon size={14} />
-            <span>ভাউচার রিডিম</span>
+            <span>{isBn ? "ভাউচার রিডিম" : "Redeem Voucher"}</span>
           </button>
         </div>
       </div>
@@ -298,8 +324,14 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                 <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mb-3 text-[#34D399]">
                   <ShieldCheckIcon size={32} />
                 </div>
-                <p className="font-display font-black text-white text-lg mb-1">সব অনুমোদন সম্পন্ন</p>
-                <p className="text-white/60 text-xs">কাউন্টারে কোনো কাস্টমার স্ক্যান করলে এখানে দৃশ্যমান হবে</p>
+                <p className="font-display font-black text-white text-lg mb-1">
+                  {isBn ? "সব অনুমোদন সম্পন্ন" : "All Caught Up"}
+                </p>
+                <p className="text-white/60 text-xs">
+                  {isBn
+                    ? "কাউন্টারে কোনো কাস্টমার স্ক্যান করলে এখানে দৃশ্যমান হবে"
+                    : "Customer scans at counter will appear here in real time"}
+                </p>
               </div>
             ) : (
               <div className="space-y-3.5">
@@ -320,17 +352,17 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                       <div className="p-5">
                         <div className="text-center mb-4">
                           <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-2xl font-black text-[#34D399]">
-                            {approval.customerName?.slice(0, 1) || "ক"}
+                            {approval.customerName?.slice(0, 1) || (isBn ? "ক" : "C")}
                           </div>
                           <p className="font-display font-black text-white text-xl">
-                            {approval.customerName || "সম্মানিত গ্রাহক"}
+                            {approval.customerName || (isBn ? "সম্মানিত গ্রাহক" : "Customer")}
                           </p>
                           <p className="text-white/60 text-xs mt-0.5 font-mono">{approval.customerPhone}</p>
                           {dist !== undefined && dist >= 0 && (
                             <div className="flex items-center justify-center gap-1.5 mt-2">
                               <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/15 border border-[#34D399]/30 px-3 py-0.5 rounded-full flex items-center gap-1">
                                 <MapPinIcon size={12} />
-                                <span>{dist} মি. দূরে</span>
+                                <span>{isBn ? `${dist} মি. দূরে` : `${dist}m away`}</span>
                               </span>
                             </div>
                           )}
@@ -345,12 +377,12 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                             {res.result === "approved" ? (
                               <>
                                 <CheckIcon size={16} />
-                                <span>সিল দেওয়া সম্পন্ন!</span>
+                                <span>{isBn ? "সিল দেওয়া সম্পন্ন!" : "Stamp Granted!"}</span>
                               </>
                             ) : (
                               <>
                                 <XIcon size={16} />
-                                <span>প্রত্যাখ্যাত</span>
+                                <span>{isBn ? "প্রত্যাখ্যাত" : "Rejected"}</span>
                               </>
                             )}
                           </div>
@@ -361,14 +393,14 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                               className="w-16 h-16 rounded-2xl bg-[#071D13] border border-white/10 flex flex-col items-center justify-center gap-1 text-white/50 transition-all active:scale-90 hover:border-red-400 hover:text-red-300 cursor-pointer"
                             >
                               <XIcon size={24} />
-                              <span className="text-xs font-bold">না</span>
+                              <span className="text-xs font-bold">{isBn ? "না" : "Reject"}</span>
                             </button>
                             <button
                               onClick={() => handleApprove(approval.id)}
                               className="flex-1 h-16 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex flex-col items-center justify-center gap-0.5 text-[#0A2318] transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
                             >
                               <CheckIcon size={28} />
-                              <span className="font-display font-black text-base">সিল দিন</span>
+                              <span className="font-display font-black text-base">{isBn ? "সিল দিন" : "Grant Stamp"}</span>
                             </button>
                           </div>
                         )}
@@ -391,8 +423,12 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   <GiftIcon size={18} />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-white text-base">ভাউচার কোড রিডিম</h2>
-                  <p className="text-xs text-white/60">কাস্টমারের স্ক্রিনের ভাউচার কোডটি লিখুন</p>
+                  <h2 className="font-display font-bold text-white text-base">
+                    {isBn ? "ভাউচার কোড রিডিম" : "Redeem Voucher Code"}
+                  </h2>
+                  <p className="text-xs text-white/60">
+                    {isBn ? "কাস্টমারের স্ক্রিনের ভাউচার কোডটি লিখুন" : "Enter customer's voucher code"}
+                  </p>
                 </div>
               </div>
 
@@ -402,7 +438,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                     type="text"
                     value={voucherCodeInput}
                     onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
-                    placeholder="যেমন: SL-M1-5X9K"
+                    placeholder={isBn ? "যেমন: SL-M1-5X9K" : "e.g. SL-M1-5X9K"}
                     className="w-full bg-[#071D13] border border-emerald-500/25 rounded-2xl px-4 py-3.5 font-mono font-black text-lg text-[#F59E0B] tracking-widest uppercase outline-none focus:border-[#34D399] shadow-inner text-center"
                   />
                   {voucherCodeInput && (
@@ -428,12 +464,12 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   {lookingUpVoucher ? (
                     <>
                       <RefreshIcon size={16} className="animate-spin" />
-                      <span>যাচাই করা হচ্ছে...</span>
+                      <span>{isBn ? "যাচাই করা হচ্ছে..." : "Verifying..."}</span>
                     </>
                   ) : (
                     <>
                       <SearchIcon size={16} />
-                      <span>ভাউচার কোড যাচাই করুন</span>
+                      <span>{isBn ? "ভাউচার কোড যাচাই করুন" : "Verify Voucher Code"}</span>
                     </>
                   )}
                 </button>
@@ -462,7 +498,9 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <SparklesIcon size={18} className="text-[#F59E0B]" />
-                    <h3 className="font-display font-bold text-white text-sm">ভাউচারের বিবরণ</h3>
+                    <h3 className="font-display font-bold text-white text-sm">
+                      {isBn ? "ভাউচারের বিবরণ" : "Voucher Details"}
+                    </h3>
                   </div>
                   <span
                     className={`px-3 py-0.5 rounded-full text-xs font-bold ${
@@ -471,23 +509,27 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                         : "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30"
                     }`}
                   >
-                    {voucherResult.redeemed ? "ইতিমধ্যে ব্যবহৃত" : "সক্রিয় ও বৈধ ✓"}
+                    {voucherResult.redeemed
+                      ? (isBn ? "ইতিমধ্যে ব্যবহৃত" : "Already Redeemed")
+                      : (isBn ? "সক্রিয় ও বৈধ ✓" : "Active & Valid ✓")}
                   </span>
                 </div>
 
                 <div className="bg-[#071D13] p-4 rounded-2xl border border-emerald-500/20 space-y-2 text-center">
-                  <p className="text-xs text-white/50 uppercase tracking-widest font-bold">পুরস্কার</p>
+                  <p className="text-xs text-white/50 uppercase tracking-widest font-bold">
+                    {isBn ? "পুরস্কার" : "Reward"}
+                  </p>
                   <p className="font-display font-black text-2xl text-[#F59E0B]">
-                    {voucherResult.rewardText || "১টি বিশেষ উপহার"}
+                    {voucherResult.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
                   </p>
                   <div className="pt-2 border-t border-white/10 flex items-center justify-around text-xs text-white/70">
                     <div>
-                      <p className="text-white/40 text-[11px]">কাস্টমার</p>
-                      <p className="font-bold text-white mt-0.5">{voucherResult.customerName || "কাস্টমার"}</p>
+                      <p className="text-white/40 text-[11px]">{isBn ? "কাস্টমার" : "Customer"}</p>
+                      <p className="font-bold text-white mt-0.5">{voucherResult.customerName || (isBn ? "কাস্টমার" : "Customer")}</p>
                     </div>
                     {voucherResult.customerPhone && (
                       <div>
-                        <p className="text-white/40 text-[11px]">ফোন</p>
+                        <p className="text-white/40 text-[11px]">{isBn ? "ফোন" : "Phone"}</p>
                         <p className="font-mono text-white mt-0.5">{voucherResult.customerPhone}</p>
                       </div>
                     )}
@@ -496,7 +538,9 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
 
                 {voucherResult.redeemed ? (
                   <div className="py-3 bg-red-500/15 border border-red-500/30 rounded-2xl text-center text-red-300 text-xs font-bold">
-                    ⚠️ এই ভাউচারটি পূর্বে রিডিম করা হয়েছে! পুনরায় ব্যবহার করা যাবে না।
+                    {isBn
+                      ? "⚠️ এই ভাউচারটি পূর্বে রিডিম করা হয়েছে! পুনরায় ব্যবহার করা যাবে না।"
+                      : "⚠️ This voucher was already redeemed! Cannot be reused."}
                   </div>
                 ) : (
                   <button
@@ -507,12 +551,12 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                     {redeeming ? (
                       <>
                         <RefreshIcon size={18} className="animate-spin" />
-                        <span>রিডিম নিশ্চিত করা হচ্ছে...</span>
+                        <span>{isBn ? "রিডিম নিশ্চিত করা হচ্ছে..." : "Confirming redemption..."}</span>
                       </>
                     ) : (
                       <>
                         <CheckIcon size={20} />
-                        <span>উপহার প্রদান ও রিডিম সম্পন্ন করুন ✓</span>
+                        <span>{isBn ? "উপহার প্রদান ও রিডিম সম্পন্ন করুন ✓" : "Give Reward & Complete Redeem ✓"}</span>
                       </>
                     )}
                   </button>

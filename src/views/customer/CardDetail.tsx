@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import confetti from "canvas-confetti"
 import { api, type CustomerCard, type Merchant, type RewardProgram } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import StampGrid from "../../components/StampGrid"
@@ -26,6 +27,7 @@ interface CardDetailProps {
 
 export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const { user, profile } = useAuth()
+  const { isBn } = useLanguage()
   const [data, setData] = useState<{
     card: CustomerCard
     merchant: Merchant
@@ -336,8 +338,12 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
         <div className="w-12 h-12 rounded-2xl bg-[#1B4332]/10 flex items-center justify-center text-2xl animate-spin mb-3">
           ⏳
         </div>
-        <p className="text-[#1B4332] font-display font-bold text-sm">কার্ডের তথ্য লোড হচ্ছে...</p>
-        <p className="text-[#6B6158] text-xs mt-1">অনুগ্রহ করে একটু অপেক্ষা করুন</p>
+        <p className="text-[#1B4332] font-display font-bold text-sm">
+          {isBn ? "কার্ডের তথ্য লোড হচ্ছে..." : "Loading card details..."}
+        </p>
+        <p className="text-[#6B6158] text-xs mt-1">
+          {isBn ? "অনুগ্রহ করে একটু অপেক্ষা করুন" : "Please wait a moment"}
+        </p>
       </div>
     )
   }
@@ -349,23 +355,25 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
           ⚠️
         </div>
         <h2 className="font-display font-bold text-[#1A1916] text-lg mb-1">
-          {error || "দোকানের তথ্য পাওয়া যায়নি"}
+          {error || (isBn ? "দোকানের তথ্য পাওয়া যায়নি" : "Store information not found")}
         </h2>
         <p className="text-[#6B6158] text-xs mb-6 max-w-xs leading-relaxed">
-          দোকানটির কিউআর কোড সঠিক নাও হতে পারে অথবা নেটওয়ার্ক সমস্যা হতে পারে।
+          {isBn
+            ? "দোকানটির কিউআর কোড সঠিক নাও হতে পারে অথবা নেটওয়ার্ক সমস্যা হতে পারে।"
+            : "The QR code may be invalid or there is a network issue."}
         </p>
         <div className="flex gap-3 w-full max-w-xs">
           <button
             onClick={onBack}
             className="flex-1 py-3 bg-[#E9E5DC] text-[#1A1916] font-bold text-xs rounded-xl hover:bg-[#DCD7CD] transition-all cursor-pointer"
           >
-            ← ফিরে যান
+            {isBn ? "← ফিরে যান" : "← Go Back"}
           </button>
           <button
             onClick={loadCardDetail}
             className="flex-1 py-3 bg-[#1B4332] text-white font-bold text-xs rounded-xl hover:bg-[#2D6A4F] transition-all cursor-pointer shadow-md"
           >
-            🔄 পুনরায় চেষ্টা
+            {isBn ? "🔄 পুনরায় চেষ্টা" : "🔄 Retry"}
           </button>
         </div>
       </div>
@@ -377,7 +385,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const target = activeProg?.target || card.target || 5
   const remaining = Math.max(0, target - card.stamps)
   const pct = Math.min(100, (card.stamps / target) * 100)
-  const currentRewardText = activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার"
+  const currentRewardText = activeProg?.rewardText || card.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")
 
   return (
     <div className="flex flex-col h-full bg-transparent overflow-y-auto" {...swipeHandlers}>
@@ -395,7 +403,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 className="absolute text-white text-4xl opacity-20 select-none pointer-events-none"
                 style={{ top: `${(i * 37) % 100}%`, left: `${(i * 53) % 100}%`, transform: "rotate(-15deg)" }}
               >
-                সিল
+                {isBn ? "সিল" : "Stamp"}
               </div>
             ))}
           </div>
@@ -407,18 +415,20 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10 active:scale-95 shadow-sm"
               >
                 <ChevronLeftIcon size={16} />
-                <span>হোম</span>
+                <span>{isBn ? "হোম" : "Home"}</span>
               </button>
 
               <button
                 onClick={onBack}
                 className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95"
-                title="হোমে ফিরুন"
+                title={isBn ? "হোমে ফিরুন" : "Back to Home"}
               >
                 <div className="w-6 h-6 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs">
-                  স
+                  {isBn ? "স" : "S"}
                 </div>
-                <span className="font-display font-black text-white text-sm">সিলসিলা</span>
+                <span className="font-display font-black text-white text-sm">
+                  {isBn ? "সিলসিলা" : "Silsila"}
+                </span>
               </button>
             </div>
 
@@ -430,20 +440,26 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 {merchant.logoUrl ? (
                   <img src={merchant.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
-                  merchant.logoInitials || "সিল"
+                  merchant.logoInitials || (isBn ? "সিল" : "S")
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-sm">{merchant.name}</h1>
+                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-sm">
+                    {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
+                  </h1>
                   {merchant.verified && (
                     <ShieldCheckIcon size={18} className="text-[#34D399] flex-shrink-0" />
                   )}
                 </div>
-                <p className="text-white/70 text-xs mt-0.5">{merchant.category} · {merchant.area || "ঢাকা"}</p>
+                <p className="text-white/70 text-xs mt-0.5">
+                  {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
+                </p>
                 <div className="flex items-center gap-1 mt-1">
                   <FireIcon size={13} className="text-[#F59E0B]" />
-                  <span className="text-white/80 text-xs font-medium">{card.streakCount || 1} সপ্তাহের সিলসিলা</span>
+                  <span className="text-white/80 text-xs font-medium">
+                    {isBn ? `${card.streakCount || 1} সপ্তাহের সিলসিলা` : `${card.streakCount || 1} week streak`}
+                  </span>
                 </div>
               </div>
             </div>
@@ -452,7 +468,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             {programs && programs.length > 1 && (
               <div className="mb-4">
                 <p className="text-white/80 text-xs font-semibold uppercase tracking-wider mb-2">
-                  পুরস্কার কার্ডসমূহ (ট্যাপ করে সিলেক্ট করুন):
+                  {isBn ? "পুরস্কার কার্ডসমূহ (ট্যাপ করে সিলেক্ট করুন):" : "Reward Programs (tap to select):"}
                 </p>
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
                   {programs.map((p: any) => {
@@ -469,9 +485,9 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                       >
                         <span className="text-base">🎁</span>
                         <div className="text-left">
-                          <p className="leading-tight font-black">{p.rewardText || "পুরস্কার"}</p>
+                          <p className="leading-tight font-black">{p.rewardText || (isBn ? "পুরস্কার" : "Reward")}</p>
                           <p className={`text-[10px] font-normal ${isSelected ? "text-[#0A2318]/80" : "text-white/70"}`}>
-                            {p.target}টি সিল প্রয়োজন
+                            {isBn ? `${p.target}টি সিল প্রয়োজন` : `${p.target} stamps needed`}
                           </p>
                         </div>
                       </button>
@@ -485,21 +501,31 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/25 shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">স্ট্যাম্প অগ্রগতি</p>
+                  <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">
+                    {isBn ? "স্ট্যাম্প অগ্রগতি" : "Stamp Progress"}
+                  </p>
                   <p className="text-white font-display font-black text-3xl leading-none drop-shadow-sm">
                     {card.stamps}
                     <span className="text-white/40 text-lg font-medium">/{target}</span>
                   </p>
                   <p className="text-white/70 text-xs mt-1.5 font-medium">
                     {card.voucherReady ? (
-                      <span className="text-[#F59E0B] font-bold">✓ উপহার প্রস্তুত! এখনই রিডিম করুন</span>
+                      <span className="text-[#F59E0B] font-bold">
+                        {isBn ? "✓ উপহার প্রস্তুত! এখনই রিডিম করুন" : "✓ Reward ready! Redeem now"}
+                      </span>
                     ) : (
-                      <>আর <strong className="text-[#34D399] font-bold">{remaining}টি</strong> সিল বাকি</>
+                      <>
+                        {isBn ? (
+                          <>আর <strong className="text-[#34D399] font-bold">{remaining}টি</strong> সিল বাকি</>
+                        ) : (
+                          <><strong className="text-[#34D399] font-bold">{remaining}</strong> stamps remaining</>
+                        )}
+                      </>
                     )}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-white/50 text-xs font-medium">চক্র</p>
+                  <p className="text-white/50 text-xs font-medium">{isBn ? "চক্র" : "Cycle"}</p>
                   <p className="text-[#34D399] font-display font-bold text-xl">#{card.cycleNo || 1}</p>
                 </div>
               </div>
@@ -520,10 +546,10 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 <div className="mt-4 p-3.5 bg-[#071D13] border border-emerald-500/20 rounded-2xl text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2 text-[#34D399] font-bold text-xs">
                     <CheckIcon size={16} className="text-[#34D399]" />
-                    <span>আজকের সিল সংগ্রহ সম্পন্ন (১টি সিল/দিন)</span>
+                    <span>{isBn ? "আজকের সিল সংগ্রহ সম্পন্ন (১টি সিল/দিন)" : "Daily stamp collected (1 stamp/day)"}</span>
                   </div>
                   <p className="text-white/60 text-[11px] mt-1">
-                    পরবর্তী সিল সংগ্রহ করতে অনুগ্রহ করে আগামীকাল আসুন!
+                    {isBn ? "পরবর্তী সিল সংগ্রহ করতে অনুগ্রহ করে আগামীকাল আসুন!" : "Please visit tomorrow for your next stamp!"}
                   </p>
                 </div>
               ) : (
@@ -533,7 +559,15 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
                 >
                   <MapPinIcon size={18} />
-                  <span>{requestingSeal ? "অনুরোধ পাঠানো হচ্ছে..." : "I'm here! Seal My Card"}</span>
+                  <span>
+                    {requestingSeal
+                      ? isBn
+                        ? "অনুরোধ পাঠানো হচ্ছে..."
+                        : "Sending request..."
+                      : isBn
+                      ? "আমি এখানে আছি! সিল দাবি করুন"
+                      : "I'm here! Seal My Card"}
+                  </span>
                 </button>
               )}
             </div>
@@ -553,19 +587,29 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
         {/* Card Info & Rules */}
         <div className="px-5 py-4 space-y-3.5 pb-28">
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">পরবর্তী পুরস্কার</p>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+              {isBn ? "পরবর্তী পুরস্কার" : "Upcoming Reward"}
+            </p>
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
                 <GiftIcon size={24} className="text-[#0A2318]" />
               </div>
               <div>
-                <p className="font-display font-bold text-white text-base">{card.rewardText || program?.rewardText || "১টি বিশেষ উপহার"}</p>
-                <p className="text-white/60 text-xs mt-0.5">{target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে</p>
+                <p className="font-display font-bold text-white text-base">
+                  {card.rewardText || program?.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
+                </p>
+                <p className="text-white/60 text-xs mt-0.5">
+                  {isBn
+                    ? `${target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে`
+                    : `Collect ${target} stamps to redeem your reward`}
+                </p>
               </div>
             </div>
             {card.voucherReady && card.voucherCode && (
               <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-white/70 text-xs mb-1.5 font-medium">আপনার একক ভাউচার কোড</p>
+                <p className="text-white/70 text-xs mb-1.5 font-medium">
+                  {isBn ? "আপনার একক ভাউচার কোড" : "Your Unique Voucher Code"}
+                </p>
                 <div className="flex items-center justify-between gap-2 bg-[#0A2318] border border-[#34D399]/30 rounded-2xl p-3">
                   <p className="font-display font-black text-[#34D399] text-lg tracking-widest">
                     {card.voucherCode}
@@ -574,16 +618,22 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                     onClick={() => handleCopyCode(card.voucherCode!)}
                     className="text-xs bg-[#34D399] text-[#0A2318] px-3.5 py-1.5 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
                   >
-                    {copied ? "কপি হয়েছে ✓" : "কপি"}
+                    {copied ? (isBn ? "কপি হয়েছে ✓" : "Copied ✓") : isBn ? "কপি" : "Copy"}
                   </button>
                 </div>
-                <p className="text-white/50 text-[11px] mt-2">কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।</p>
+                <p className="text-white/50 text-[11px] mt-2">
+                  {isBn
+                    ? "কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।"
+                    : "Show this code at counter. Staff will verify with their PIN."}
+                </p>
               </div>
             )}
           </div>
 
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">সিল অর্জনের ইতিহাস</p>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+              {isBn ? "সিল অর্জনের ইতিহাস" : "Stamp History"}
+            </p>
             <div className="space-y-3">
               {stampsHistory && stampsHistory.length > 0 ? (
                 stampsHistory.map((visit, i) => (
@@ -592,24 +642,32 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                       ✓
                     </div>
                     <div className="flex-1">
-                      <p className="text-white text-sm font-medium">সিল #{stampsHistory.length - i}</p>
+                      <p className="text-white text-sm font-medium">
+                        {isBn ? `সিল #${stampsHistory.length - i}` : `Stamp #${stampsHistory.length - i}`}
+                      </p>
                       <p className="text-white/40 text-xs">{visit.formattedDate}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-white/50 py-2">কোনো অতীত ভিজিট রেকর্ড নেই</p>
+                <p className="text-xs text-white/50 py-2">
+                  {isBn ? "কোনো অতীত ভিজিট রেকর্ড নেই" : "No past visit records"}
+                </p>
               )}
             </div>
           </div>
 
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">দোকানের অবস্থান ও সময়সূচি</p>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+              {isBn ? "দোকানের অবস্থান ও সময়সূচি" : "Location & Hours"}
+            </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <MapPinIcon size={16} className="text-[#34D399] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-white text-sm leading-relaxed">{merchant.address || "ঢাকা, বাংলাদেশ"}</p>
+                  <p className="text-white text-sm leading-relaxed">
+                    {merchant.address || (isBn ? "ঢাকা, বাংলাদেশ" : "Dhaka, Bangladesh")}
+                  </p>
                   {merchant.lat && merchant.lng && (
                     <a
                       href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
@@ -617,20 +675,24 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                       rel="noreferrer"
                       className="text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
                     >
-                      গুগল ম্যাপে দেখুন <ExternalLinkIcon size={11} />
+                      {isBn ? "গুগল ম্যাপে দেখুন" : "View on Google Maps"} <ExternalLinkIcon size={11} />
                     </a>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <ClockIcon size={16} className="text-[#34D399] flex-shrink-0" />
-                <p className="text-white text-sm">সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)</p>
+                <p className="text-white text-sm">
+                  {merchant.hours || (isBn ? "সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)" : "9:00 AM – 10:00 PM (Daily)")}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">সোশ্যাল মিডিয়া ও রিভিউ</p>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+              {isBn ? "সোশ্যাল মিডিয়া ও রিভিউ" : "Social Media & Reviews"}
+            </p>
             <div className="flex flex-wrap gap-2">
               {merchant.instagram && (
                 <a
@@ -661,7 +723,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   rel="noreferrer"
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] text-xs font-black shadow-md glow-amber"
                 >
-                  ⭐ Google রিভিউ দিন
+                  {isBn ? "⭐ Google রিভিউ দিন" : "⭐ Leave Google Review"}
                 </a>
               )}
             </div>
@@ -675,14 +737,12 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             onClick={() => setShowVoucherModal(true)}
             className="w-full py-4 rounded-2xl bg-[#F59E0B] text-[#1B4332] font-display font-black text-lg shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 animate-bounce cursor-pointer"
           >
-            <GiftIcon size={20} /> পুরস্কার ভাউচার দেখুন
+            <GiftIcon size={20} /> {isBn ? "পুরস্কার ভাউচার দেখুন" : "View Reward Voucher"}
           </button>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* FLOATING STATUS PILL WHEN WAITING & MINIMIZED */}
-      {/* ========================================================================= */}
+      {/* Floating Status Pill */}
       {approvalStatus === "waiting" && minimizedWaiting && (
         <div className="fixed bottom-6 left-4 right-4 z-40 max-w-md mx-auto animate-slide-up">
           <div
@@ -692,36 +752,36 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-[#F59E0B] animate-ping flex-shrink-0" />
               <div>
-                <p className="font-bold text-xs">সিল অনুমোদনের অপেক্ষায়...</p>
-                <p className="text-[11px] text-[#52B788]">মার্চেন্ট অনুমোদনের অপেক্ষায় (৩০ মিনিট সক্রিয়)</p>
+                <p className="font-bold text-xs">
+                  {isBn ? "সিল অনুমোদনের অপেক্ষায়..." : "Waiting for seal approval..."}
+                </p>
+                <p className="text-[11px] text-[#52B788]">
+                  {isBn ? "মার্চেন্ট অনুমোদনের অপেক্ষায়" : "Awaiting merchant approval"}
+                </p>
               </div>
             </div>
             <span className="text-xs bg-[#F59E0B] text-[#1B4332] font-black px-3 py-1 rounded-xl shadow-xs">
-              স্ট্যাটাস দেখুন →
+              {isBn ? "স্ট্যাটাস দেখুন →" : "View Status →"}
             </span>
           </div>
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* REAL-TIME APPROVAL STATUS MODAL ("Waiting for Approval...") */}
-      {/* ========================================================================= */}
+      {/* Real-Time Approval Modal */}
       {approvalStatus !== "idle" && (!minimizedWaiting || approvalStatus !== "waiting") && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full card-shadow-md animate-slide-up text-center border border-[#E9E5DC] relative">
-            
-            {/* Top-right close/minimize button */}
             {approvalStatus === "waiting" && (
               <button
                 onClick={() => setMinimizedWaiting(true)}
-                title="মিনিমাইজ করুন"
+                title={isBn ? "মিনিমাইজ করুন" : "Minimize"}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#F7F5F0] hover:bg-[#E9E5DC] text-[#6B6158] flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
               >
                 ✕
               </button>
             )}
 
-            {/* STATE 1: WAITING FOR APPROVAL */}
+            {/* STATE 1: WAITING */}
             {approvalStatus === "waiting" && (
               <div>
                 <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
@@ -732,19 +792,21 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 </div>
 
                 <h3 className="font-display font-black text-2xl text-[#1A1916] mb-1.5">
-                  Waiting for Approval...
+                  {isBn ? "অনুমোদনের অপেক্ষা..." : "Waiting for Approval..."}
                 </h3>
                 <p className="text-xs font-bold text-[#F59E0B] uppercase tracking-wider mb-3">
-                  মার্চেন্ট অনুমোদনের অপেক্ষায় (৩০ মিনিট সক্রিয়)
+                  {isBn ? "মার্চেন্ট অনুমোদনের অপেক্ষায়" : "Awaiting merchant approval"}
                 </p>
 
                 <p className="text-xs text-[#6B6158] leading-relaxed mb-5 bg-[#F7F5F0] p-3.5 rounded-2xl border border-[#E9E5DC]">
-                  কাউন্টারে আপনার সিল অনুরোধ পাঠানো হয়েছে। মার্চেন্ট অনুমোদন করলেই আপনার কার্ডে নতুন সিল যুক্ত হবে।
+                  {isBn
+                    ? "কাউন্টারে আপনার সিল অনুরোধ পাঠানো হয়েছে। মার্চেন্ট অনুমোদন করলেই আপনার কার্ডে নতুন সিল যুক্ত হবে।"
+                    : "Stamp request sent to counter. Your stamp will appear as soon as staff approves."}
                 </p>
 
                 <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#1B4332] mb-5">
                   <span className="w-2 h-2 rounded-full bg-[#52B788] animate-ping" />
-                  <span>কাউন্টার কানেক্টেড...</span>
+                  <span>{isBn ? "কাউন্টার কানেক্টেড..." : "Connected to counter..."}</span>
                 </div>
 
                 <div className="space-y-2">
@@ -752,7 +814,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                     onClick={() => setMinimizedWaiting(true)}
                     className="w-full py-3 rounded-xl bg-[#1B4332] hover:bg-[#143427] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
                   >
-                    লুকান ও ব্রাউজ চালিয়ে যান
+                    {isBn ? "লুকান ও ব্রাউজ চালিয়ে যান" : "Minimize & Continue"}
                   </button>
 
                   <button
@@ -766,13 +828,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                     }}
                     className="w-full py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] hover:bg-[#F7F5F0] font-medium text-xs transition-colors cursor-pointer"
                   >
-                    অনুরোধ বাতিল করুন
+                    {isBn ? "অনুরোধ বাতিল করুন" : "Cancel Request"}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STATE 2: SEAL APPROVED! */}
+            {/* STATE 2: APPROVED */}
             {approvalStatus === "approved" && (
               <div>
                 <div className="w-20 h-20 rounded-full bg-[#D8EDDF] border-2 border-[#52B788] flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg text-[#1B4332] animate-bounce">
@@ -780,21 +842,21 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 </div>
 
                 <h3 className="font-display font-black text-2xl text-[#1B4332] mb-1">
-                  Seal Approved!
+                  {isBn ? "সিল অনুমোদিত!" : "Seal Approved!"}
                 </h3>
                 <p className="text-sm font-bold text-[#52B788] mb-3">
-                  সিল অনুমোদিত হয়েছে! ✓
+                  {isBn ? "সিল সফলভাবে যোগ হয়েছে ✓" : "Stamp added successfully ✓"}
                 </p>
 
                 <p className="text-xs text-[#6B6158] mb-6 bg-[#F0F7F2] p-3.5 rounded-2xl border border-[#52B788]/30">
-                  {approvalMessage || "+১টি নতুন সিল আপনার কার্ডে সফলভাবে যুক্ত হয়েছে!"}
+                  {approvalMessage || (isBn ? "+১টি নতুন সিল আপনার কার্ডে সফলভাবে যুক্ত হয়েছে!" : "+1 new stamp has been added to your card!")}
                 </p>
 
                 <button
                   onClick={() => setApprovalStatus("idle")}
                   className="w-full py-3.5 bg-[#1B4332] hover:bg-[#143427] text-white font-display font-black text-sm rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
                 >
-                  চমৎকার! কার্ড দেখুন ✓
+                  {isBn ? "চমৎকার! কার্ড দেখুন ✓" : "Awesome! View Card ✓"}
                 </button>
               </div>
             )}
@@ -807,17 +869,17 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 </div>
 
                 <h3 className="font-display font-black text-xl text-[#1A1916] mb-1">
-                  অনুরোধ প্রত্যাখ্যাত
+                  {isBn ? "অনুরোধ প্রত্যাখ্যাত" : "Request Rejected"}
                 </h3>
                 <p className="text-xs text-[#6B6158] mb-6">
-                  {approvalMessage || "কাউন্টার থেকে অনুরোধটি অনুমোদন করা যায়নি।"}
+                  {approvalMessage || (isBn ? "কাউন্টার থেকে অনুরোধটি অনুমোদন করা যায়নি।" : "The request could not be approved by staff.")}
                 </p>
 
                 <button
                   onClick={() => setApprovalStatus("idle")}
-                  className="w-full py-3 bg-[#6B6158] text-white font-bold text-xs rounded-xl"
+                  className="w-full py-3 bg-[#6B6158] text-white font-bold text-xs rounded-xl cursor-pointer"
                 >
-                  বন্ধ করুন
+                  {isBn ? "বন্ধ করুন" : "Close"}
                 </button>
               </div>
             )}
@@ -832,30 +894,39 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             <div className="w-16 h-16 rounded-full bg-[#FEF3C7] flex items-center justify-center mx-auto mb-3 text-3xl">
               🎁
             </div>
-            <h3 className="font-display font-black text-2xl text-[#1A1916] mb-1">অভিনন্দন!</h3>
+            <h3 className="font-display font-black text-2xl text-[#1A1916] mb-1">
+              {isBn ? "অভিনন্দন!" : "Congratulations!"}
+            </h3>
             <p className="text-sm text-[#6B6158] mb-4">
-              আপনি {merchant.name}-এ <strong>{target}টি সিল</strong> সম্পন্ন করেছেন
+              {isBn
+                ? `আপনি ${merchant.name}-এ `
+                : `You've completed `}
+              <strong>{target} {isBn ? "টি সিল" : "stamps"}</strong> {isBn ? "সম্পন্ন করেছেন" : `at ${merchant.name}`}
             </p>
 
             <div className="bg-[#1B4332] text-white p-5 rounded-2xl mb-4">
-              <p className="text-xs text-[#52B788] uppercase tracking-widest font-bold mb-1">ভাউচার কোড</p>
+              <p className="text-xs text-[#52B788] uppercase tracking-widest font-bold mb-1">
+                {isBn ? "ভাউচার কোড" : "Voucher Code"}
+              </p>
               <p className="font-mono font-black text-2xl tracking-widest text-[#F59E0B]">
                 {card.voucherCode || "SL-M1-5X9K"}
               </p>
               <p className="text-xs text-white/70 mt-2">
-                পুরস্কার: {card.rewardText || program?.rewardText}
+                {isBn ? "পুরস্কার: " : "Reward: "}{card.rewardText || program?.rewardText}
               </p>
             </div>
 
             <p className="text-xs text-[#6B6158] mb-6">
-              দোকানের কাউন্টারে এই কোডটি দেখান। স্টাফ তাদের পিন দিয়ে এটি রিডিম করবেন।
+              {isBn
+                ? "দোকানের কাউন্টারে এই কোডটি দেখান। স্টাফ তাদের পিন দিয়ে এটি রিডিম করবেন।"
+                : "Show this code at counter. Staff will redeem using their PIN."}
             </p>
 
             <button
               onClick={() => setShowVoucherModal(false)}
               className="w-full py-3 bg-[#1B4332] text-white font-bold rounded-xl text-sm cursor-pointer"
             >
-              বন্ধ করুন
+              {isBn ? "বন্ধ করুন" : "Close"}
             </button>
           </div>
         </div>

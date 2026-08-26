@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import StampGrid from "../../components/StampGrid"
 import { FireIcon, GiftIcon, LogOutIcon, CompassIcon, RefreshIcon } from "../../components/Icons"
@@ -12,7 +13,7 @@ interface WalletHomeProps {
   onLogout?: () => void
 }
 
-function formatVisitDate(iso?: string) {
+function formatVisitDate(iso?: string, isBn = true) {
   if (!iso) return ""
   try {
     const d = new Date(iso)
@@ -22,11 +23,11 @@ function formatVisitDate(iso?: string) {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
-    if (diffHours < 1) return "এইমাত্র"
-    if (diffHours < 24 && d.getDate() === now.getDate()) return "আজকে"
-    if (diffDays === 1 || (diffHours < 48 && d.getDate() === now.getDate() - 1)) return "গতকাল"
-    if (diffDays < 30) return `${diffDays} দিন আগে`
-    return d.toLocaleDateString("bn-BD", { day: "numeric", month: "short" })
+    if (diffHours < 1) return isBn ? "এইমাত্র" : "Just now"
+    if (diffHours < 24 && d.getDate() === now.getDate()) return isBn ? "আজকে" : "Today"
+    if (diffDays === 1 || (diffHours < 48 && d.getDate() === now.getDate() - 1)) return isBn ? "গতকাল" : "Yesterday"
+    if (diffDays < 30) return isBn ? `${diffDays} দিন আগে` : `${diffDays}d ago`
+    return d.toLocaleDateString(isBn ? "bn-BD" : "en-US", { day: "numeric", month: "short" })
   } catch {
     return ""
   }
@@ -34,6 +35,7 @@ function formatVisitDate(iso?: string) {
 
 export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: WalletHomeProps) {
   const { user, profile } = useAuth()
+  const { isBn } = useLanguage()
   const [cards, setCards] = useState<CustomerCard[]>([])
   const [availableMerchants, setAvailableMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,7 +44,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
   const [error, setError] = useState<string | null>(null)
 
   const customerId = profile?.id || user?.uid || null
-  const displayName = profile?.name || user?.displayName || "সম্মানিত গ্রাহক"
+  const displayName = profile?.name || user?.displayName || (isBn ? "সম্মানিত গ্রাহক" : "Valued Customer")
 
   useEffect(() => {
     loadAvailableMerchants()
@@ -118,13 +120,13 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-2.5 cursor-pointer group active:scale-95 transition-transform"
-            title="হোম"
+            title={isBn ? "হোম" : "Home"}
           >
             <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center font-display font-black text-[#0A2318] text-base shadow-lg glow-amber">
-              স
+              {isBn ? "স" : "S"}
             </div>
             <span className="font-display font-black text-white text-xl tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
-              সিলসিলা
+              {isBn ? "সিলসিলা" : "Silsila"}
             </span>
           </button>
 
@@ -132,7 +134,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             <div className="relative">
               <button
                 onClick={loadCards}
-                title="রিফ্রেশ করুন"
+                title={isBn ? "রিফ্রেশ করুন" : "Refresh"}
                 className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer active:scale-95 text-xs backdrop-blur-md border border-white/15"
               >
                 <RefreshIcon size={14} className={loading ? "animate-spin text-[#34D399]" : "text-white"} />
@@ -147,11 +149,11 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             {onLogout && (
               <button
                 onClick={onLogout}
-                title="লগআউট করুন"
+                title={isBn ? "লগআউট করুন" : "Log Out"}
                 className="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center gap-1.5 border border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm backdrop-blur-md"
               >
                 <LogOutIcon size={14} />
-                <span>লগ আউট</span>
+                <span>{isBn ? "লগ আউট" : "Log Out"}</span>
               </button>
             )}
           </div>
@@ -161,7 +163,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           <Link
             to="/profile"
             className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-lg glow-emerald flex-shrink-0 cursor-pointer active:scale-95 transition-all group"
-            title="প্রোফাইল দেখুন"
+            title={isBn ? "প্রোফাইল দেখুন" : "View Profile"}
           >
             {(profile?.avatarUrl || profile?.photoURL) ? (
               <img
@@ -171,12 +173,14 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               />
             ) : (
               <span className="font-display font-black text-white text-lg">
-                {displayName.trim().slice(0, 1) || "গ্র"}
+                {displayName.trim().slice(0, 1) || (isBn ? "গ্র" : "C")}
               </span>
             )}
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">স্বাগতম</p>
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">
+              {isBn ? "স্বাগতম" : "Welcome"}
+            </p>
             <h1 className="font-display text-2xl font-black text-white truncate leading-tight mt-0.5 drop-shadow-sm">{displayName}</h1>
           </div>
         </div>
@@ -185,12 +189,12 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         <div className="mt-3.5 bg-[#0F2A1E]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-4 flex items-center justify-around text-center shadow-2xl">
           <div>
             <p className="font-display font-black text-white text-2xl leading-none">{totalStamps}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">মোট সিল</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "মোট সিল" : "Total Stamps"}</p>
           </div>
           <div className="w-px h-8 bg-white/10" />
           <div>
             <p className="font-display font-black text-[#34D399] text-2xl leading-none">{completedCardsCount}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">কার্ড সম্পন্ন</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "কার্ড সম্পন্ন" : "Completed"}</p>
           </div>
           <div className="w-px h-8 bg-white/10" />
           <div>
@@ -198,7 +202,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               <FireIcon size={20} className="text-[#F59E0B]" />
               {maxStreak}
             </p>
-            <p className="text-white/60 text-xs mt-1 font-medium">সপ্তাহের সিলসিলা</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "সপ্তাহের সিলসিলা" : "Streak"}</p>
           </div>
         </div>
       </div>
@@ -206,7 +210,9 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
       <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
         {/* Filter Tabs */}
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-white text-lg drop-shadow-xs">আমার কার্ডগুলো</h2>
+          <h2 className="font-display font-bold text-white text-lg drop-shadow-xs">
+            {isBn ? "আমার কার্ডগুলো" : "My Cards"}
+          </h2>
           <div className="flex gap-1 bg-[#092015]/80 backdrop-blur-md p-1 rounded-xl border border-white/10">
             <button
               onClick={() => setFilter("all")}
@@ -214,7 +220,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 filter === "all" ? "bg-[#34D399] text-[#0A2318] shadow-sm" : "text-white/60 hover:text-white"
               }`}
             >
-              সব ({cards.length})
+              {isBn ? `সব (${cards.length})` : `All (${cards.length})`}
             </button>
             <button
               onClick={() => setFilter("claim")}
@@ -222,7 +228,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 filter === "claim" ? "bg-[#F59E0B] text-[#0A2318] shadow-sm" : "text-white/60 hover:text-white"
               }`}
             >
-              দাবিযোগ্য ({cards.filter((c) => c.voucherReady).length})
+              {isBn ? `দাবিযোগ্য (${cards.filter((c) => c.voucherReady).length})` : `Claimable (${cards.filter((c) => c.voucherReady).length})`}
             </button>
           </div>
         </div>
@@ -230,7 +236,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         {loading ? (
           <div className="py-12 text-center text-white/70 text-sm">
             <RefreshIcon size={24} className="animate-spin text-[#34D399] mx-auto mb-2" />
-            <p>কার্ড লোড হচ্ছে...</p>
+            <p>{isBn ? "কার্ড লোড হচ্ছে..." : "Loading cards..."}</p>
           </div>
         ) : filteredCards.length > 0 ? (
           <div className="space-y-3">
@@ -248,10 +254,10 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               const merchant = card.merchant?.name
                 ? card.merchant
                 : (found || {
-                    name: "দোকান",
-                    category: "লয়্যালটি",
+                    name: isBn ? "দোকান" : "Store",
+                    category: isBn ? "লয়্যালটি" : "Loyalty",
                     area: "",
-                    logoInitials: "সি",
+                    logoInitials: isBn ? "সি" : "S",
                     logoBg: "#D8EDDF",
                     logoColor: "#1B4332",
                     verified: false,
@@ -271,10 +277,12 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     <div className="bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
                       <div className="flex items-center gap-2">
                         <GiftIcon size={14} className="text-[#0A2318]" />
-                        <span className="text-xs font-black">পুরস্কার প্রস্তুত! এখনই দাবি করুন</span>
+                        <span className="text-xs font-black">
+                          {isBn ? "পুরস্কার প্রস্তুত! এখনই দাবি করুন" : "Reward Ready! Claim Now"}
+                        </span>
                       </div>
                       <span className="text-[10px] font-black bg-[#0A2318] text-[#F59E0B] px-2.5 py-0.5 rounded-full">
-                        কোড দেখুন
+                        {isBn ? "কোড দেখুন" : "View Code"}
                       </span>
                     </div>
                   )}
@@ -288,13 +296,13 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                         {merchant.logoUrl ? (
                           <img src={merchant.logoUrl} alt={merchant.name} className="w-full h-full object-cover" />
                         ) : (
-                          merchant.logoInitials || (merchant.name ? merchant.name.slice(0, 2) : "সি")
+                          merchant.logoInitials || (merchant.name ? merchant.name.slice(0, 2) : isBn ? "সি" : "S")
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="font-display font-bold text-base truncate text-white group-hover:text-[#34D399] transition-colors">
-                            {merchant.name}
+                            {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                           </p>
                           {merchant.verified && (
                             <span className="text-[#34D399] flex-shrink-0 text-sm">✓</span>
@@ -308,7 +316,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                         <p className={`font-display font-black text-xl leading-none ${card.voucherReady ? "text-[#F59E0B]" : "text-[#34D399]"}`}>
                           {card.stamps}<span className="text-sm font-medium text-white/40">/{target}</span>
                         </p>
-                        <p className="text-xs mt-0.5 text-white/50 font-medium">সিল</p>
+                        <p className="text-xs mt-0.5 text-white/50 font-medium">{isBn ? "সিল" : "Stamps"}</p>
                       </div>
                     </div>
 
@@ -322,18 +330,26 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     <div className="pt-2 border-t border-white/10 flex items-center justify-between">
                       <p className="text-xs text-white/80">
                         {card.voucherReady ? (
-                          <span className="font-bold text-[#F59E0B]">{card.rewardText || "পুরস্কার প্রস্তুত"}</span>
+                          <span className="font-bold text-[#F59E0B]">
+                            {card.rewardText || (isBn ? "পুরস্কার প্রস্তুত" : "Reward Ready")}
+                          </span>
                         ) : isNearComplete ? (
                           <span className="text-[#F59E0B] font-bold flex items-center gap-1">
                             <FireIcon size={12} className="inline text-[#F59E0B]" />
-                            আর মাত্র ১টি সিল বাকি!
+                            {isBn ? "আর মাত্র ১টি সিল বাকি!" : "Only 1 stamp left!"}
                           </span>
                         ) : (
-                          <>আর <span className="font-bold text-[#34D399]">{remaining}টি</span> সিলে: {card.rewardText || "পুরস্কার"}</>
+                          <>
+                            {isBn ? (
+                              <>আর <span className="font-bold text-[#34D399]">{remaining}টি</span> সিলে: {card.rewardText || "পুরস্কার"}</>
+                            ) : (
+                              <><span className="font-bold text-[#34D399]">{remaining} stamps</span> until: {card.rewardText || "Reward"}</>
+                            )}
+                          </>
                         )}
                       </p>
                       <p className="text-xs font-medium text-white/40">
-                        {formatVisitDate(card.lastVisit || card.updatedAt)}
+                        {formatVisitDate(card.lastVisit || card.updatedAt, isBn)}
                       </p>
                     </div>
 
@@ -355,9 +371,13 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           <div className="space-y-4">
             <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
               <CompassIcon size={32} className="text-[#34D399] mx-auto mb-2" />
-              <p className="font-display font-bold text-white text-lg drop-shadow-sm">উপলব্ধ ক্যাফে ও রেস্তোরাঁ</p>
+              <p className="font-display font-bold text-white text-lg drop-shadow-sm">
+                {isBn ? "উপলব্ধ ক্যাফে ও রেস্তোরাঁ" : "Available Cafes & Stores"}
+              </p>
               <p className="text-white/60 text-xs leading-relaxed mt-1">
-                নিচের যেকোনো দোকানে ক্লিক করে স্ট্যাম্প কার্ড দেখুন ও সিল সংগ্রহ করুন
+                {isBn
+                  ? "নিচের যেকোনো দোকানে ক্লিক করে স্ট্যাম্প কার্ড দেখুন ও সিল সংগ্রহ করুন"
+                  : "Tap any store below to view their loyalty card and start stamping"}
               </p>
             </div>
 
@@ -377,31 +397,31 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                           color: merchant.logoColor || "#1B4332",
                         }}
                       >
-                        {merchant.logoInitials || merchant.name?.slice(0, 2) || "দোকান"}
+                        {merchant.logoInitials || merchant.name?.slice(0, 2) || (isBn ? "দোকান" : "Store")}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
                           <p className="font-display font-bold text-base text-white group-hover:text-[#34D399] transition-colors truncate">
-                            {merchant.name}
+                            {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                           </p>
                           {merchant.verified && (
                             <span className="text-[#34D399] text-xs font-bold">✓</span>
                           )}
                         </div>
                         <p className="text-xs text-white/60 mt-0.5">
-                          {merchant.category} · {merchant.area || "ঢাকা"}
+                          {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
                         </p>
                       </div>
                       <span className="text-[#0A2318] font-black text-xs bg-[#34D399] px-3 py-1 rounded-full flex-shrink-0 shadow-sm">
-                        কার্ড খুলুন →
+                        {isBn ? "কার্ড খুলুন →" : "Open Card →"}
                       </span>
                     </div>
 
                     <StampGrid filled={0} total={5} size="sm" />
 
                     <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
-                      <span>🎁 অর্ডারে ফ্রি উপহার রিওয়ার্ড পান</span>
-                      <span className="text-[#34D399] font-bold">স্ট্যাম্প কার্ড দেখুন</span>
+                      <span>{isBn ? "🎁 অর্ডারে ফ্রি উপহার রিওয়ার্ড পান" : "🎁 Earn free rewards on orders"}</span>
+                      <span className="text-[#34D399] font-bold">{isBn ? "স্ট্যাম্প কার্ড দেখুন" : "View Card"}</span>
                     </div>
                   </button>
                 ))}
@@ -413,8 +433,14 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         <div className="mt-6 p-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md flex items-center gap-3 text-white/60">
           <span className="text-2xl">🏪</span>
           <div>
-            <p className="text-sm font-medium text-[#6B6158]">একটি অ্যাকাউন্ট, সব দোকান</p>
-            <p className="text-xs mt-0.5">যেকোনো সিলসিলা দোকানে একই অ্যাকাউন্টেই সিল জমবে</p>
+            <p className="text-sm font-medium text-white/80">
+              {isBn ? "একটি অ্যাকাউন্ট, সব দোকান" : "One Account, All Stores"}
+            </p>
+            <p className="text-xs mt-0.5">
+              {isBn
+                ? "যেকোনো সিলসিলা দোকানে একই অ্যাকাউন্টেই সিল জমবে"
+                : "Stamps collect into this single account across all partner stores"}
+            </p>
           </div>
         </div>
       </div>

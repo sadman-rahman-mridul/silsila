@@ -2,6 +2,7 @@ import { useState } from "react"
 import QRCode from "qrcode"
 import { api } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES } from "../../constants/categories"
 import { CheckIcon, DownloadIcon, ShareIcon, LogOutIcon } from "../../components/Icons"
@@ -12,22 +13,17 @@ interface OnboardingWizardProps {
   onBack?: () => void
 }
 
-const steps = [
-  { num: 1, label: "ব্যবসার তথ্য" },
-  { num: 2, label: "লোকেশন" },
-  { num: 3, label: "পুরস্কার প্রোগ্রাম" },
-  { num: 4, label: "QR কোড" },
-]
-
-/**
- * First-run setup for a merchant account.
- *
- * Nothing here is pre-filled with sample data — the shop name, category,
- * location and reward all come from the owner, and the merchant record stays
- * un-onboarded until this wizard completes.
- */
 export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizardProps) {
   const { profile } = useAuth()
+  const { isBn } = useLanguage()
+
+  const steps = [
+    { num: 1, label: isBn ? "ব্যবসার তথ্য" : "Business Info" },
+    { num: 2, label: isBn ? "লোকেশন" : "Location" },
+    { num: 3, label: isBn ? "পুরস্কার প্রোগ্রাম" : "Rewards" },
+    { num: 4, label: isBn ? "QR কোড" : "QR Code" },
+  ]
+
   const [step, setStep] = useState(1)
   const [bizName, setBizName] = useState("")
   const [category, setCategory] = useState("")
@@ -153,17 +149,21 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
-              <span className="text-[#1B4332] font-black text-sm">সি</span>
+              <span className="text-[#1B4332] font-black text-sm">{isBn ? "সি" : "S"}</span>
             </div>
             <div>
-              <p className="text-white font-display font-bold">সিলসিলায় স্বাগতম!</p>
-              <p className="text-[#52B788] text-xs">আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!</p>
+              <p className="text-white font-display font-bold">
+                {isBn ? "সিলসিলায় স্বাগতম!" : "Welcome to Silsila!"}
+              </p>
+              <p className="text-[#52B788] text-xs">
+                {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your brand's digital loyalty card!"}
+              </p>
             </div>
           </div>
           {onBack && (
             <button
               onClick={onBack}
-              title="লগআউট / শুরুতে ফিরুন"
+              title={isBn ? "লগআউট / শুরুতে ফিরুন" : "Log out / Exit"}
               className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer active:scale-95 flex-shrink-0"
             >
               <LogOutIcon size={16} />
@@ -207,32 +207,44 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
 
         {step === 1 && (
           <div className="animate-slide-up">
-            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">আপনার ব্যবসার তথ্য দিন</h2>
-            <p className="text-[#6B6158] text-xs mb-6">এই তথ্য কাস্টমারদের স্মার্টফোন কার্ডে প্রদর্শিত হবে</p>
+            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">
+              {isBn ? "আপনার ব্যবসার তথ্য দিন" : "Enter Business Information"}
+            </h2>
+            <p className="text-[#6B6158] text-xs mb-6">
+              {isBn ? "এই তথ্য কাস্টমারদের স্মার্টফোন কার্ডে প্রদর্শিত হবে" : "This information will appear on customers' smartphone cards"}
+            </p>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">ব্র্যান্ড আইকন প্রিভিউ</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-2">
+                {isBn ? "ব্র্যান্ড আইকন প্রিভিউ" : "Brand Icon Preview"}
+              </label>
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-[#D8EDDF] flex items-center justify-center font-display font-black text-[#1B4332] text-2xl">
-                  {bizName ? bizName.slice(0, 2) : "দোকান"}
+                  {bizName ? bizName.slice(0, 2) : (isBn ? "দোকান" : "Store")}
                 </div>
-                <p className="text-xs text-[#6B6158]">নাম লিখলে স্বয়ংক্রিয়ভাবে তৈরি হবে</p>
+                <p className="text-xs text-[#6B6158]">
+                  {isBn ? "নাম লিখলে স্বয়ংক্রিয়ভাবে তৈরি হবে" : "Generated automatically from business name"}
+                </p>
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">দোকান / ব্যবসার নাম *</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">
+                {isBn ? "দোকান / ব্যবসার নাম *" : "Store / Business Name *"}
+              </label>
               <input
                 type="text"
                 value={bizName}
                 onChange={(e) => setBizName(e.target.value)}
-                placeholder="যেমন: উত্তরার মিষ্টি মুখ"
+                placeholder={isBn ? "যেমন: উত্তরার মিষ্টি মুখ" : "e.g. Uttara Coffee House"}
                 className="w-full bg-white border border-[#E9E5DC] rounded-xl px-4 py-3.5 text-[#1A1916] text-sm outline-none focus:border-[#1B4332] font-semibold"
               />
             </div>
 
             <div>
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">ক্যাটাগরি *</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-2">
+                {isBn ? "ক্যাটাগরি *" : "Category *"}
+              </label>
               <div className="flex flex-wrap gap-2">
                 {BUSINESS_CATEGORIES.map((cat) => (
                   <button
@@ -244,7 +256,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
                         : "bg-white border border-[#E9E5DC] text-[#6B6158]"
                     }`}
                   >
-                    {cat.emoji} {cat.label}
+                    {cat.emoji} {isBn ? cat.label : (cat.labelEn || cat.label)}
                   </button>
                 ))}
               </div>
@@ -254,29 +266,35 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
 
         {step === 2 && (
           <div className="animate-slide-up">
-            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">দোকানের অবস্থান</h2>
+            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">
+              {isBn ? "দোকানের অবস্থান" : "Store Location"}
+            </h2>
             <p className="text-[#6B6158] text-xs mb-6">
-              কাস্টমাররা কোথায় আপনার দোকান খুঁজে পাবে?
+              {isBn ? "কাস্টমাররা কোথায় আপনার দোকান খুঁজে পাবে?" : "Where can customers find your store?"}
             </p>
 
             <div className="space-y-3">
               <div>
-                <label className="text-[#6B6158] text-xs font-medium block mb-1.5">এলাকা / লোকেশন</label>
+                <label className="text-[#6B6158] text-xs font-medium block mb-1.5">
+                  {isBn ? "এলাকা / লোকেশন" : "Area / Location"}
+                </label>
                 <input
                   type="text"
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
-                  placeholder="যেমন: উত্তরা সেক্টর ৭"
+                  placeholder={isBn ? "যেমন: উত্তরা সেক্টর ৭" : "e.g. Banani, Block C"}
                   className="w-full bg-white border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332]"
                 />
               </div>
               <div>
-                <label className="text-[#6B6158] text-xs font-medium block mb-1.5">পূর্ণ ঠিকানা</label>
+                <label className="text-[#6B6158] text-xs font-medium block mb-1.5">
+                  {isBn ? "পূর্ণ ঠিকানা" : "Full Address"}
+                </label>
                 <input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="বাড়ি নম্বর, রোড, এলাকা, শহর"
+                  placeholder={isBn ? "বাড়ি নম্বর, রোড, এলাকা, শহর" : "House, Road, Area, City"}
                   className="w-full bg-white border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332]"
                 />
               </div>
@@ -286,11 +304,19 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
 
         {step === 3 && (
           <div className="animate-slide-up">
-            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">প্রথম লয়্যালটি প্রোগ্রাম</h2>
-            <p className="text-[#6B6158] text-xs mb-6">কাস্টমার কতটি সিল সংগ্রহ করলে কী উপহার বা ডিসকাউন্ট পাবে?</p>
+            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-1">
+              {isBn ? "প্রথম লয়্যালটি প্রোগ্রাম" : "First Loyalty Program"}
+            </h2>
+            <p className="text-[#6B6158] text-xs mb-6">
+              {isBn
+                ? "কাস্টমার কতটি সিল সংগ্রহ করলে কী উপহার বা ডিসকাউন্ট পাবে?"
+                : "What reward will customers get upon collecting enough stamps?"}
+            </p>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-2">
+                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
+              </label>
               <div className="flex gap-2">
                 {[3, 5, 7, 8, 10].map((n) => (
                   <button
@@ -309,18 +335,22 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">পুরস্কারের বিবরণ *</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">
+                {isBn ? "পুরস্কারের বিবরণ *" : "Reward Description *"}
+              </label>
               <input
                 type="text"
                 value={rewardText}
                 onChange={(e) => setRewardText(e.target.value)}
-                placeholder="যেমন: ১টি ডেজার্ট ফ্রি অথবা ২০০ টাকার ভাউচার"
+                placeholder={isBn ? "যেমন: ১টি ডেজার্ট ফ্রি অথবা ২০০ টাকার ভাউচার" : "e.g. 1 Free Dessert or $5 Off"}
                 className="w-full bg-white border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332] font-semibold"
               />
             </div>
 
             <div className="mb-5">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">ভাউচারের মেয়াদ: {expiryDays} দিন</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">
+                {isBn ? `ভাউচারের মেয়াদ: ${expiryDays} দিন` : `Voucher Validity: ${expiryDays} days`}
+              </label>
               <input
                 type="range"
                 min={7}
@@ -332,20 +362,27 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             </div>
 
             <div>
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">লাইভ কার্ড প্রিভিউ</label>
+              <label className="text-[#6B6158] text-xs font-medium block mb-2">
+                {isBn ? "লাইভ কার্ড প্রিভিউ" : "Live Card Preview"}
+              </label>
               <div className="bg-white rounded-2xl p-4 card-shadow border border-[#E9E5DC]">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-[#D8EDDF] flex items-center justify-center font-bold text-[#1B4332] text-sm">
                     {bizName ? bizName.slice(0, 2) : "—"}
                   </div>
                   <div>
-                    <p className="font-bold text-[#1A1916] text-sm">{bizName || "আপনার দোকান"}</p>
-                    <p className="text-[#52B788] text-xs font-medium">০/{rewardTarget} সিল</p>
+                    <p className="font-bold text-[#1A1916] text-sm">
+                      {bizName || (isBn ? "আপনার দোকান" : "Your Store")}
+                    </p>
+                    <p className="text-[#52B788] text-xs font-medium">
+                      0/{rewardTarget} {isBn ? "সিল" : "Stamps"}
+                    </p>
                   </div>
                 </div>
                 <StampGrid filled={0} total={rewardTarget} size="sm" />
                 <p className="text-[#6B6158] text-xs mt-3">
-                  🎁 উপহার: <span className="font-bold text-[#1A1916]">{rewardText || "..."}</span>
+                  🎁 {isBn ? "উপহার: " : "Reward: "}
+                  <span className="font-bold text-[#1A1916]">{rewardText || "..."}</span>
                 </p>
               </div>
             </div>
@@ -357,9 +394,13 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             <div className="w-16 h-16 rounded-full bg-[#D8EDDF] flex items-center justify-center mx-auto mb-3 text-3xl">
               🎉
             </div>
-            <h2 className="font-display font-black text-[#1A1916] text-2xl mb-1">দোকান প্রস্তুত!</h2>
+            <h2 className="font-display font-black text-[#1A1916] text-2xl mb-1">
+              {isBn ? "দোকান প্রস্তুত!" : "Store Ready!"}
+            </h2>
             <p className="text-[#6B6158] text-xs mb-5">
-              আপনার কাউন্টার QR কোড তৈরি হয়েছে। এটি প্রিন্ট করে ক্যাশ কাউন্টারে রাখুন।
+              {isBn
+                ? "আপনার কাউন্টার QR কোড তৈরি হয়েছে। এটি প্রিন্ট করে ক্যাশ কাউন্টারে রাখুন।"
+                : "Your counter QR code is generated. Print and place it at your counter."}
             </p>
 
             <div className="bg-white rounded-2xl card-shadow p-5 mb-5 mx-auto max-w-xs border border-[#E9E5DC]">
@@ -368,7 +409,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
                   <img src={qrDataUrl} alt="New Merchant QR" className="w-full h-full object-contain" />
                 ) : (
                   <div className="w-full h-full bg-[#1A1916] rounded flex items-center justify-center text-white text-xs">
-                    QR কোড
+                    QR Code
                   </div>
                 )}
               </div>
@@ -381,13 +422,13 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
                 onClick={handleDownloadQr}
                 className="flex-1 py-3 rounded-xl bg-[#1B4332] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm"
               >
-                <DownloadIcon size={16} /> QR ডাউনলোড
+                <DownloadIcon size={16} /> {isBn ? "QR ডাউনলোড" : "Download QR"}
               </button>
               <button
                 onClick={() => navigator.clipboard?.writeText(`https://${qrLink}`)}
                 className="flex-1 py-3 rounded-xl border border-[#1B4332] text-[#1B4332] font-bold text-xs flex items-center justify-center gap-1.5"
               >
-                <ShareIcon size={16} /> শেয়ার লিংক
+                <ShareIcon size={16} /> {isBn ? "শেয়ার লিংক" : "Share Link"}
               </button>
             </div>
           </div>
@@ -401,7 +442,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
               onClick={() => setStep((s) => s - 1)}
               className="px-5 py-3 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs"
             >
-              ← পেছনে
+              {isBn ? "← পেছনে" : "← Back"}
             </button>
           )}
           <button
@@ -422,15 +463,25 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             }`}
           >
             {saving
-              ? "ডাটাবেজে সংরক্ষণ হচ্ছে..."
+              ? isBn
+                ? "ডাটাবেজে সংরক্ষণ হচ্ছে..."
+                : "Saving to database..."
               : step === 4
-              ? "মার্চেন্ট ড্যাশবোর্ডে যান →"
+              ? isBn
+                ? "মার্চেন্ট ড্যাশবোর্ডে যান →"
+                : "Go to Dashboard →"
               : step === 3
-              ? "প্রোগ্রাম চালু করুন ও QR তৈরি করুন"
-              : "পরবর্তী ধাপ →"}
+              ? isBn
+                ? "প্রোগ্রাম চালু করুন ও QR তৈরি করুন"
+                : "Launch Program & Generate QR"
+              : isBn
+              ? "পরবর্তী ধাপ →"
+              : "Next Step →"}
           </button>
         </div>
-        <p className="text-center text-[#B0A99E] text-[10px] mt-2 font-medium">ধাপ {step} / {steps.length}</p>
+        <p className="text-center text-[#B0A99E] text-[10px] mt-2 font-medium">
+          {isBn ? `ধাপ ${step} / ${steps.length}` : `Step ${step} of ${steps.length}`}
+        </p>
       </div>
     </div>
   )
