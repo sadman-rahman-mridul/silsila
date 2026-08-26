@@ -6,6 +6,7 @@ import { firebaseService } from "../services/firebaseService"
 import { GlobeIcon } from "../components/Icons"
 
 type LandingStep = "choose" | "phone" | "login_pin" | "register_pin" | "otp"
+type Role = "customer" | "merchant" | "ops"
 
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
@@ -21,6 +22,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   const [pin, setPin] = useState("")
   const [showPin, setShowPin] = useState(false)
   const [consentGiven, setConsentGiven] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [infoMsg, setInfoMsg] = useState<string | null>(null)
 
