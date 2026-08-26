@@ -122,20 +122,29 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
 
   if (showAnalytics) {
     return (
-      <div className="flex flex-col h-full bg-transparent max-w-md mx-auto relative overflow-hidden">
-        <div className="flex-1 overflow-hidden relative">
+      <div className="flex flex-col h-full min-h-[100dvh] bg-transparent w-full max-w-md mx-auto relative overflow-hidden">
+        {/* Top Navigation Bar */}
+        <div
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-3.5 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
+          style={{ paddingTop: "max(10px, env(safe-area-inset-top, 10px))" }}
+        >
+          <button
+            onClick={handleExitSpecialMode}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/20 active:scale-95 shadow-md"
+          >
+            <ChevronLeftIcon size={16} />
+            <span>{isBn ? "ড্যাশবোর্ড" : "Dashboard"}</span>
+          </button>
+          <span className="font-display font-black text-white text-sm">
+            {isBn ? "অ্যানালিটিক্স রিপোর্ট" : "Analytics Report"}
+          </span>
+          <div className="w-12" />
+        </div>
+
+        <div className="flex-1 overflow-hidden relative w-full">
           <div className="absolute inset-0 overflow-y-auto">
             <AnalyticsPage activeMerchantId={merchantId} />
           </div>
-        </div>
-        <div className="bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 px-4 py-3 shadow-2xl z-20">
-          <button
-            onClick={handleExitSpecialMode}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-emerald active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
-          >
-            <ChevronLeftIcon size={18} />
-            <span>{isBn ? "ড্যাশবোর্ডে ফিরুন" : "Back to Dashboard"}</span>
-          </button>
         </div>
       </div>
     )

@@ -90,10 +90,10 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
   const hasNoData = !loading && stats.uniqueCustomers === 0 && stats.scansToday === 0
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
+    <div className="flex flex-col h-full bg-transparent w-full">
       {/* Header */}
-      <div className="px-5 pt-4 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">
+      <div className="px-3.5 pt-4 pb-3 w-full">
+        <h1 className="font-display text-xl font-black text-white mb-0.5 drop-shadow-xs">
           {isBn ? "রিপোর্ট ও পরিসংখ্যান" : "Analytics & Reports"}
         </h1>
         <p className="text-[#34D399] text-xs font-semibold">
@@ -101,7 +101,7 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         </p>
 
         {/* 4-Stat tiles */}
-        <div className="mt-4 grid grid-cols-2 gap-2.5">
+        <div className="mt-3.5 grid grid-cols-2 gap-2">
           {[
             {
               label: isBn ? "আজকের মোট স্ক্যান" : "Today's Scans",
@@ -140,13 +140,13 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
               up: true,
             },
           ].map((s) => (
-            <div key={s.label} className="bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 shadow-lg">
+            <div key={s.label} className="bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 shadow-lg">
               <div className="flex items-center gap-1.5 text-white/60 mb-1">
                 {s.icon}
-                <p className="text-white/60 text-xs font-medium">{s.label}</p>
+                <p className="text-white/60 text-[11px] font-medium">{s.label}</p>
               </div>
-              <p className="font-display font-black text-white text-2xl mt-0.5">{s.value}</p>
-              <p className={"text-xs mt-0.5 font-bold " + (s.up ? "text-[#34D399]" : "text-red-400")}>
+              <p className="font-display font-black text-white text-xl mt-0.5">{s.value}</p>
+              <p className={"text-[11px] mt-0.5 font-bold " + (s.up ? "text-[#34D399]" : "text-red-400")}>
                 {s.change}
               </p>
             </div>
@@ -154,7 +154,7 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2 space-y-4">
+      <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 space-y-3.5 w-full">
         {loading && (
           <div className="py-6 text-center text-xs text-white/70 flex items-center justify-center gap-2">
             <RefreshIcon size={16} className="animate-spin text-[#34D399]" />
