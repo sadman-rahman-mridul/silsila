@@ -201,89 +201,11 @@ export default function MerchantDashboard({
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      {/* Compact green header */}
-      <div className="bg-[#1B4332] px-5 pt-12 pb-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Logo Avatar */}
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-lg shadow-md border-2 overflow-hidden flex-shrink-0"
-              style={{
-                backgroundColor: activeMerchant?.logoBg || "#D8EDDF",
-                color: activeMerchant?.logoColor || "#1B4332",
-                borderColor: activeMerchant?.logoColor || "#1B4332",
-              }}
-            >
-              {activeMerchant?.logoUrl ? (
-                <img src={activeMerchant.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-              ) : (
-                merchantInitials || "সি"
-              )}
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-[#52B788] text-xs font-semibold">মার্চেন্ট কনসোল</p>
-                {ownedMerchants.length > 1 && (
-                  <select
-                    value={merchantId}
-                    onChange={(e) => onMerchantChange(e.target.value)}
-                    className="bg-white/10 text-white text-xs rounded-lg px-2 py-0.5 border border-white/20 outline-none"
-                  >
-                    {ownedMerchants.map((m) => (
-                      <option key={m.id} value={m.id} className="text-[#1A1916]">
-                        {m.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {merchantName ? (
-                <h1 className="font-display text-xl font-bold text-white leading-tight mt-0.5">
-                  {merchantName}
-                </h1>
-              ) : (
-                <p className="text-white/40 text-sm mt-0.5">অনবোর্ডিং প্রয়োজন</p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <button
-              onClick={loadPrograms}
-              title="রিফ্রেশ"
-              className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-white cursor-pointer active:scale-95"
-            >
-              <RefreshIcon size={16} className={loading ? "animate-spin" : ""} />
-            </button>
-            {onOpenSettings && (
-              <button
-                onClick={onOpenSettings}
-                title="সেটিংস"
-                className="w-9 h-9 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] flex items-center justify-center hover:bg-[#F59E0B]/30 transition-all cursor-pointer active:scale-95"
-              >
-                <SettingsIcon size={16} />
-              </button>
-            )}
-            {onLogout && (
-              <button
-                onClick={onLogout}
-                title="লগআউট করুন"
-                className="w-9 h-9 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center justify-center border border-red-500/30 transition-all cursor-pointer active:scale-95 shadow-sm"
-              >
-                <LogOutIcon size={16} />
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-4">
         {/* Pending Approvals */}
         {approvals.length > 0 && (
-          <div className="px-4 pt-4">
+          <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-display font-bold text-[#1A1916] text-lg flex items-center gap-2">
                 অনুমোদন প্রয়োজন

@@ -158,9 +158,9 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
-        <h1 className="font-display text-2xl font-bold text-white mb-1">লয়্যালটি ও পুরস্কার</h1>
-        <p className="text-[#52B788] text-sm">ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি</p>
+      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
+        <h1 className="font-display text-xl font-bold text-white mb-1">লয়্যালটি ও পুরস্কার</h1>
+        <p className="text-[#52B788] text-xs">ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি</p>
 
         <div className="mt-4 flex gap-3">
           <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">

@@ -69,7 +69,7 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-5">
+      <div className="bg-[#1B4332] px-5 pt-10 pb-5">
         <h1 className="font-display text-2xl font-bold text-white mb-3">আশেপাশের দোকান</h1>
         <div className="relative">
           <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B0A99E]" />

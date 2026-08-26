@@ -112,8 +112,8 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-5">
-        <h1 className="font-display text-2xl font-bold text-white mb-3">কাস্টমার সিআরএম</h1>
+      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
+        <h1 className="font-display text-xl font-bold text-white mb-2.5">কাস্টমার সিআরএম</h1>
         <div className="relative">
           <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
           <input
@@ -121,7 +121,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="নাম বা মোবাইল নম্বর খুঁজুন..."
-            className="w-full bg-white/10 border border-white/20 rounded-xl pl-9 pr-4 py-3 text-white placeholder-white/40 text-sm outline-none focus:border-[#52B788] transition-colors"
+            className="w-full bg-white/10 border border-white/20 rounded-xl pl-9 pr-4 py-2 text-white placeholder-white/40 text-sm outline-none focus:border-[#52B788] transition-colors"
           />
           {search && (
             <button
@@ -171,10 +171,10 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               <p className="text-sm font-bold text-[#1A1916]">কোনো কাস্টমার পাওয়া যায়নি</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {customers.map((customer) => {
                 const badge = statusBadge[customer.status] || statusBadge.active
-                const pct = target ? Math.min(100, (customer.stamps / target) * 100) : 0
+                const totalCups = target || 5
 
                 return (
                   <div
@@ -195,29 +195,45 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                         </div>
                         <p className="text-[#B0A99E] text-xs font-mono">{customer.phone}</p>
 
-                        <div className="flex items-center gap-4 mt-2">
+                        <div className="flex items-center gap-4 mt-2.5">
                           <div className="text-center">
                             <p className="font-display font-bold text-[#1B4332] text-base leading-none">
                               {customer.stamps}{target ? `/${target}` : ""}
                             </p>
-                            <p className="text-[#B0A99E] text-[10px] mt-0.5">বর্তমান সিল</p>
+                            <p className="text-[#B0A99E] text-[10px] mt-0.5">সিল</p>
                           </div>
                           <div className="text-center">
                             <p className="font-display font-bold text-[#1A1916] text-base leading-none">
                               {customer.totalVisits}
                             </p>
-                            <p className="text-[#B0A99E] text-[10px] mt-0.5">মোট ভিজিট</p>
+                            <p className="text-[#B0A99E] text-[10px] mt-0.5">ভিজিট</p>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-[#B0A99E] text-[10px]">অগ্রগতি</span>
+                              <span className="text-[#1B4332] font-bold text-[10px]">অগ্রগতি</span>
                               <span className="text-[#B0A99E] text-[10px]">{customer.lastVisit}</span>
                             </div>
-                            <div className="h-1.5 bg-[#F0EDE6] rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-[#1B4332] rounded-full transition-all"
-                                style={{ width: `${pct}%` }}
-                              />
+                            {/* Coffee Cup Progress Animation */}
+                            <div className="flex items-center gap-1 bg-[#F7F5F0] px-2 py-1 rounded-xl border border-[#E9E5DC]">
+                              {Array.from({ length: totalCups }).map((_, i) => {
+                                const isFilled = i < customer.stamps
+                                return (
+                                  <span
+                                    key={i}
+                                    className={`text-sm transition-all duration-300 ${
+                                      isFilled
+                                        ? "opacity-100 scale-110 drop-shadow-xs"
+                                        : "opacity-25 grayscale"
+                                    }`}
+                                    title={`কাপ ${i + 1}`}
+                                  >
+                                    ☕
+                                  </span>
+                                )
+                              })}
+                              <span className="text-[10px] font-bold text-[#1B4332] ml-auto">
+                                {customer.stamps}/{totalCups}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -270,7 +286,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 bg-[#F7F5F0] p-3 rounded-2xl mb-4 text-center">
+            <div className="grid grid-cols-3 gap-2 bg-[#F7F5F0] p-3 rounded-2xl mb-3 text-center">
               <div>
                 <p className="font-display font-black text-[#1B4332] text-xl">
                   {selectedCustomer.stamps}{target ? `/${target}` : ""}
@@ -286,6 +302,30 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                   {selectedCustomer.status === "completed" ? "১" : "০"}
                 </p>
                 <p className="text-[10px] text-[#6B6158]">প্রস্তুত পুরস্কার</p>
+              </div>
+            </div>
+
+            {/* Coffee Cups Progress in Modal */}
+            <div className="bg-[#F0F7F2] border border-[#52B788]/30 rounded-2xl p-3.5 mb-4 text-center">
+              <p className="text-xs font-bold text-[#1B4332] mb-2">
+                কফি কাপ অগ্রগতি ({selectedCustomer.stamps}/{target || 5} কাপ সম্পন্ন)
+              </p>
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {Array.from({ length: target || 5 }).map((_, i) => {
+                  const isFilled = i < selectedCustomer.stamps
+                  return (
+                    <div
+                      key={i}
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all duration-300 ${
+                        isFilled
+                          ? "bg-[#1B4332] shadow-sm scale-105"
+                          : "bg-white border border-[#E9E5DC] opacity-30 grayscale"
+                      }`}
+                    >
+                      ☕
+                    </div>
+                  )
+                })}
               </div>
             </div>
 

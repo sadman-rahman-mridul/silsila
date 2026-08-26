@@ -55,7 +55,7 @@ export default function RewardsPage() {
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
+      <div className="bg-[#1B4332] px-5 pt-10 pb-6">
         <h1 className="font-display text-2xl font-bold text-white mb-1">পুরস্কার</h1>
         <p className="text-[#52B788] text-sm">আপনার অর্জিত সব উপহার ও ভাউচার</p>
         <div className="mt-4 flex gap-3">

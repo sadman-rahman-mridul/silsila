@@ -77,11 +77,11 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
 
   return (
     <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
-      <div className="bg-[#1B4332] px-5 pt-12 pb-6">
+      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-2xl font-bold text-white mb-1">মার্কেটিং ও রিভিউ</h1>
-            <p className="text-[#52B788] text-sm">কাস্টমারদের সাথে যোগাযোগের লিঙ্ক ও চ্যানেল</p>
+            <h1 className="font-display text-xl font-bold text-white mb-1">মার্কেটিং ও রিভিউ</h1>
+            <p className="text-[#52B788] text-xs">কাস্টমারদের সাথে যোগাযোগের লিঙ্ক ও চ্যানেল</p>
           </div>
           <button
             onClick={handleSaveMarketing}
