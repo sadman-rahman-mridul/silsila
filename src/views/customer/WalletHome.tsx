@@ -151,21 +151,6 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           </button>
 
           <div className="flex items-center gap-1.5">
-            <div className="relative">
-              <button
-                onClick={loadCards}
-                title={isBn ? "রিফ্রেশ করুন" : "Refresh"}
-                className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer active:scale-95 text-xs backdrop-blur-md border border-white/15"
-              >
-                <RefreshIcon size={14} className={loading ? "animate-spin text-[#34D399]" : "text-white"} />
-              </button>
-              {cards.some((c) => c.voucherReady) && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse shadow-md">
-                  {cards.filter((c) => c.voucherReady).length}
-                </span>
-              )}
-            </div>
-
             {onLogout && (
               <button
                 onClick={onLogout}
