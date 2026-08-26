@@ -39,15 +39,7 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         firebaseService.getMerchantCustomers(merchantId, "all").catch(() => []),
       ])
 
-      const mergedStats = {
-        ...(apiStats || {}),
-        ...(fbStats || {}),
-        scansToday: Math.max(apiStats?.scansToday || 0, fbStats?.scansToday || 0),
-        uniqueCustomers: Math.max(apiStats?.uniqueCustomers || 0, fbStats?.uniqueCustomers || 0),
-        rewardsRedeemed: Math.max(apiStats?.rewardsRedeemed || 0, fbStats?.rewardsRedeemed || 0),
-        repeatRate: fbStats?.repeatRate ?? apiStats?.repeatRate ?? 0,
-        hasActivity: Boolean(fbStats?.hasActivity || apiStats?.hasActivity),
-      }
+      const mergedStats = fbStats || apiStats || emptyMerchantStats
 
       const map = new Map<string, MerchantCustomer>()
       apiCust.forEach((c: any) => map.set(c.id, c))

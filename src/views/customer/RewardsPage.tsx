@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { api, type Voucher } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
-import { GiftIcon, ClockIcon } from "../../components/Icons"
+import { GiftIcon, ClockIcon, SparklesIcon } from "../../components/Icons"
 
 export default function RewardsPage() {
   const { user, profile } = useAuth()
@@ -18,11 +18,7 @@ export default function RewardsPage() {
     // Real-time Firestore card subscription: auto-detect if customer unlocked any new voucher
     const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
       if (firestoreCards && firestoreCards.length > 0) {
-        const readyCards = firestoreCards.filter((c) => c.voucherReady)
-        if (readyCards.length > 0) {
-          // Re-sync vouchers
-          api.getVouchers(customerId).then(setVouchers).catch(console.warn)
-        }
+        loadVouchers()
       }
     })
 
@@ -32,12 +28,26 @@ export default function RewardsPage() {
   }, [customerId])
 
   async function loadVouchers() {
+    if (!customerId) {
+      setVouchers([])
+      setLoading(false)
+      return
+    }
     try {
       setLoading(true)
-      const data = await api.getVouchers(customerId)
-      setVouchers(data)
+      // 1. Fetch real Firestore vouchers
+      const fbVouchers = await firebaseService.getCustomerVouchers(customerId).catch(() => [])
+      if (fbVouchers && fbVouchers.length > 0) {
+        setVouchers(fbVouchers)
+        return
+      }
+
+      // 2. Fallback to API if any
+      const apiData = await api.getVouchers({ customerId }).catch(() => [])
+      setVouchers(apiData || [])
     } catch (err) {
       console.error("Failed to load vouchers:", err)
+      setVouchers([])
     } finally {
       setLoading(false)
     }
@@ -45,7 +55,7 @@ export default function RewardsPage() {
 
   const activeVouchers = vouchers.filter((v) => v.status === "active")
   const redeemedVouchers = vouchers.filter((v) => v.status === "redeemed")
-  const totalSavedApprox = redeemedVouchers.length * 120
+  const totalSavedApprox = redeemedVouchers.length * 150
 
   function copyCode(code: string) {
     navigator.clipboard?.writeText(code)
@@ -68,7 +78,7 @@ export default function RewardsPage() {
             <p className="text-white/60 text-xs mt-1 font-medium">দাবিযোগ্য</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-2xl leading-none">৳{totalSavedApprox}</p>
+            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{redeemedVouchers.length > 0 ? `৳${totalSavedApprox}` : "০"}</p>
             <p className="text-white/60 text-xs mt-1 font-medium">সাশ্রয় করেছেন</p>
           </div>
         </div>
@@ -76,9 +86,23 @@ export default function RewardsPage() {
 
       <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
         {loading ? (
-          <div className="py-12 text-center text-white/70 text-sm">
-            <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
-            <p>পুরস্কার লোড হচ্ছে...</p>
+          <div className="py-16 text-center text-white/70 text-sm">
+            <span className="inline-block animate-spin text-3xl mb-3">⏳</span>
+            <p className="font-bold text-white">পুরস্কার লোড হচ্ছে...</p>
+          </div>
+        ) : vouchers.length === 0 ? (
+          <div className="py-14 text-center bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/20 shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 text-[#F59E0B] flex items-center justify-center mx-auto mb-3 shadow-lg">
+              <GiftIcon size={32} />
+            </div>
+            <h2 className="font-display font-black text-white text-lg mb-1">এখনো কোনো পুরস্কার অর্জিত হয়নি</h2>
+            <p className="text-white/60 text-xs max-w-xs mx-auto leading-relaxed mb-4">
+              দোকানে সিল সম্পন্ন করে বিনামূল্যে উপহার ও ভাউচার আনলক করুন!
+            </p>
+            <div className="inline-flex items-center gap-1.5 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] text-xs px-3.5 py-1.5 rounded-full font-bold">
+              <SparklesIcon size={14} />
+              <span>কার্ড সম্পন্ন করলেই ভাউচার কোড মিলবে</span>
+            </div>
           </div>
         ) : (
           <>
@@ -86,7 +110,7 @@ export default function RewardsPage() {
               <div className="mb-6">
                 <h2 className="font-display font-bold text-white text-base mb-3 flex items-center gap-1.5 drop-shadow-xs">
                   <GiftIcon size={16} className="text-[#F59E0B]" />
-                  দাবি করার অপেক্ষায় ({activeVouchers.length})
+                  <span>দাবি করার অপেক্ষায় ({activeVouchers.length})</span>
                 </h2>
                 <div className="space-y-3.5">
                   {activeVouchers.map((voucher) => (
@@ -108,7 +132,7 @@ export default function RewardsPage() {
                         <div className="bg-[#071D13] border border-[#34D399]/30 rounded-2xl p-3.5 mb-3 flex items-center justify-between shadow-inner">
                           <div>
                             <p className="text-white/50 text-[10px] mb-0.5 font-medium">ভাউচার কোড</p>
-                            <p className="font-display font-black text-[#34D399] text-xl tracking-widest">{voucher.code}</p>
+                            <p className="font-display font-black text-[#F59E0B] text-xl tracking-widest">{voucher.code}</p>
                           </div>
                           <button
                             onClick={() => copyCode(voucher.code)}
@@ -120,9 +144,9 @@ export default function RewardsPage() {
                         <div className="flex items-center justify-between text-white/50 text-xs">
                           <div className="flex items-center gap-1">
                             <ClockIcon size={11} className="text-[#F59E0B]" />
-                            <span>মেয়াদ: {voucher.expiresAt}</span>
+                            <span>মেয়াদ: ৩০ দিন</span>
                           </div>
-                          <span className="text-[10px]">কাউন্টারে স্টাফ পিন দিয়ে ভেরিফাই হবে</span>
+                          <span className="text-[10px]">কাউন্টারে স্টাফ পিন দিয়ে রিডিম হবে</span>
                         </div>
                       </div>
                     </div>
@@ -143,7 +167,7 @@ export default function RewardsPage() {
                       <div className="flex-1">
                         <p className="font-display font-bold text-white text-sm">{item.merchantName}</p>
                         <p className="text-[#34D399] text-xs font-medium">{item.rewardText}</p>
-                        <p className="text-white/40 text-[11px] mt-0.5">রিডিম: {item.redeemedAt}</p>
+                        <p className="text-white/40 text-[11px] mt-0.5">রিডিম: {item.redeemedAt ? new Date(item.redeemedAt).toLocaleDateString("bn-BD") : "সম্পন্ন"}</p>
                       </div>
                       <span className="text-xs text-[#34D399] bg-[#34D399]/15 border border-[#34D399]/20 px-2.5 py-1 rounded-full font-bold">
                         ব্যবহৃত
@@ -151,7 +175,7 @@ export default function RewardsPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-[#B0A99E] py-3 text-center">কোনো অতীত রিডিম রেকর্ড নেই</p>
+                  <p className="text-xs text-white/50 py-3 text-center bg-[#0E281C]/60 rounded-2xl border border-white/5">কোনো অতীত রিডিম রেকর্ড নেই</p>
                 )}
               </div>
             </div>

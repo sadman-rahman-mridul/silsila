@@ -42,9 +42,9 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
       const targetId = await resolveId()
       if (!targetId) return
 
-      const [fbPrograms, statsData, apiPrograms] = await Promise.all([
+      const [fbPrograms, fbStats, apiPrograms] = await Promise.all([
         firebaseService.getRewardPrograms(targetId).catch(() => []),
-        api.getMerchantStats(targetId).catch(() => null),
+        firebaseService.getMerchantStats(targetId).catch(() => null),
         api.getRewardPrograms(targetId).catch(() => []),
       ])
 
@@ -63,7 +63,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
       }
 
       setPrograms(uniquePrograms)
-      setStats(statsData)
+      setStats(fbStats)
     } catch (err: any) {
       setError(err?.message || "প্রোগ্রাম লোড করতে সমস্যা হয়েছে")
     }

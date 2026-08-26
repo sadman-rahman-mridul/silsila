@@ -877,6 +877,83 @@ export const firebaseService = {
     }
   },
 
+  /** Read real-time vouchers for a customer from Firestore cards & vouchers collection */
+  async getCustomerVouchers(customerId: string): Promise<Voucher[]> {
+    if (!customerId) return []
+    try {
+      const vouchers: Voucher[] = []
+
+      // 1. Check direct vouchers collection
+      const vSnap = await getDocs(collection(firestore, "vouchers")).catch(() => null)
+      if (vSnap) {
+        vSnap.docs.forEach((docSnap) => {
+          const v = docSnap.data() as any
+          if (v.customerId === customerId) {
+            vouchers.push({
+              id: v.id || docSnap.id,
+              customerId: v.customerId,
+              merchantId: v.merchantId,
+              merchantName: v.merchantName || "দোকান",
+              code: v.code,
+              rewardText: v.rewardText || "উপহার",
+              status: v.redeemed ? "redeemed" : "active",
+              createdAt: v.createdAt || new Date().toISOString(),
+              expiresAt: v.expiresAt || new Date(Date.now() + 30 * 86400000).toISOString(),
+              redeemedAt: v.redeemedAt || null,
+            })
+          }
+        })
+      }
+
+      // 2. Also check customer cards in Firestore with voucherReady === true or previous redemption cycle
+      const cardsSnap = await getDocs(collection(firestore, "cards")).catch(() => null)
+      if (cardsSnap) {
+        cardsSnap.docs.forEach((docSnap) => {
+          const c = docSnap.data() as any
+          if (c.customerId === customerId) {
+            // If active ready voucher exists and not already added from vouchers collection
+            if (c.voucherReady && c.voucherCode && !vouchers.some((v) => v.code === c.voucherCode)) {
+              vouchers.push({
+                id: `v_${c.id}`,
+                customerId: c.customerId,
+                merchantId: c.merchantId,
+                merchantName: c.merchant?.name || "দোকান",
+                code: c.voucherCode,
+                rewardText: c.rewardText || "উপহার",
+                status: "active",
+                createdAt: c.updatedAt || new Date().toISOString(),
+                expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
+              })
+            }
+            // If card has been redeemed in past cycle
+            if (c.lastRedeemedAt && c.cycleNo > 1) {
+              const oldCode = `SL-${(c.merchant?.slug || c.merchantId).slice(0, 4).toUpperCase()}-COMPLETED`
+              if (!vouchers.some((v) => v.status === "redeemed" && v.merchantId === c.merchantId)) {
+                vouchers.push({
+                  id: `v_past_${c.id}`,
+                  customerId: c.customerId,
+                  merchantId: c.merchantId,
+                  merchantName: c.merchant?.name || "দোকান",
+                  code: oldCode,
+                  rewardText: c.rewardText || "উপহার",
+                  status: "redeemed",
+                  createdAt: c.lastRedeemedAt,
+                  expiresAt: c.lastRedeemedAt,
+                  redeemedAt: c.lastRedeemedAt,
+                })
+              }
+            }
+          }
+        })
+      }
+
+      return vouchers
+    } catch (err) {
+      console.warn("Failed to get customer vouchers from Firestore:", err)
+      return []
+    }
+  },
+
   async getCustomerStampHistory(customerId: string, merchantId?: string): Promise<any[]> {
     if (!customerId) return []
     try {
@@ -1047,9 +1124,10 @@ export const firebaseService = {
       const targetId = fbMerchant?.id || merchantId
       const cleanSlug = merchantId.toLowerCase().replace(/[^a-z0-9]/g, "")
 
-      const [cardsSnap, approvalsSnap] = await Promise.all([
+      const [cardsSnap, approvalsSnap, vouchersSnap] = await Promise.all([
         getDocs(collection(firestore, "cards")),
         getDocs(collection(firestore, "pendingApprovals")),
+        getDocs(collection(firestore, "vouchers")),
       ])
 
       const matchedCards = cardsSnap.docs
@@ -1069,12 +1147,23 @@ export const firebaseService = {
           )
         })
 
+      const matchedVouchers = vouchersSnap.docs
+        .map((d) => ({ id: d.id, ...d.data() } as any))
+        .filter((v) => {
+          const mId = (v.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+          return (v.merchantId === targetId || mId === cleanSlug || v.merchantId === merchantId) && v.redeemed
+        })
+
       const uniqueCustomers = matchedCards.length
       const cardStampsTotal = matchedCards.reduce((acc, c) => acc + (Number(c.stamps) || 0), 0)
       const totalStamps = Math.max(cardStampsTotal, matchedApprovals.length)
       const repeatCustomers = matchedCards.filter((c) => (Number(c.stamps) || 0) > 1 || (c.cycleNo || 1) > 1).length
       const repeatRate = uniqueCustomers > 0 ? Math.round((repeatCustomers / uniqueCustomers) * 100) : 0
-      const rewardsRedeemed = matchedCards.filter((c) => (c.cycleNo || 1) > 1 || c.voucherReady).length
+      const cardRedeemedCount = matchedCards.reduce(
+        (acc, c) => acc + (Math.max(0, (c.cycleNo || 1) - 1) + (c.lastRedeemedAt && c.cycleNo === 1 ? 1 : 0)),
+        0
+      )
+      const rewardsRedeemed = Math.max(matchedVouchers.length, cardRedeemedCount)
 
       // Dynamic 7-day trends
       const dailyTrends = Array.from({ length: 7 }).map((_, i) => {
