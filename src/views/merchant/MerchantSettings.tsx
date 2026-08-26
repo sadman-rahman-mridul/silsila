@@ -83,10 +83,10 @@ export default function MerchantSettings({
   const [saving, setSaving] = useState(false)
 
   // Staff PIN flow
-  const [pinStep, setPinStep] = useState<PinStep>("idle")
+  const [pinStep, setPinStep] = useState<"idle" | "enter_pin" | "saving" | "done">("idle")
   const [pinStatus, setPinStatus] = useState<{ hasPin: boolean; updatedAt: string | null; ownerPhoneMasked: string | null } | null>(null)
   const [newPin, setNewPin] = useState("")
-  const [pinOtp, setPinOtp] = useState("")
+  const [confirmPin, setConfirmPin] = useState("")
   const [pinError, setPinError] = useState("")
   const [pinSuccess, setPinSuccess] = useState("")
 
@@ -138,6 +138,14 @@ export default function MerchantSettings({
         setFacebook(m.facebook || "")
         setWhatsapp(m.whatsapp || "")
         setReviewLink(m.reviewLink || "")
+
+        if (m.staffPin) {
+          setPinStatus({
+            hasPin: true,
+            updatedAt: m.staffPinUpdatedAt || null,
+            ownerPhoneMasked: m.phone || m.ownerPhone || "সংরক্ষিত",
+          })
+        }
       }
     } catch (err) {
       console.warn("Failed to load merchant:", err)
@@ -148,8 +156,17 @@ export default function MerchantSettings({
 
   async function loadPinStatus() {
     try {
+      const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId).catch(() => null)
+      if (fbMerchant?.staffPin) {
+        setPinStatus({
+          hasPin: true,
+          updatedAt: fbMerchant.staffPinUpdatedAt || null,
+          ownerPhoneMasked: phone || profile?.phone || "সংরক্ষিত",
+        })
+        return
+      }
       const token = localStorage.getItem("silsila_token") || ""
-      const res = await fetch("/api/staff/pin/status", {
+      const res = await fetch(`/api/staff/pin/status?merchantId=${merchantId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
@@ -309,64 +326,50 @@ export default function MerchantSettings({
   }
 
   // ── PIN Flow ──
-  async function handleRequestPinOtp() {
-    setPinStep("sending_otp")
-    setPinError("")
-    try {
-      const token = localStorage.getItem("silsila_token") || ""
-      const res = await fetch("/api/staff/pin/request-otp", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setPinError(data.error || "OTP পাঠাতে ব্যর্থ হয়েছে")
-        setPinStep("idle")
-        return
-      }
-      setPinStep("enter_otp_and_pin")
-    } catch {
-      setPinError("নেটওয়ার্ক সমস্যা, পুনরায় চেষ্টা করুন")
-      setPinStep("idle")
-    }
-  }
-
-  async function handleSetPin() {
+  async function handleSavePin() {
     if (!/^\d{4}$/.test(newPin)) {
-      setPinError("পিন অবশ্যই ৪ সংখ্যার হতে হবে")
+      setPinError("পিন অবশ্যই ৪ সংখ্যার হতে হবে (যেমন: 1234)")
       return
     }
-    if (!pinOtp.trim()) {
-      setPinError("OTP কোড লিখুন")
+    if (confirmPin && newPin !== confirmPin) {
+      setPinError("পিন দুটি মিলছে না, আবার নিশ্চিত করুন")
       return
     }
     setPinStep("saving")
     setPinError("")
     try {
+      // 1. Save to Firestore
+      if (merchantId) {
+        await firebaseService.updateMerchant(merchantId, {
+          staffPin: newPin,
+          staffPinUpdatedAt: new Date().toISOString(),
+        }).catch(console.warn)
+      }
+
+      // 2. Sync to API backend
       const token = localStorage.getItem("silsila_token") || ""
-      const res = await fetch("/api/staff/pin/set", {
+      await fetch("/api/staff/pin/save-direct", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ pin: newPin, otp: pinOtp }),
+        body: JSON.stringify({ merchantId, pin: newPin }),
+      }).catch(console.warn)
+
+      setPinSuccess("স্টাফ মোড পিন সফলভাবে সংরক্ষিত হয়েছে ✓")
+      setPinStatus({
+        hasPin: true,
+        updatedAt: new Date().toISOString(),
+        ownerPhoneMasked: phone || profile?.phone || "সংরক্ষিত",
       })
-      const data = await res.json()
-      if (!res.ok) {
-        setPinError(data.error || "পিন সেট করতে ব্যর্থ হয়েছে")
-        setPinStep("enter_otp_and_pin")
-        return
-      }
-      setPinSuccess("স্টাফ মোড পিন সফলভাবে আপডেট হয়েছে ✓")
       setPinStep("done")
       setNewPin("")
-      setPinOtp("")
-      loadPinStatus()
+      setConfirmPin("")
       setTimeout(() => {
         setPinStep("idle")
         setPinSuccess("")
       }, 4000)
-    } catch {
-      setPinError("নেটওয়ার্ক সমস্যা, পুনরায় চেষ্টা করুন")
-      setPinStep("enter_otp_and_pin")
+    } catch (err: any) {
+      setPinError(err?.message || "পিন সংরক্ষণ করতে সমস্যা হয়েছে")
+      setPinStep("enter_pin")
     }
   }
 
@@ -798,8 +801,8 @@ export default function MerchantSettings({
               <h2 className="font-display font-bold text-white text-base">স্টাফ মোড পিন</h2>
               <p className="text-xs text-white/60">
                 {pinStatus?.hasPin
-                  ? `পিন সেট আছে · ${pinStatus.ownerPhoneMasked || "মালিকের নম্বরে OTP যাবে"}`
-                  : "এখনো পিন সেট করা হয়নি"}
+                  ? "৪-সংখ্যার পিন সক্রিয় আছে (••••)"
+                  : "এখনো পিন সেট করা হয়নি (ডিফল্ট: 1234)"}
               </p>
             </div>
           </div>
@@ -818,33 +821,22 @@ export default function MerchantSettings({
 
           {pinStep === "idle" && (
             <button
-              onClick={handleRequestPinOtp}
+              onClick={() => {
+                setPinStep("enter_pin")
+                setPinError("")
+                setNewPin("")
+                setConfirmPin("")
+              }}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
             >
               {pinStatus?.hasPin ? "পিন পরিবর্তন করুন" : "পিন সেট করুন"}
             </button>
           )}
 
-          {pinStep === "sending_otp" && (
-            <div className="text-center py-3 text-white/70 text-sm">
-              <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> OTP পাঠানো হচ্ছে...
-            </div>
-          )}
-
-          {pinStep === "enter_otp_and_pin" && (
+          {pinStep === "enter_pin" && (
             <div className="space-y-3">
               <div className="bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl px-3 py-2.5 text-xs text-amber-200">
-                মালিকের ফোনে ({pinStatus?.ownerPhoneMasked || "নিবন্ধিত নম্বরে"}) OTP পাঠানো হয়েছে
-              </div>
-              <div>
-                <label className="text-white/70 text-xs font-semibold block mb-1">OTP কোড</label>
-                <input
-                  type="text"
-                  value={pinOtp}
-                  onChange={(e) => setPinOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  placeholder="6-সংখ্যার OTP"
-                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none focus:border-[#34D399] tracking-widest"
-                />
+                কাউন্টার স্টাফদের সিল অনুমোদন এবং ভাউচার রিডিম করার জন্য ৪-সংখ্যার পিন নির্ধারণ করুন
               </div>
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
@@ -852,33 +844,55 @@ export default function MerchantSettings({
                 </label>
                 <input
                   type="password"
+                  inputMode="numeric"
+                  maxLength={4}
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
                   placeholder="••••"
-                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-2xl font-mono text-white outline-none focus:border-[#34D399] tracking-[0.5em]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-2xl font-mono text-white outline-none focus:border-[#34D399] tracking-[0.5em] text-center"
+                />
+              </div>
+              <div>
+                <label className="text-white/70 text-xs font-semibold block mb-1">
+                  পিন নিশ্চিত করুন (Confirm PIN)
+                </label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  value={confirmPin}
+                  onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  placeholder="••••"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-2xl font-mono text-white outline-none focus:border-[#34D399] tracking-[0.5em] text-center"
                 />
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => { setPinStep("idle"); setPinError(""); setNewPin(""); setPinOtp("") }}
+                  onClick={() => {
+                    setPinStep("idle")
+                    setPinError("")
+                    setNewPin("")
+                    setConfirmPin("")
+                  }}
                   className="flex-1 py-2.5 rounded-xl border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition-all cursor-pointer"
                 >
                   বাতিল
                 </button>
                 <button
-                  onClick={handleSetPin}
+                  onClick={handleSavePin}
                   className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
                 >
                   <CheckIcon size={16} />
-                  Save PIN
+                  <span>পিন সংরক্ষণ করুন</span>
                 </button>
               </div>
             </div>
           )}
 
           {pinStep === "saving" && (
-            <div className="text-center py-3 text-white/70 text-sm">
-              <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> Saving PIN...
+            <div className="text-center py-3 text-white/70 text-sm flex items-center justify-center gap-2">
+              <RefreshIcon size={16} className="animate-spin text-[#34D399]" />
+              <span>পিন সংরক্ষণ করা হচ্ছে...</span>
             </div>
           )}
         </div>

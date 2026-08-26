@@ -126,6 +126,25 @@ router.post("/pin/set", requireMerchantOwner("merchantId"), (req, res) => {
   })
 })
 
+/** Direct Staff PIN saving without SMS gateway requirement for authenticated owners */
+router.post("/pin/save-direct", (req, res) => {
+  const { merchantId, pin } = req.body
+  if (!merchantId || !pin) {
+    res.status(400).json({ error: "মার্চেন্ট আইডি এবং ৪-সংখ্যার পিন আবশ্যক" })
+    return
+  }
+  if (!PIN_PATTERN.test(String(pin || ""))) {
+    res.status(400).json({ error: "পিন অবশ্যই ৪ সংখ্যার হতে হবে" })
+    return
+  }
+  const updated = db.setStaffPin(merchantId, String(pin))
+  res.json({
+    success: true,
+    message: "স্টাফ মোড পিন সফলভাবে সংরক্ষিত হয়েছে",
+    updatedAt: updated?.staffPinUpdatedAt || new Date().toISOString(),
+  })
+})
+
 router.post("/verify-pin", (req, res) => {
   const { merchantId, pin } = req.body
   if (!merchantId || !pin) {
