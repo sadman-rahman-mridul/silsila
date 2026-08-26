@@ -340,10 +340,10 @@ export default function MerchantSettings({
     try {
       // 1. Save to Firestore
       if (merchantId) {
-        await firebaseService.updateMerchant(merchantId, {
+        await firebaseService.updateMerchantInFirestore(merchantId, {
           staffPin: newPin,
           staffPinUpdatedAt: new Date().toISOString(),
-        }).catch(console.warn)
+        })
       }
 
       // 2. Sync to API backend

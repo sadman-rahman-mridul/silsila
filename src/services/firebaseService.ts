@@ -217,6 +217,11 @@ export const firebaseService = {
     }
   },
 
+  /** Alias for updateMerchantInFirestore */
+  async updateMerchant(merchantId: string, updates: Record<string, unknown>) {
+    return this.updateMerchantInFirestore(merchantId, updates)
+  },
+
   /** Read one merchant document by ID or slug. */
   async getMerchantByIdOrSlug(idOrSlug: string) {
     if (!idOrSlug) return null
