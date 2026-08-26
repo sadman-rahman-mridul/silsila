@@ -148,8 +148,8 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
       <div className="bg-[#1B4332] px-5 pt-12 pb-6">
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
-              <span className="text-[#1B4332] font-black text-sm">{isBn ? "সি" : "S"}</span>
+            <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center shadow-md border border-white/20">
+              <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
             </div>
             <div>
               <p className="text-white font-display font-bold">

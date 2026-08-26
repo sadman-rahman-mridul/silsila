@@ -142,8 +142,8 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title={isBn ? "হোম" : "Home"}
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center font-display font-black text-[#0A2318] text-sm shadow-lg glow-amber">
-              {isBn ? "স" : "S"}
+            <div className="w-8 h-8 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg glow-amber border border-white/20 flex-shrink-0">
+              <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
             </div>
             <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
               {isBn ? "সিলসিলা" : "Sealsela"}

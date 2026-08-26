@@ -1,8 +1,6 @@
 # Sealsela
-
 React + Vite + Tailwind CSS project for Sealsela (Customer Loyalty & Merchant Rewards Platform).
 
-## Development Server
 
 A Vite development server runs on port 3000 (`0.0.0.0:3000`).
 

@@ -83,8 +83,8 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
       <div className="px-5 pt-12 pb-4 bg-[#0F1117] border-b border-white/10">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#F59E0B] flex items-center justify-center shadow-md">
-              <span className="text-[#1B4332] font-black text-sm">{isBn ? "সি" : "S"}</span>
+            <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center shadow-md border border-white/20">
+              <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="font-display font-bold text-white text-lg leading-none">

@@ -135,14 +135,8 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
           {activeMerchant?.logoUrl ? (
             <img src={activeMerchant.logoUrl} alt="Logo" className="w-7 h-7 rounded-xl object-cover border border-white/20 shadow-md" />
           ) : (
-            <div
-              className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shadow-md border border-white/15"
-              style={{
-                backgroundColor: activeMerchant?.logoBg || "#0D3824",
-                color: activeMerchant?.logoColor || "#34D399",
-              }}
-            >
-              {activeMerchant?.logoInitials || (isBn ? "সি" : "S")}
+            <div className="w-7 h-7 rounded-xl bg-white p-0.5 flex items-center justify-center shadow-md border border-white/15">
+              <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
             </div>
           )}
           <span className="text-white font-bold text-sm group-hover:text-[#34D399] transition-colors truncate max-w-[110px] sm:max-w-[130px] drop-shadow-xs">
