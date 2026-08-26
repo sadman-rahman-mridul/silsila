@@ -140,6 +140,14 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
             </button>
 
             <NavBtn
+              icon={<GiftIcon size={22} />}
+              label="পুরস্কার"
+              active={tab === "rewards"}
+              onClick={() => handleTabChange("rewards")}
+              badge={readyRewardsCount > 0 ? readyRewardsCount : undefined}
+            />
+
+            <NavBtn
               icon={
                 (profile?.avatarUrl || profile?.photoURL) ? (
                   <div
