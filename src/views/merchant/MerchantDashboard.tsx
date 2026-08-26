@@ -147,6 +147,7 @@ export default function MerchantDashboard({
   const [copiedLink, setCopiedLink] = useState(false)
   const [qrDownloadedToast, setQrDownloadedToast] = useState(false)
   const [dashboardQrDataUrl, setDashboardQrDataUrl] = useState<string>("")
+  const [showFullscreenQr, setShowFullscreenQr] = useState(false)
 
   const origin = typeof window !== "undefined" ? window.location.origin : "https://silsilaqr.netlify.app"
   const host = typeof window !== "undefined" ? window.location.host : "silsilaqr.netlify.app"
@@ -489,14 +490,25 @@ export default function MerchantDashboard({
 
           <div className="p-4">
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              {/* QR Code Canvas/Image */}
-              <div className="w-32 h-32 bg-white rounded-2xl p-2 shadow-2xl flex items-center justify-center flex-shrink-0">
+              {/* QR Code Canvas/Image - Click to Enlarge */}
+              <div
+                onClick={() => dashboardQrDataUrl && setShowFullscreenQr(true)}
+                className="w-32 h-32 bg-white rounded-2xl p-2 shadow-2xl flex flex-col items-center justify-center flex-shrink-0 cursor-pointer group hover:scale-105 active:scale-95 transition-all relative border-2 border-emerald-500/30 glow-emerald"
+                title={isBn ? "কাস্টমারকে দেখাতে QR কোড বড় করুন" : "Click to enlarge QR code"}
+              >
                 {dashboardQrDataUrl ? (
-                  <img
-                    src={dashboardQrDataUrl}
-                    alt="Counter QR Code"
-                    className="w-full h-full object-contain"
-                  />
+                  <>
+                    <img
+                      src={dashboardQrDataUrl}
+                      alt="Counter QR Code"
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-2xl flex items-center justify-center transition-opacity">
+                      <span className="text-[10px] font-black bg-[#0A2318]/90 text-[#34D399] px-2 py-0.5 rounded-full shadow-md backdrop-blur-xs">
+                        🔍 {isBn ? "বড় করুন" : "Enlarge"}
+                      </span>
+                    </div>
+                  </>
                 ) : (
                   <div className="text-gray-400 text-xs font-mono">
                     {isBn ? "তৈরি হচ্ছে..." : "Generating..."}
@@ -505,13 +517,18 @@ export default function MerchantDashboard({
               </div>
 
               <div className="flex-1 space-y-2 text-center sm:text-left">
-                <p className="font-bold text-white text-sm">
-                  {merchantName || (isBn ? "আপনার দোকান" : "Your Store")} {isBn ? "QR কোড" : "QR Code"}
-                </p>
+                <div className="flex items-center justify-center sm:justify-start gap-2">
+                  <p className="font-bold text-white text-sm">
+                    {merchantName || (isBn ? "আপনার দোকান" : "Your Store")} {isBn ? "QR কোড" : "QR Code"}
+                  </p>
+                  <span className="text-[10px] font-bold bg-[#34D399]/20 text-[#34D399] px-2 py-0.5 rounded-md border border-[#34D399]/30">
+                    {isBn ? "ট্যাপ করে বড় করুন" : "Tap to enlarge"}
+                  </span>
+                </div>
                 <p className="text-xs text-white/60 leading-relaxed">
                   {isBn
-                    ? "কাস্টমারদের স্ক্যান করতে এটি ক্যাশ কাউন্টারে প্রিন্ট করে রাখুন।"
-                    : "Print and place this at your cash counter for customers to scan."}
+                    ? "QR কোডে ট্যাপ করে কাস্টমারকে ফুলস্ক্রিনে দেখান অথবা কাউন্টারে প্রিন্ট করে রাখুন।"
+                    : "Tap QR code to present full-screen to customers or print at your cash counter."}
                 </p>
 
                 {/* Toast notification */}
@@ -524,9 +541,17 @@ export default function MerchantDashboard({
 
                 <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
                   <button
+                    onClick={() => dashboardQrDataUrl && setShowFullscreenQr(true)}
+                    className="px-3.5 py-2.5 bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-amber flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+                  >
+                    <span>🔍</span>
+                    <span>{isBn ? "ফুলস্ক্রিন QR প্রদর্শন" : "Show Fullscreen QR"}</span>
+                  </button>
+
+                  <button
                     onClick={handleDownloadCounterQr}
                     disabled={downloadingQr || !dashboardQrDataUrl}
-                    className="px-4 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    className="px-3.5 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     <DownloadIcon size={14} />
                     <span>
@@ -535,21 +560,21 @@ export default function MerchantDashboard({
                           ? "ডাউনলোড হচ্ছে..."
                           : "Downloading..."
                         : isBn
-                        ? "QR ডাউনলোড (HD PNG)"
-                        : "Download QR (HD PNG)"}
+                        ? "ডাউনলোড (HD)"
+                        : "Download (HD)"}
                     </span>
                   </button>
 
                   <button
                     onClick={handleCopyStoreLink}
-                    className="px-3.5 py-2.5 border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 backdrop-blur-md"
+                    className="px-3 py-2.5 border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 backdrop-blur-md"
                   >
                     {copiedLink ? <CheckIcon size={14} className="text-[#34D399]" /> : <CopyIcon size={14} />}
                     <span>
                       {copiedLink
                         ? isBn
-                          ? "লিংক কপি হয়েছে!"
-                          : "Link Copied!"
+                          ? "কপি হয়েছে!"
+                          : "Copied!"
                         : isBn
                         ? "লিংক কপি"
                         : "Copy Link"}
@@ -561,6 +586,99 @@ export default function MerchantDashboard({
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Big QR Presenter Modal */}
+      {showFullscreenQr && (
+        <div className="fixed inset-0 z-50 bg-[#071D13]/95 backdrop-blur-2xl flex flex-col items-center justify-between p-4 sm:p-6 animate-fade-in text-white">
+          {/* Top Bar with Merchant Info and Close Button */}
+          <div className="w-full max-w-sm flex items-center justify-between pt-safe">
+            <div className="flex items-center gap-2.5">
+              {activeMerchant?.logoUrl ? (
+                <img src={activeMerchant.logoUrl} alt="Logo" className="w-9 h-9 rounded-xl object-cover border border-white/20 shadow-md" />
+              ) : (
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shadow-md border border-white/15"
+                  style={{
+                    backgroundColor: activeMerchant?.logoBg || "#0D3824",
+                    color: activeMerchant?.logoColor || "#34D399",
+                  }}
+                >
+                  {merchantInitials || (isBn ? "সি" : "S")}
+                </div>
+              )}
+              <div>
+                <h2 className="font-display font-black text-white text-base leading-tight">
+                  {merchantName || (isBn ? "সিলসিলা স্টোর" : "Silsila Store")}
+                </h2>
+                <p className="text-[#34D399] text-[11px] font-mono font-bold">
+                  {qrDisplayLink || origin}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowFullscreenQr(false)}
+              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-base cursor-pointer active:scale-95 transition-all shadow-md"
+              title={isBn ? "বন্ধ করুন" : "Close"}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Center Giant High-Contrast QR Code Card */}
+          <div className="my-auto flex flex-col items-center max-w-sm w-full py-4">
+            <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-2xl border-4 border-emerald-500/40 glow-emerald flex flex-col items-center w-full max-w-[330px]">
+              <div className="w-60 h-60 sm:w-68 sm:h-68 flex items-center justify-center">
+                <img
+                  src={dashboardQrDataUrl}
+                  alt={merchantName}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="mt-3 pt-2.5 border-t border-gray-200 w-full text-center">
+                <p className="font-display font-black text-[#0A2318] text-base">
+                  {merchantName}
+                </p>
+                <p className="text-gray-500 text-xs mt-0.5 font-medium">
+                  {isBn ? "যেকোনো ক্যামেরা বা সিলসিলা দিয়ে স্ক্যান করুন" : "Scan with any Phone Camera or Silsila"}
+                </p>
+              </div>
+            </div>
+
+            {/* Hint Badge */}
+            <div className="mt-4 bg-[#0E281C]/90 backdrop-blur-xl border border-emerald-500/25 rounded-2xl px-4 py-2 text-center max-w-xs shadow-xl">
+              <p className="text-[#34D399] text-xs font-bold flex items-center justify-center gap-1.5">
+                <span>✨</span>
+                <span>{isBn ? "কাস্টমারদের সরাসরি এই স্ক্রিনটি দেখান" : "Show this screen directly to customers"}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom Action Buttons */}
+          <div className="w-full max-w-sm flex gap-2 pb-safe">
+            <button
+              onClick={handleDownloadCounterQr}
+              className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs rounded-xl shadow-lg glow-emerald flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all"
+            >
+              <DownloadIcon size={14} />
+              <span>{isBn ? "HD ডাউনলোড" : "Download HD"}</span>
+            </button>
+            <button
+              onClick={handleCopyStoreLink}
+              className="flex-1 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all backdrop-blur-md"
+            >
+              {copiedLink ? <CheckIcon size={14} className="text-[#34D399]" /> : <CopyIcon size={14} />}
+              <span>{copiedLink ? (isBn ? "কপি হয়েছে!" : "Copied!") : (isBn ? "লিংক কপি" : "Copy Link")}</span>
+            </button>
+            <button
+              onClick={() => setShowFullscreenQr(false)}
+              className="px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-500/30 font-bold text-xs rounded-xl cursor-pointer active:scale-95 transition-all"
+            >
+              {isBn ? "বন্ধ" : "Close"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Quick Voucher Redeem Modal for Store Owner */}
       {showRedeemModal && (
