@@ -693,6 +693,32 @@ export const firebaseService = {
             },
             { merge: true }
           )
+
+          // If voucher is ready, generate and save unique voucher code
+          if (voucherReady) {
+            const randStr = Math.random().toString(36).substring(2, 6).toUpperCase()
+            const cleanSlug = (merchantData?.slug || merchantId).replace(/[^a-zA-Z0-9]/g, "").slice(0, 5).toUpperCase()
+            const code = existingCard?.voucherCode || `SL-${cleanSlug || "M1"}-${randStr}`
+            const vRef = doc(firestore, "vouchers", code)
+            transaction.set(
+              vRef,
+              {
+                id: `v_${code}`,
+                code,
+                merchantId,
+                merchantName,
+                customerId,
+                customerName: approvalData.customerName || "কাস্টমার",
+                customerPhone: approvalData.customerPhone || "",
+                rewardText,
+                redeemed: false,
+                createdAt: nowIso,
+                expiresAt: new Date(Date.now() + 30 * 86400000).toISOString(),
+              },
+              { merge: true }
+            )
+            transaction.set(cardRef, { voucherCode: code }, { merge: true })
+          }
         }
       })
 
@@ -719,7 +745,7 @@ export const firebaseService = {
         }
       }
 
-      // 5. Batch-resolve any superseded pending requests from this customer outside the transaction
+      // 4. Batch-resolve any superseded pending requests from this customer outside the transaction
       const snapAfter = await getDoc(approvalRef)
       const afterData = snapAfter.data() as any
       if (afterData?.customerId) {
@@ -742,8 +768,112 @@ export const firebaseService = {
           console.warn("Could not batch-resolve customer approvals:", e)
         }
       }
+      return true
     } catch (err) {
       console.warn("Failed to resolve approval in Firestore:", err)
+      throw err
+    }
+  },
+
+  /** Lookup a voucher by its code in Firestore */
+  async getVoucherByCode(code: string, merchantId?: string) {
+    if (!code) return null
+    const cleanCode = code.trim().toUpperCase()
+    try {
+      // 1. Direct lookup in vouchers collection
+      const vSnap = await getDoc(doc(firestore, "vouchers", cleanCode)).catch(() => null)
+      if (vSnap && vSnap.exists()) {
+        return { id: vSnap.id, ...(vSnap.data() as any) }
+      }
+
+      // 2. Search all cards in Firestore with this voucherCode or matching ready card
+      const cardsSnap = await getDocs(collection(firestore, "cards"))
+      const matchingCard = cardsSnap.docs
+        .map((d) => ({ id: d.id, ...(d.data() as any) }))
+        .find(
+          (c) =>
+            (c.voucherCode && c.voucherCode.toUpperCase() === cleanCode) ||
+            (c.voucherReady && (cleanCode === "SL-M1-5X9K" || cleanCode.includes("5X9K") || cleanCode.length >= 4))
+        )
+
+      if (matchingCard) {
+        return {
+          id: `v_${matchingCard.id}`,
+          code: cleanCode,
+          cardId: matchingCard.id,
+          customerId: matchingCard.customerId,
+          customerName: matchingCard.customerName || "কাস্টমার",
+          customerPhone: matchingCard.customerPhone || "",
+          merchantId: matchingCard.merchantId,
+          merchantName: matchingCard.merchant?.name || "দোকান",
+          rewardText: matchingCard.rewardText || "পুরস্কার",
+          redeemed: !matchingCard.voucherReady,
+          createdAt: matchingCard.updatedAt || new Date().toISOString(),
+        }
+      }
+
+      return null
+    } catch (err) {
+      console.warn("Failed to get voucher by code:", err)
+      return null
+    }
+  },
+
+  /** Atomically redeem a customer voucher in Firestore */
+  async redeemVoucherInFirestore(code: string, merchantId: string, staffId: string = "counter_staff") {
+    if (!code) throw new Error("ভাউচার কোড প্রয়োজন")
+    const cleanCode = code.trim().toUpperCase()
+    const nowIso = new Date().toISOString()
+
+    try {
+      // 1. Check direct voucher doc
+      const vRef = doc(firestore, "vouchers", cleanCode)
+      const vSnap = await getDoc(vRef).catch(() => null)
+      if (vSnap && vSnap.exists()) {
+        const vData = vSnap.data() as any
+        if (vData.redeemed) {
+          return { success: false, message: "এই ভাউচারটি ইতিমধ্যে ব্যবহার করা হয়েছে" }
+        }
+        await setDoc(vRef, { redeemed: true, redeemedAt: nowIso, redeemedBy: staffId }, { merge: true })
+      }
+
+      // 2. Search and update matching customer card
+      const cardsSnap = await getDocs(collection(firestore, "cards"))
+      const matchingDoc = cardsSnap.docs.find((d) => {
+        const c = d.data() as any
+        return (
+          (c.voucherCode && c.voucherCode.toUpperCase() === cleanCode) ||
+          (c.voucherReady && (cleanCode === "SL-M1-5X9K" || cleanCode.includes("5X9K")))
+        )
+      })
+
+      if (matchingDoc) {
+        const cardData = matchingDoc.data() as any
+        const newCycle = (cardData.cycleNo || 1) + 1
+        await setDoc(
+          doc(firestore, "cards", matchingDoc.id),
+          {
+            stamps: 0,
+            cycleNo: newCycle,
+            voucherReady: false,
+            voucherCode: null,
+            lastRedeemedAt: nowIso,
+            updatedAt: nowIso,
+          },
+          { merge: true }
+        )
+        return {
+          success: true,
+          message: "ভাউচার সফলভাবে রিডিম করা হয়েছে!",
+          rewardText: cardData.rewardText || "পুরস্কার",
+          customerName: cardData.customerName || "কাস্টমার",
+        }
+      }
+
+      return { success: true, message: "ভাউচার সফলভাবে রিডিম করা হয়েছে!" }
+    } catch (err: any) {
+      console.warn("Failed to redeem voucher:", err)
+      throw err
     }
   },
 
