@@ -68,16 +68,37 @@ html, body, #root {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+@keyframes border-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes border-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .animate-stamp-in { animation: stamp-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .animate-slide-up { animation: slide-up 0.35s ease-out forwards; }
 .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
 .animate-pulse-ring { animation: pulse-ring 1.2s ease-out infinite; }
+.animate-border-shimmer {
+  background-size: 200% 200%;
+  animation: border-shimmer 3s ease infinite;
+}
+.animate-border-spin {
+  animation: border-spin 4s linear infinite;
+}
 
 .card-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), 0 0 1px rgba(255, 255, 255, 0.1); }
 .card-shadow-md { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.15); }
 
 .glow-emerald { box-shadow: 0 0 25px rgba(52, 211, 153, 0.25); }
 .glow-amber { box-shadow: 0 0 25px rgba(245, 158, 11, 0.3); }
+.glow-gold-pulse {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4), 0 0 40px rgba(52, 211, 153, 0.2);
+}
 
 .glass-panel {
   background: rgba(15, 42, 30, 0.85);
