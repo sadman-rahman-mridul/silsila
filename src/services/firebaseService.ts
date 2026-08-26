@@ -137,27 +137,39 @@ export const firebaseService = {
   // ----------------------------------------------------
 
   /** Write a customer profile to `users`. Creates no loyalty cards. */
-  async saveCustomerProfile(profile: { id: string; phone: string; name: string; password?: string }) {
+  async saveCustomerProfile(profile: {
+    id: string
+    phone: string
+    name: string
+    password?: string
+    avatarUrl?: string
+    photoURL?: string
+  }) {
     try {
       const clean = normalizePhone(profile.phone)
       const digits10 = clean.slice(-10)
       const deterministicId = `c_${digits10}`
-      const docId = profile.id && profile.id.startsWith("c_") ? profile.id : deterministicId
-      await setDoc(
-        doc(firestore, USERS, docId),
-        {
-          id: docId,
-          uid: docId,
-          phone: digits10,
-          phoneE164: `+880${digits10}`,
-          name: profile.name || "",
-          ...(profile.password ? { password: profile.password } : {}),
-          role: "customer",
-          consentPDPA: true,
-          updatedAt: new Date().toISOString(),
-        },
-        { merge: true }
-      )
+      const docId = profile.id && profile.id.startsWith("c_")
+        ? `c_${profile.id.slice(2).replace(/\D/g, "").slice(-10) || digits10}`
+        : deterministicId
+
+      const dataToSave: Record<string, unknown> = {
+        id: docId,
+        uid: docId,
+        phone: digits10,
+        phoneE164: `+880${digits10}`,
+        name: profile.name || "",
+        role: "customer",
+        consentPDPA: true,
+        updatedAt: new Date().toISOString(),
+      }
+      if (profile.password) dataToSave.password = profile.password
+      if (profile.avatarUrl || profile.photoURL) {
+        dataToSave.avatarUrl = profile.avatarUrl || profile.photoURL
+        dataToSave.photoURL = profile.avatarUrl || profile.photoURL
+      }
+
+      await setDoc(doc(firestore, USERS, docId), dataToSave, { merge: true })
     } catch (err) {
       console.warn("Failed to write customer to Firestore:", err)
     }
@@ -168,7 +180,10 @@ export const firebaseService = {
     if (!customerId) return
     try {
       let docId = customerId
-      if (!docId.startsWith("c_") && /^\d+$/.test(docId)) {
+      if (docId.startsWith("c_")) {
+        const digits = docId.slice(2).replace(/\D/g, "")
+        if (digits.length >= 10) docId = `c_${digits.slice(-10)}`
+      } else if (/^\d+$/.test(docId)) {
         docId = `c_${docId.slice(-10)}`
       }
       const data: Record<string, unknown> = {

@@ -376,14 +376,19 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       return
     }
 
-    const customer = res.customer
+    const customer = res.customer || cachedAccount
     const digits10 = phone.replace(/\D/g, "").slice(-10)
     const custId = customer?.id || `c_${digits10}`
+    const existingAvatar =
+      customer?.avatarUrl || customer?.photoURL || cachedAccount?.avatarUrl || cachedAccount?.photoURL || ""
+
     const profile: UserProfile = {
       id: custId,
       phone,
       name: finalName,
       role: "customer",
+      avatarUrl: existingAvatar || undefined,
+      photoURL: existingAvatar || undefined,
       createdAt: customer?.createdAt || new Date().toISOString(),
     }
 
@@ -392,6 +397,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       phone,
       name: finalName,
       password: pin.trim() || customer?.password || undefined,
+      avatarUrl: existingAvatar || undefined,
+      photoURL: existingAvatar || undefined,
     })
 
     setSessionProfile(profile, res.token)

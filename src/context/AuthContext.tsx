@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
-import { auth } from "../lib/firebase"
+import { auth, firestore } from "../lib/firebase"
 import { onAuthStateChanged, signOut, type User, type ConfirmationResult } from "firebase/auth"
+import { doc, onSnapshot } from "firebase/firestore"
 import { firebaseService } from "../services/firebaseService"
 
 export type UserRole = "customer" | "merchant" | "ops"
@@ -63,6 +64,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
     return () => unsubscribe()
   }, [])
+
+  // Real-time Firestore Profile Synchronization (Avatar, Name, etc.)
+  useEffect(() => {
+    if (!profile?.id || !profile?.role) return
+
+    let docId = profile.id
+    if (profile.role === "customer") {
+      if (docId.startsWith("c_")) {
+        const digits = docId.slice(2).replace(/\D/g, "")
+        if (digits.length >= 10) docId = `c_${digits.slice(-10)}`
+      } else if (profile.phone) {
+        docId = `c_${profile.phone.replace(/\D/g, "").slice(-10)}`
+      }
+    }
+
+    const colName = profile.role === "customer" ? "users" : "merchants"
+
+    const unsub = onSnapshot(
+      doc(firestore, colName, docId),
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data() as any
+          const newAvatar = data.avatarUrl || data.photoURL || ""
+          const newName =
+            data.name || (profile.role === "merchant" ? data.ownerName : "") || profile.name
+
+          setProfile((prev) => {
+            if (!prev) return prev
+            const hasAvatarDiff = newAvatar && prev.avatarUrl !== newAvatar
+            const hasNameDiff = newName && prev.name !== newName
+            if (hasAvatarDiff || hasNameDiff) {
+              const updated: UserProfile = {
+                ...prev,
+                avatarUrl: newAvatar || prev.avatarUrl,
+                photoURL: newAvatar || prev.photoURL,
+                name: newName || prev.name,
+              }
+              try {
+                localStorage.setItem(PROFILE_KEY, JSON.stringify(updated))
+              } catch {}
+              return updated
+            }
+            return prev
+          })
+        }
+      },
+      (err) => {
+        console.warn("Real-time profile sync error:", err)
+      }
+    )
+
+    return () => unsub()
+  }, [profile?.id, profile?.role, profile?.phone])
 
   function persist(next: UserProfile | null, nextToken?: string | null) {
     setProfile(next)
