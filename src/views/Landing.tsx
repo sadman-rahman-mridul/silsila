@@ -474,10 +474,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
       {/* Main Container - Lifted to Upper Side */}
       <div className="flex-1 flex flex-col items-center justify-start pt-6 sm:pt-10 pb-6 px-4 relative z-10 w-full max-w-sm mx-auto">
-        {/* Compact Hero Branding with Official Logo */}
-        <div className="text-center mb-5 animate-slide-up flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-white p-2 mb-2.5 shadow-2xl glow-emerald flex items-center justify-center border-2 border-emerald-500/30">
-            <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
+        {/* Compact Hero Branding */}
+        <div className="text-center mb-5 animate-slide-up">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 mb-2 backdrop-blur-md border border-white/20 shadow-xl glow-emerald">
+            <span className="text-3xl">🔖</span>
           </div>
           <h1 className="font-display text-3xl font-black text-white tracking-tight leading-none drop-shadow-md">
             {isBn ? "সিলসিলা" : "Sealsela"}

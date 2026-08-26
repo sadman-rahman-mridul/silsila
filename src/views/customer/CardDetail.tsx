@@ -437,8 +437,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95 bg-white/10 px-3 py-1 rounded-xl backdrop-blur-md border border-white/15"
                 title={isBn ? "হোমে ফিরুন" : "Back to Home"}
               >
-                <div className="w-5 h-5 rounded-md bg-white p-0.5 flex items-center justify-center border border-white/20">
-                  <img src="/sealsela-logo.png" alt="SealSela" className="w-full h-full object-contain" />
+                <div className="w-5 h-5 rounded-md bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-[10px]">
+                  {isBn ? "স" : "S"}
                 </div>
                 <span className="font-display font-black text-white text-xs">
                   {isBn ? "সিলসিলা" : "Sealsela"}
