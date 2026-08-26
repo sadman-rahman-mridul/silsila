@@ -100,8 +100,8 @@ function PublicMerchantRoute() {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-[100dvh] bg-[#071D13] bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] text-white max-w-md mx-auto relative overflow-hidden">
-      <div className="flex-1 overflow-hidden relative">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-[#071D13] bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] text-white w-full max-w-lg mx-auto relative overflow-hidden">
+      <div className="flex-1 overflow-hidden relative w-full">
         <div className="absolute inset-0 overflow-y-auto">
           <CardDetail
             merchantId={slug}
@@ -119,15 +119,14 @@ function PublicMerchantRoute() {
       {/* Static Bottom Navigation (Facebook style) */}
       {profile?.role === "customer" ? (
         <nav
-          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe shadow-2xl z-20"
-          style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-1 pb-safe shadow-2xl z-20 w-full"
         >
-          <div className="flex items-center justify-around">
+          <div className="flex items-center justify-around py-0.5">
             <button
               onClick={() => navigate("/home")}
               className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
             >
-              <HomeIcon size={22} />
+              <HomeIcon size={21} />
               <span className="text-[10px] mt-1 font-medium">{isBn ? "হোম" : "Home"}</span>
             </button>
 
@@ -135,25 +134,25 @@ function PublicMerchantRoute() {
               onClick={() => navigate("/explore")}
               className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
             >
-              <CompassIcon size={22} />
+              <CompassIcon size={21} />
               <span className="text-[10px] mt-1 font-medium">{isBn ? "খুঁজুন" : "Explore"}</span>
             </button>
 
             <button
               onClick={() => navigate("/scan")}
-              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
+              className="flex flex-col items-center -mt-4 relative cursor-pointer active:scale-95 transition-transform group"
             >
-              <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20">
-                <ScanIcon size={24} className="text-[#071D13]" />
+              <div className="w-13 h-13 rounded-full flex items-center justify-center shadow-xl transition-all bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20">
+                <ScanIcon size={22} className="text-[#071D13]" />
               </div>
-              <span className="text-[10px] mt-1 font-bold text-[#52B788]">{isBn ? "স্ক্যান" : "Scan"}</span>
+              <span className="text-[10px] mt-0.5 font-bold text-[#52B788]">{isBn ? "স্ক্যান" : "Scan"}</span>
             </button>
 
             <button
               onClick={() => navigate("/rewards")}
               className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
             >
-              <GiftIcon size={22} />
+              <GiftIcon size={21} />
               <span className="text-[10px] mt-1 font-medium">{isBn ? "পুরস্কার" : "Rewards"}</span>
             </button>
 
@@ -170,7 +169,7 @@ function PublicMerchantRoute() {
                   />
                 </div>
               ) : (
-                <UserIcon size={22} />
+                <UserIcon size={21} />
               )}
               <span className="text-[10px] mt-1 font-medium">{isBn ? "প্রোফাইল" : "Profile"}</span>
             </button>
@@ -178,8 +177,7 @@ function PublicMerchantRoute() {
         </nav>
       ) : (
         <div
-          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 pb-safe shadow-2xl z-20 flex items-center justify-between gap-3"
-          style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 pb-safe shadow-2xl z-20 flex items-center justify-between gap-3 w-full"
         >
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-black text-xs text-[#0A2318]">
