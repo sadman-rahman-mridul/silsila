@@ -289,7 +289,7 @@ function AppRoutes() {
       />
 
       {/* Dynamic Merchant Slugs (e.g. /cafeb, /north-end, etc.) */}
-      <Route path="/:slug" element={<DynamicMerchantSlugRoute />} />
+      <Route path="/:slug" element={<PublicMerchantRoute />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

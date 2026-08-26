@@ -569,34 +569,22 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   </p>
                 </div>
               ) : (
-                <div className="relative mt-4 group">
-                  {/* Outer Pulsing Glow Ambient Aura */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#F59E0B] via-[#10B981] to-[#FBBF24] rounded-2xl blur-md opacity-70 group-hover:opacity-100 transition duration-700 animate-pulse" />
-
-                  {/* Animated Rotating Gradient Border */}
-                  <div className="relative p-[2.5px] rounded-2xl overflow-hidden bg-gradient-to-r from-[#F59E0B] via-[#34D399] to-[#FBBF24] animate-border-shimmer shadow-2xl">
-                    <button
-                      onClick={handleRequestSeal}
-                      disabled={requestingSeal || approvalStatus === "waiting"}
-                      className="relative w-full py-4 px-5 rounded-[14px] bg-gradient-to-r from-[#F59E0B] via-[#FBBF24] to-[#F59E0B] hover:brightness-110 text-[#0A2318] font-display font-black text-sm shadow-xl flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 tracking-wider overflow-hidden"
-                    >
-                      {/* Subtle Shimmer Sweep Effect on Button Surface */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-                      <span className="text-base animate-bounce">⚡</span>
-                      <span className="font-extrabold uppercase text-sm drop-shadow-xs">
-                        {requestingSeal
-                          ? isBn
-                            ? "অনুরোধ পাঠানো হচ্ছে..."
-                            : "Requesting seal..."
-                          : isBn
-                          ? "আমার সিল নিন (Get my seal)"
-                          : "Get my seal"}
-                      </span>
-                      <MapPinIcon size={18} className="text-[#0A2318] flex-shrink-0" />
-                    </button>
-                  </div>
-                </div>
+                <button
+                  onClick={handleRequestSeal}
+                  disabled={requestingSeal || approvalStatus === "waiting"}
+                  className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <MapPinIcon size={18} />
+                  <span>
+                    {requestingSeal
+                      ? isBn
+                        ? "অনুরোধ পাঠানো হচ্ছে..."
+                        : "Sending request..."
+                      : isBn
+                      ? "আমি এখানে আছি! সিল দাবি করুন"
+                      : "I'm here! Seal My Card"}
+                  </span>
+                </button>
               )}
             </div>
           </div>
