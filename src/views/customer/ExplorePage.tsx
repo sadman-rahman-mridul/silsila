@@ -129,12 +129,12 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
 
         {loading ? (
           <div className="py-12 text-center text-white/70 text-sm">
-            <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
+            <RefreshIcon size={24} className="animate-spin text-[#34D399] mx-auto mb-2" />
             <p>দোকানের তালিকা লোড হচ্ছে...</p>
           </div>
         ) : merchants.length === 0 ? (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
-            <span className="text-3xl mb-2 block">🔍</span>
+            <SearchIcon size={32} className="text-[#34D399] mx-auto mb-2" />
             <p className="font-bold text-white">কোনো দোকান খুঁজে পাওয়া যায়নি</p>
             <p className="text-xs text-white/60 mt-1">অন্য কোনো নাম বা ক্যাটাগরি দিয়ে অনুসন্ধান করুন</p>
           </div>

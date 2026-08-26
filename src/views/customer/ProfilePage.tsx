@@ -168,7 +168,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             onClick={() => setNotifications((n) => !n)}
             className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
-            <span className="text-xl w-8 flex-shrink-0">🔔</span>
+            <BellIcon size={18} className="text-[#34D399] flex-shrink-0" />
             <p className="flex-1 text-left font-semibold text-sm text-white">নোটিফিকেশন ও অ্যালার্ট</p>
             <span className={`text-xs px-3 py-1 rounded-full font-bold ${notifications ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30" : "bg-white/10 text-white/50"}`}>
               {notifications ? "চালু" : "বন্ধ"}
@@ -180,7 +180,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             onClick={() => setShowDeleteModal(true)}
             className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-500/10 transition-colors text-red-400 cursor-pointer"
           >
-            <span className="text-xl w-8 flex-shrink-0">🗑️</span>
+            <LogOutIcon size={18} className="text-red-400 flex-shrink-0" />
             <div className="flex-1 text-left">
               <p className="font-bold text-sm text-red-300">আমার ডেটা ও সিল মুছে ফেলুন</p>
               <p className="text-[10px] text-red-400/70">Right to erasure (PDPA ২০২৬ ধারা ৬৩)</p>

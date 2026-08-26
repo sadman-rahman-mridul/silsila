@@ -13,6 +13,8 @@ import {
   CopyIcon,
   QRIcon,
   LogOutIcon,
+  ShieldCheckIcon,
+  GiftIcon,
 } from "../../components/Icons"
 
 interface MerchantDashboardProps {
@@ -288,7 +290,9 @@ export default function MerchantDashboard({
 
         {approvals.length === 0 && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
-            <span className="text-3xl mb-2 block">✅</span>
+            <div className="w-14 h-14 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#34D399]">
+              <ShieldCheckIcon size={30} />
+            </div>
             <p className="font-display font-bold text-white text-base">সব অনুমোদন সম্পন্ন</p>
             <p className="text-white/60 text-xs mt-1 leading-relaxed">
               কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে
@@ -305,7 +309,7 @@ export default function MerchantDashboard({
             </div>
             <div className="p-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
-                🎁
+                <GiftIcon size={24} className="text-[#0A2318]" />
               </div>
               <div className="flex-1">
                 <p className="text-white font-bold text-sm">{program.rewardText}</p>

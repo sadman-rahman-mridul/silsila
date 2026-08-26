@@ -100,7 +100,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       <div className="flex items-start justify-between gap-3 mb-3 pb-2 border-b border-[#E9E5DC]">
         <div>
           <h2 className="font-display font-bold text-[#1A1916] text-base flex items-center gap-2">
-            👷 স্টাফ মোড পিন
+            স্টাফ মোড পিন
           </h2>
           <p className="text-xs text-[#6B6158] mt-0.5">
             কাউন্টার স্টাফ এই ৪ সংখ্যার পিন দিয়ে অনুমোদন স্ক্রিন খুলবেন
@@ -179,7 +179,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
           </div>
 
           <p className="text-[11px] text-[#6B6158] bg-[#F0F7F2] border border-[#52B788]/30 rounded-xl px-3 py-2">
-            🔐 নিশ্চিত করতে মালিকের নম্বরে
+            নিশ্চিত করতে মালিকের নম্বরে
             {ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} একটি OTP পাঠানো হবে।
           </p>
 

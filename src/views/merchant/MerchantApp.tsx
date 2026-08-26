@@ -7,7 +7,7 @@ import MarketingPage from "./MarketingPage"
 import MerchantSettings from "./MerchantSettings"
 import AnalyticsPage from "./AnalyticsPage"
 import StaffMode from "./StaffMode"
-import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon, LogOutIcon } from "../../components/Icons"
+import { ChartIcon, UsersIcon, StarIcon, MegaphoneIcon, SettingsIcon, LogOutIcon, BarChartIcon, LockIcon, ChevronLeftIcon } from "../../components/Icons"
 import { type Merchant } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
@@ -168,15 +168,17 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleOpenAnalytics}
-            className="px-2.5 py-1.5 rounded-xl bg-white/10 text-white/80 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10"
+            className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10 flex items-center gap-1.5"
           >
-            📊 রিপোর্ট
+            <BarChartIcon size={14} className="text-[#34D399]" />
+            <span>রিপোর্ট</span>
           </button>
           <button
             onClick={handleOpenStaff}
-            className="px-2.5 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer backdrop-blur-md shadow-xs"
+            className="px-3 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-amber-300 text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer backdrop-blur-md shadow-xs flex items-center gap-1.5"
           >
-            👷 স্টাফ
+            <LockIcon size={14} className="text-[#F59E0B]" />
+            <span>স্টাফ</span>
           </button>
           <button
             onClick={handleLogout}

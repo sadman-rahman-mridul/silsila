@@ -318,7 +318,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                   </div>
                   <StampGrid filled={0} total={previewStamps} size="sm" />
                   <p className="text-[#34D399] font-bold text-xs mt-2">
-                    🎁 {rewardText || "পুরস্কারের বিবরণ লিখুন"}
+                    {rewardText || "পুরস্কারের বিবরণ লিখুন"}
                   </p>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
         {programs.length === 0 && !showCreate && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
-            <span className="text-3xl mb-2 block">🎁</span>
+            <GiftIcon size={36} className="text-[#F59E0B] mx-auto mb-2" />
             <p className="font-display font-bold text-white">কোনো প্রোগ্রাম নেই</p>
             <p className="text-white/60 text-xs mt-1">
               "নতুন প্রোগ্রাম" চেপে আপনার প্রথম স্ট্যাম্প কার্ড চালু করুন।
@@ -382,13 +382,13 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                     }}
                     className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/15 text-white transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-white/10"
                   >
-                    ✏️ Edit
+                    Edit
                   </button>
                   <button
                     onClick={() => setDeleteConfirmId(program.id)}
                     className="px-3 py-1 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-red-500/30"
                   >
-                    🗑️ Delete
+                    Delete
                   </button>
                 </div>
               </div>
