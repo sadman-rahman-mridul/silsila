@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { api, type Merchant, generateMerchantSlug } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useAuth } from "../../context/AuthContext"
@@ -24,7 +25,8 @@ import {
 import StampGrid from "../../components/StampGrid"
 
 interface MerchantSettingsProps {
-  onBack: () => void
+  onBack?: () => void
+  onLogout?: () => void
   activeMerchantId?: string
   onMerchantUpdated?: (updated: Merchant) => void
 }
@@ -37,10 +39,12 @@ type PinStep = "idle" | "sending_otp" | "enter_otp_and_pin" | "saving" | "done"
 
 export default function MerchantSettings({
   onBack,
+  onLogout,
   activeMerchantId,
   onMerchantUpdated,
 }: MerchantSettingsProps) {
-  const { profile } = useAuth()
+  const { profile, logout } = useAuth()
+  const navigate = useNavigate()
   // Never fall back to "m1" — only use the authenticated merchant's id
   const merchantId = activeMerchantId || profile?.merchantId || profile?.id || ""
 
@@ -377,6 +381,21 @@ export default function MerchantSettings({
   const formattedQrLink = slug ? `${host}/${slug}` : ""
 
   const swipeHandlers = useSwipeBack(onBack)
+
+  async function handleLogout() {
+    try {
+      if (onLogout) {
+        onLogout()
+      } else if (onBack) {
+        onBack()
+      }
+      await logout()
+      navigate("/")
+    } catch (err) {
+      console.warn("Logout error:", err)
+      navigate("/")
+    }
+  }
 
   return (
     <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
@@ -885,11 +904,11 @@ export default function MerchantSettings({
 
         {/* Log Out */}
         <button
-          onClick={onBack}
-          className="w-full py-3 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          onClick={handleLogout}
+          className="w-full py-3.5 rounded-2xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 shadow-sm backdrop-blur-md"
         >
-          <LogOutIcon size={14} />
-          লগ আউট
+          <LogOutIcon size={16} />
+          <span>লগ আউট</span>
         </button>
       </div>
 

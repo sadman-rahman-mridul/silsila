@@ -214,6 +214,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
           {tab === "settings" && (
             <MerchantSettings
               onBack={onBack}
+              onLogout={handleLogout}
               activeMerchantId={merchantId}
               onMerchantUpdated={(updated) => {
                 setActiveMerchant(updated)
