@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#051B11"/>
+      <stop offset="50%" stop-color="#0A2E1F"/>
+      <stop offset="100%" stop-color="#04160E"/>
+    </linearGradient>
+    <linearGradient id="emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#34D399" stroke-opacity="0.3" stroke-width="6"/>
+
+  <!-- Interlocking Silsila Loyalty Rings (Seal / Chain) -->
+  <g filter="url(#glow)">
+    <!-- Outer Loyalty Seal Ring -->
+    <circle cx="256" cy="256" r="160" fill="none" stroke="url(#emerald)" stroke-width="28" stroke-dasharray="24 16" stroke-linecap="round" opacity="0.9"/>
+
+    <!-- Inner Core Circle -->
+    <circle cx="256" cy="256" r="104" fill="#0D3B27" stroke="url(#emerald)" stroke-width="16"/>
+    
+    <!-- Stylized Diamond Sparkle / Crown of Rewards -->
+    <path d="M256 168 L278 234 L344 256 L278 278 L256 344 L234 278 L168 256 L234 234 Z" fill="url(#gold)"/>
+    <circle cx="256" cy="256" r="20" fill="#FFFBEB"/>
+  </g>
+</svg>
