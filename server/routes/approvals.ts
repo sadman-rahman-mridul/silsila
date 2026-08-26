@@ -59,6 +59,42 @@ router.post("/scan", (req, res) => {
     }
   }
 
+  // 2. Strict Same-Day Limit Verification: Max 1 stamp per customer per merchant per calendar day
+  const lastStamp = db.getLastStampForCustomer(customerId, merchantId)
+  const existingCard = db.getCard(customerId, merchantId)
+  const today = new Date()
+
+  let stampedToday = false
+  if (lastStamp?.timestamp) {
+    const d = new Date(lastStamp.timestamp)
+    stampedToday =
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate()
+  } else if (existingCard && existingCard.stamps > 0 && existingCard.lastVisit) {
+    const d = new Date(existingCard.lastVisit)
+    stampedToday =
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate()
+  }
+
+  if (stampedToday) {
+    db.logFraudSignal({
+      merchantId: merchant.id,
+      merchantName: merchant.name,
+      signal: "একই দিনে একাধিক সিল নেওয়ার প্রচেষ্টা",
+      severity: "info",
+      count: 1,
+      timestamp: "এইমাত্র",
+    })
+    res.status(429).json({
+      error: "আপনি ইতিমধ্যে আজকের জন্য এই দোকানে ১টি সিল পেয়েছেন। ১ দিনে সর্বোচ্চ ১টি সিল সংগ্রহ করা যাবে। পরবর্তী সিলের জন্য অনুগ্রহ করে আগামীকাল আসুন!",
+      isSameDay: true,
+      alreadyStampedToday: true,
+    })
+    return
+  }
 
 
   // Check if there is already an active pending approval for this customer at this merchant

@@ -85,6 +85,20 @@
       "voucherReady": false,
       "createdAt": "2026-08-26T03:27:42.789Z",
       "completedAt": null
+    },
+    {
+      "id": "cc_1787717450858_667",
+      "customerId": "c_test_sameday_1787717450858",
+      "merchantId": "m_audit_1",
+      "programId": "rp_m_audit_1",
+      "stamps": 1,
+      "cycleNo": 1,
+      "streakCount": 1,
+      "graceUsed": false,
+      "lastVisit": "এইমাত্র",
+      "lastVisitTimestamp": 1787717450860,
+      "voucherReady": false,
+      "createdAt": "2026-08-26T04:10:50.858Z"
     }
   ],
   "pendingApprovals": [
@@ -121,6 +135,18 @@
       "scanLng": 90.3742,
       "resolvedBy": "staff_1",
       "resolvedAt": "2026-08-26T03:27:42.791Z"
+    },
+    {
+      "id": "pa_sameday_1",
+      "merchantId": "m_audit_1",
+      "customerId": "c_test_sameday_1787717450858",
+      "customerName": "Test SameDay User",
+      "customerPhone": "01712345678",
+      "status": "waiting",
+      "resolution": "approved",
+      "timestamp": "2026-08-26T04:10:50.859Z",
+      "resolvedBy": "counter_staff",
+      "resolvedAt": "2026-08-26T04:10:50.860Z"
     }
   ],
   "stamps": [
@@ -147,6 +173,16 @@
       "lng": 90.3742,
       "createdAt": "2026-08-26T03:27:42.791Z",
       "timestamp": 1787714862791
+    },
+    {
+      "id": "st_1787717450860_919",
+      "cardId": "cc_1787717450858_667",
+      "merchantId": "m_audit_1",
+      "customerId": "c_test_sameday_1787717450858",
+      "staffId": "counter_staff",
+      "approvalId": "pa_sameday_1",
+      "createdAt": "2026-08-26T04:10:50.860Z",
+      "timestamp": 1787717450860
     }
   ],
   "vouchers": [
