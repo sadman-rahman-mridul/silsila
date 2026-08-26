@@ -158,32 +158,32 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
-      <div className="px-5 pt-4 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">
+    <div className="flex flex-col h-full bg-transparent w-full">
+      <div className="px-3.5 pt-4 pb-3 w-full">
+        <h1 className="font-display text-xl font-black text-white mb-0.5 drop-shadow-xs">
           {isBn ? "লয়্যালটি ও পুরস্কার" : "Loyalty & Rewards"}
         </h1>
         <p className="text-[#34D399] text-xs font-semibold">
           {isBn ? "ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি" : "Digital stamp cards & reward rules"}
         </p>
 
-        <div className="mt-4 flex gap-2.5">
+        <div className="mt-3.5 flex gap-2">
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none">{stats?.rewardsRedeemed || 0}</p>
+            <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{stats?.rewardsRedeemed || 0}</p>
             <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিডিম হয়েছে" : "Redeemed"}</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{stats?.repeatRate ?? 0}%</p>
+            <p className="font-display font-black text-[#34D399] text-xl leading-none">{stats?.repeatRate ?? 0}%</p>
             <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিপিট রেট" : "Repeat Rate"}</p>
           </div>
           <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-white text-2xl leading-none">{programs.length}</p>
+            <p className="font-display font-black text-white text-xl leading-none">{programs.length}</p>
             <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "সক্রিয় প্রোগ্রাম" : "Active Programs"}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
+      <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-white text-base drop-shadow-xs">
             {isBn ? "সক্রিয় প্রোগ্রামসমূহ" : "Active Programs"}
@@ -198,177 +198,6 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             {isBn ? "+ নতুন প্রোগ্রাম" : "+ New Program"}
           </button>
         </div>
-
-        {/* Edit Modal */}
-        {editingProgram && (
-          <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
-            <h3 className="font-display font-bold text-white mb-3">
-              {isBn ? "রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন" : "Edit Reward Program"}
-            </h3>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
-                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
-              </label>
-              <div className="flex gap-2">
-                {[3, 5, 7, 8, 10].map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setEditingProgram({ ...editingProgram, target: n })}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
-                      editingProgram.target === n
-                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                        : "bg-[#071D13] text-white/70 border border-white/10"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
-                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
-              </label>
-              <input
-                type="text"
-                value={editingProgram.rewardText}
-                onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
-                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
-                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
-              </label>
-              <input
-                type="number"
-                value={editingProgram.expiryDays}
-                onChange={(e) => setEditingProgram({ ...editingProgram, expiryDays: Number(e.target.value) })}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setEditingProgram(null)}
-                className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
-              >
-                {isBn ? "বাতিল" : "Cancel"}
-              </button>
-              <button
-                onClick={handleUpdateProgram}
-                disabled={savingEdit || !editingProgram.rewardText.trim()}
-                className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
-              >
-                <CheckIcon size={15} />
-                {savingEdit ? (isBn ? "সংরক্ষণ হচ্ছে..." : "Saving...") : (isBn ? "আপডেট সংরক্ষণ করুন" : "Save Changes")}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Create Modal */}
-        {showCreate && !editingProgram && (
-          <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
-            <h3 className="font-display font-bold text-white mb-3">
-              {isBn ? "নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন" : "Create New Reward Program"}
-            </h3>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
-                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
-              </label>
-              <div className="flex gap-2">
-                {[3, 5, 7, 8, 10].map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setPreviewStamps(n)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
-                      previewStamps === n
-                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                        : "bg-[#071D13] text-white/70 border border-white/10"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
-                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
-              </label>
-              <input
-                type="text"
-                value={rewardText}
-                onChange={(e) => setRewardText(e.target.value)}
-                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
-                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
-              </label>
-              <input
-                type="number"
-                value={expiryDays}
-                onChange={(e) => setExpiryDays(Number(e.target.value))}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
-                {isBn ? "লাইভ কাস্টমার প্রিভিউ" : "Live Customer Preview"}
-              </label>
-              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
-                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
-                      {merchantName.slice(0, 2) || "—"}
-                    </div>
-                    <div>
-                      <p className="font-display font-bold text-white text-xs">
-                        {merchantName || (isBn ? "আপনার দোকান" : "Your Store")}
-                      </p>
-                      <p className="text-white/50 text-[10px]">
-                        0/{previewStamps} {isBn ? "সিল" : "Stamps"}
-                      </p>
-                    </div>
-                  </div>
-                  <StampGrid filled={0} total={previewStamps} size="sm" />
-                  <p className="text-[#34D399] font-bold text-xs mt-2">
-                    {rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowCreate(false)}
-                className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
-              >
-                {isBn ? "বাতিল" : "Cancel"}
-              </button>
-              <button
-                onClick={handleCreateProgram}
-                disabled={creating || !rewardText.trim()}
-                className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
-              >
-                <CheckIcon size={15} />
-                {creating ? (isBn ? "চালু হচ্ছে..." : "Launching...") : (isBn ? "প্রোগ্রাম চালু করুন" : "Launch Program")}
-              </button>
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
@@ -470,6 +299,242 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
           ))}
         </div>
       </div>
+
+      {/* Edit Program Modal */}
+      {editingProgram && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-white">
+          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#F59E0B] text-[#0A2318] flex items-center justify-center font-bold text-sm">
+                  🎁
+                </div>
+                <h3 className="font-display font-black text-white text-base">
+                  {isBn ? "রিওয়ার্ড প্রোগ্রাম সম্পাদনা" : "Edit Reward Program"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingProgram(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-xs cursor-pointer active:scale-95 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
+              </label>
+              <div className="flex gap-2">
+                {[3, 5, 7, 8, 10].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setEditingProgram({ ...editingProgram, target: n })}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                      editingProgram.target === n
+                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
+                        : "bg-[#071D13] text-white/70 border border-white/10 hover:bg-white/10"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
+              </label>
+              <input
+                type="text"
+                value={editingProgram.rewardText}
+                onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
+                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
+              </label>
+              <input
+                type="number"
+                value={editingProgram.expiryDays}
+                onChange={(e) => setEditingProgram({ ...editingProgram, expiryDays: Number(e.target.value) })}
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "লাইভ কার্ড প্রিভিউ" : "Live Card Preview"}
+              </label>
+              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
+                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
+                      {merchantName.slice(0, 2) || "—"}
+                    </div>
+                    <div>
+                      <p className="font-display font-bold text-white text-xs">
+                        {merchantName || (isBn ? "আপনার দোকান" : "Your Store")}
+                      </p>
+                      <p className="text-white/50 text-[10px]">
+                        0/{editingProgram.target} {isBn ? "সিল" : "Stamps"}
+                      </p>
+                    </div>
+                  </div>
+                  <StampGrid filled={0} total={editingProgram.target} size="sm" variant="coffee" />
+                  <p className="text-[#34D399] font-bold text-xs mt-2">
+                    {editingProgram.rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingProgram(null)}
+                className="flex-1 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
+              >
+                {isBn ? "বাতিল" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={handleUpdateProgram}
+                disabled={savingEdit || !editingProgram.rewardText.trim()}
+                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
+              >
+                <CheckIcon size={15} />
+                {savingEdit ? (isBn ? "সংরক্ষণ হচ্ছে..." : "Saving...") : (isBn ? "আপডেট সংরক্ষণ করুন" : "Save Changes")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Program Modal */}
+      {showCreate && !editingProgram && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-white">
+          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-[#10B981] text-[#0A2318] flex items-center justify-center font-bold text-sm">
+                  +
+                </div>
+                <h3 className="font-display font-black text-white text-base">
+                  {isBn ? "নতুন রিওয়ার্ড প্রোগ্রাম তৈরি" : "Create New Reward Program"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreate(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-xs cursor-pointer active:scale-95 transition-all"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
+              </label>
+              <div className="flex gap-2">
+                {[3, 5, 7, 8, 10].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setPreviewStamps(n)}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                      previewStamps === n
+                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
+                        : "bg-[#071D13] text-white/70 border border-white/10 hover:bg-white/10"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
+              </label>
+              <input
+                type="text"
+                value={rewardText}
+                onChange={(e) => setRewardText(e.target.value)}
+                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
+              </label>
+              <input
+                type="number"
+                value={expiryDays}
+                onChange={(e) => setExpiryDays(Number(e.target.value))}
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="text-white/70 text-xs font-semibold block mb-2">
+                {isBn ? "লাইভ কাস্টমার প্রিভিউ" : "Live Customer Preview"}
+              </label>
+              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
+                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
+                      {merchantName.slice(0, 2) || "—"}
+                    </div>
+                    <div>
+                      <p className="font-display font-bold text-white text-xs">
+                        {merchantName || (isBn ? "আপনার দোকান" : "Your Store")}
+                      </p>
+                      <p className="text-white/50 text-[10px]">
+                        0/{previewStamps} {isBn ? "সিল" : "Stamps"}
+                      </p>
+                    </div>
+                  </div>
+                  <StampGrid filled={0} total={previewStamps} size="sm" variant="coffee" />
+                  <p className="text-[#34D399] font-bold text-xs mt-2">
+                    {rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowCreate(false)}
+                className="flex-1 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
+              >
+                {isBn ? "বাতিল" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateProgram}
+                disabled={creating || !rewardText.trim()}
+                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
+              >
+                <CheckIcon size={15} />
+                {creating ? (isBn ? "চালু হচ্ছে..." : "Launching...") : (isBn ? "প্রোগ্রাম চালু করুন" : "Launch Program")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
