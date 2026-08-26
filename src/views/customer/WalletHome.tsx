@@ -302,20 +302,20 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                   onClick={() => onSelectCard(card.merchantId)}
                   className="w-full text-left rounded-3xl overflow-hidden shadow-2xl transition-all active:scale-[0.99] cursor-pointer hover:border-emerald-400/40 border border-white/10 bg-[#0E281C]/90 backdrop-blur-xl group relative"
                 >
-                  {/* Realistic Merchant Cover Photo Banner */}
+                  {/* Luxury Cover Photo Ambient Background */}
                   {merchant.coverUrl && (
-                    <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-[#0A2318]">
+                    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-3xl">
                       <img
                         src={merchant.coverUrl}
                         alt={merchant.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-cover opacity-25 group-hover:opacity-35 group-hover:scale-105 transition-all duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0E281C]/40 to-[#0E281C]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0E281C] via-[#0E281C]/85 to-[#0E281C]/65" />
                     </div>
                   )}
 
                   {card.voucherReady && (
-                    <div className="bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
+                    <div className="relative z-10 bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
                       <div className="flex items-center gap-2">
                         <GiftIcon size={14} className="text-[#0A2318]" />
                         <span className="text-xs font-black">
@@ -328,12 +328,10 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     </div>
                   )}
 
-                  <div className={`p-4 ${merchant.coverUrl ? "pt-2" : ""}`}>
-                    <div className="flex items-start gap-3 mb-3">
+                  <div className="p-4 relative z-10">
+                    <div className="flex items-center gap-3 mb-3.5">
                       <div
-                        className={`w-13 h-13 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-xl border-2 border-white/20 overflow-hidden bg-[#0A2318] glow-emerald ${
-                          merchant.coverUrl ? "-mt-7 relative z-10" : ""
-                        }`}
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-lg border border-white/20 overflow-hidden bg-[#0A2318] glow-emerald"
                         style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
                       >
                         {merchant.logoUrl ? (
@@ -363,7 +361,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-[#071D13] border border-emerald-500/20 mb-3">
+                    <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-[#071D13]/80 backdrop-blur-md border border-emerald-500/20 mb-3 shadow-inner">
                       <StampGrid filled={card.stamps} total={target} size="sm" variant="coffee" />
                       <span className="text-[11px] font-black text-[#34D399] font-mono whitespace-nowrap">
                         {card.stamps}/{target} ☕
