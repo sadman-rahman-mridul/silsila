@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { collection, onSnapshot } from "firebase/firestore"
+import { firestore } from "../../lib/firebase"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
@@ -49,20 +51,38 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
   useEffect(() => {
     loadAvailableMerchants()
 
+    // Real-time live merchants subscription from Firestore
+    const unsubscribeMerchants = onSnapshot(
+      collection(firestore, "merchants"),
+      (snap) => {
+        const liveMerchants = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        setAvailableMerchants((prev) => {
+          const map = new Map<string, any>()
+          prev.forEach((m) => map.set(m.id, m))
+          liveMerchants.forEach((m) => map.set(m.id, { ...map.get(m.id), ...m }))
+          return Array.from(map.values())
+        })
+      },
+      (err) => console.warn("Merchants subscription error in WalletHome:", err)
+    )
+
     if (!customerId) {
       setCards([])
       setLoading(false)
-      return
+      return () => {
+        if (typeof unsubscribeMerchants === "function") unsubscribeMerchants()
+      }
     }
 
     // Single source of truth: Listen to Firestore cards collection directly
-    const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
+    const unsubscribeCards = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
       setCards(firestoreCards || [])
       setLoading(false)
     })
 
     return () => {
-      if (typeof unsubscribe === "function") unsubscribe()
+      if (typeof unsubscribeCards === "function") unsubscribeCards()
+      if (typeof unsubscribeMerchants === "function") unsubscribeMerchants()
     }
   }, [customerId])
 
@@ -251,17 +271,26 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 const slugClean = (m.slug || "").toLowerCase().replace(/[^a-z0-9]/g, "")
                 return mClean === cleanMId || enClean === cleanMId || bnClean === cleanMId || slugClean === cleanMId
               })
-              const merchant = card.merchant?.name
-                ? card.merchant
-                : (found || {
-                    name: isBn ? "দোকান" : "Store",
-                    category: isBn ? "লয়্যালটি" : "Loyalty",
-                    area: "",
-                    logoInitials: isBn ? "সি" : "S",
-                    logoBg: "#D8EDDF",
-                    logoColor: "#1B4332",
-                    verified: false,
-                  })
+
+              const coverUrl = found?.coverUrl || card.coverUrl || card.merchant?.coverUrl || ""
+              const logoUrl = found?.logoUrl || card.logoUrl || card.merchant?.logoUrl || ""
+              const rawName = (!isBn && (found?.nameEn || card.merchant?.nameEn))
+                ? (found?.nameEn || card.merchant?.nameEn)
+                : (found?.name || card.merchant?.name || card.merchantName || (isBn ? "দোকান" : "Store"))
+
+              const merchant = {
+                ...(card.merchant || {}),
+                ...(found || {}),
+                coverUrl,
+                logoUrl,
+                name: rawName,
+                nameEn: found?.nameEn || card.merchant?.nameEn || "",
+                category: found?.category || card.merchant?.category || (isBn ? "ক্যাফে" : "Cafe"),
+                area: found?.area || card.merchant?.area || (isBn ? "ঢাকা" : "Dhaka"),
+                logoBg: found?.logoBg || card.merchant?.logoBg || "#0D3824",
+                logoColor: found?.logoColor || card.merchant?.logoColor || "#34D399",
+                verified: found?.verified ?? card.merchant?.verified ?? false,
+              }
               const target = card.target || 5
               const remaining = Math.max(0, target - card.stamps)
               const isNearComplete = remaining === 1
