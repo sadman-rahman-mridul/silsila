@@ -171,10 +171,6 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   // Handle "I'm here! Seal My Card"
   async function handleRequestSeal() {
     if (!customerId) return
-    if (hasStampToday) {
-      setError("আপনি ইতিমধ্যে আজ এই দোকানে ১টি সিল পেয়েছেন। একই দিনে একাধিক সিল নেওয়া যাবে না। পরবর্তী সিলের জন্য অনুগ্রহ করে আগামীকাল আসুন!")
-      return
-    }
     setRequestingSeal(true)
     setError(null)
     setApprovalMessage("")
@@ -497,26 +493,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               </div>
 
               {/* ACTION BUTTON: "I'm here! Seal My Card" */}
-              {hasStampToday ? (
-                <div className="mt-4 p-3 bg-white/10 border border-white/15 rounded-2xl text-center backdrop-blur-md">
-                  <p className="text-white text-xs font-bold flex items-center justify-center gap-1.5">
-                    <CheckIcon size={16} className="text-[#34D399]" />
-                    আজকের সিল সংগ্রহ করা হয়েছে (১টি/দিন)
-                  </p>
-                  <p className="text-white/70 text-[11px] mt-1">
-                    পরবর্তী সিল সংগ্রহ করতে অনুগ্রহ করে আগামীকাল আসুন!
-                  </p>
-                </div>
-              ) : (
-                <button
-                  onClick={handleRequestSeal}
-                  disabled={requestingSeal || approvalStatus === "waiting"}
-                  className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <MapPinIcon size={18} />
-                  <span>{requestingSeal ? "অনুরোধ পাঠানো হচ্ছে..." : "I'm here! Seal My Card"}</span>
-                </button>
-              )}
+              <button
+                onClick={handleRequestSeal}
+                disabled={requestingSeal || approvalStatus === "waiting"}
+                className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+              >
+                <MapPinIcon size={18} />
+                <span>{requestingSeal ? "অনুরোধ পাঠানো হচ্ছে..." : "I'm here! Seal My Card"}</span>
+              </button>
             </div>
           </div>
         </div>
