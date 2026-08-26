@@ -1,4 +1,4 @@
-# Silsila (সিলসিলা) — Product Requirement Document (PRD)
+# Sealsela (সিলসিলা) — Product Requirement Document (PRD)
 **Version:** 2.0  
 **Status:** Active / Production-Ready  
 **Target Audience:** Stakeholders, Product Managers, UI/UX Designers, Frontend/Backend Developers, and QA Engineers  
@@ -9,7 +9,7 @@
 ## 1. Executive Summary & Vision
 
 ### 1.1 Product Mission
-**Silsila (সিলসিলা)** — meaning *"chain of continuous connection"* — is a mobile-first, zero-friction digital loyalty and rewards platform engineered specifically for cafes, restaurants, salons, and retail merchants in Bangladesh and emerging markets.
+**Sealsela (সিলসিলা)** — meaning *"chain of continuous connection"* — is a mobile-first, zero-friction digital loyalty and rewards platform engineered specifically for cafes, restaurants, salons, and retail merchants in Bangladesh and emerging markets.
 
 ### 1.2 Core Problem Statement
 * **Paper Card Fatigue:** Traditional physical loyalty punch cards suffer from an 82% loss/forget rate, damage, and high printing costs.
@@ -29,7 +29,7 @@
 
 ```mermaid
 graph TD
-    A[Silsila Platform] --> B[Customer / গ্রাহক]
+    A[Sealsela Platform] --> B[Customer / গ্রাহক]
     A --> C[Store Staff / বারিস্তা]
     A --> D[Store Owner / মার্চেন্ট]
     A --> E[Ops Superadmin / অ্যাডমিন]
@@ -214,7 +214,7 @@ graph LR
 
 ```mermaid
 timeline
-    title Silsila Engineering & Product Roadmap
+    title Sealsela Engineering & Product Roadmap
     Phase 1 (Completed) : Core Digital Wallet PWA : Staff Mode Stamping : Real-time Approvals : CRM & Analytics : Glassmorphic Design System
     Phase 2 (Next Up) : Apple Wallet (.pkpass) & Google Wallet Native Passes : WhatsApp & SMS Automated Blast Notifications : Multi-tier VIP Cards (Bronze, Silver, Gold)
     Phase 3 (Enterprise) : POS Hardware Integration (Clover, Square, Bikroy) : Offline Bluetooth Low Energy (BLE) Stamping : AI-Driven Churn Prediction & Smart Offers
@@ -229,6 +229,6 @@ timeline
 
 | Version | Date | Author / Team | Summary of Changes |
 | :--- | :--- | :--- | :--- |
-| **v1.0** | 2026-08-15 | Silsila Core Product Team | Initial platform specification and prototype baseline. |
+| **v1.0** | 2026-08-15 | Sealsela Core Product Team | Initial platform specification and prototype baseline. |
 | **v1.5** | 2026-08-22 | Engineering & Design | Added Staff Mode, instant QR scanning, and multi-language support. |
 | **v2.0** | 2026-08-26 | Product & Architecture | Fullscreen QR Presenter, modal-based program editor, instant CRM fuzzy search, privacy phone masking, and PWA viewport standardization. |

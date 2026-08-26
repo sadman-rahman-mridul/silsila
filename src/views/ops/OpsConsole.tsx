@@ -90,7 +90,7 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
               <h1 className="font-display font-bold text-white text-lg leading-none">
                 {isBn ? "অপারেশনস কনসোল (Ops)" : "Operations Console (Ops)"}
               </h1>
-              <p className="text-white/40 text-[11px] mt-0.5">Silsila Network Admin</p>
+              <p className="text-white/40 text-[11px] mt-0.5">Sealsela Network Admin</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

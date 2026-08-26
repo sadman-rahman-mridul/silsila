@@ -146,7 +146,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               {isBn ? "স" : "S"}
             </div>
             <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
-              {isBn ? "সিলসিলা" : "Silsila"}
+              {isBn ? "সিলসিলা" : "Sealsela"}
             </span>
           </button>
 

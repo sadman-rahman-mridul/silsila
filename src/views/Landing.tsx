@@ -480,7 +480,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             <span className="text-3xl">🔖</span>
           </div>
           <h1 className="font-display text-3xl font-black text-white tracking-tight leading-none drop-shadow-md">
-            {isBn ? "সিলসিলা" : "Silsila"}
+            {isBn ? "সিলসিলা" : "Sealsela"}
           </h1>
           <p className="text-[#34D399] text-xs font-semibold tracking-wide mt-1 drop-shadow-sm">
             {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your Brand's Digital Loyalty Card!"}
@@ -973,7 +973,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             </>
           ) : (
             <>
-              By accessing the Silsila platform, you agree to our{" "}
+              By accessing the Sealsela platform, you agree to our{" "}
               <span className="underline text-white/60">Privacy Policy (PDPA 2026)</span>.
             </>
           )}

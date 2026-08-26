@@ -1,6 +1,6 @@
-# Silsila
+# Sealsela
 
-React + Vite + Tailwind CSS project for Silsila (Customer Loyalty & Merchant Rewards Platform).
+React + Vite + Tailwind CSS project for Sealsela (Customer Loyalty & Merchant Rewards Platform).
 
 ## Development Server
 

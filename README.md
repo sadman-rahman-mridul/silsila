@@ -1,1 +1,2 @@
-# silsila
+# Sealsela — Digital Loyalty & Rewards Platform
+

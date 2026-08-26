@@ -146,7 +146,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
             </div>
           )}
           <span className="text-white font-bold text-sm group-hover:text-[#34D399] transition-colors truncate max-w-[110px] sm:max-w-[130px] drop-shadow-xs">
-            {(!isBn && activeMerchant?.nameEn) ? activeMerchant.nameEn : (activeMerchant?.name || (isBn ? "সিলসিলা" : "Silsila"))}
+            {(!isBn && activeMerchant?.nameEn) ? activeMerchant.nameEn : (activeMerchant?.name || (isBn ? "সিলসিলা" : "Sealsela"))}
           </span>
         </button>
 

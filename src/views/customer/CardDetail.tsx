@@ -441,7 +441,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   {isBn ? "স" : "S"}
                 </div>
                 <span className="font-display font-black text-white text-xs">
-                  {isBn ? "সিলসিলা" : "Silsila"}
+                  {isBn ? "সিলসিলা" : "Sealsela"}
                 </span>
               </button>
             </div>

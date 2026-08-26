@@ -153,7 +153,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
             </div>
             <div>
               <p className="text-white font-display font-bold">
-                {isBn ? "সিলসিলায় স্বাগতম!" : "Welcome to Silsila!"}
+                {isBn ? "সিলসিলায় স্বাগতম!" : "Welcome to Sealsela!"}
               </p>
               <p className="text-[#52B788] text-xs">
                 {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your brand's digital loyalty card!"}

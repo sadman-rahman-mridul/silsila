@@ -196,7 +196,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               {isBn ? "স" : "S"}
             </div>
             <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#34D399] transition-colors">
-              {isBn ? "সিলসিলা" : "Silsila"}
+              {isBn ? "সিলসিলা" : "Sealsela"}
             </span>
           </button>
 
@@ -333,7 +333,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           {isBn ? "লগ আউট" : "Log Out"}
         </button>
 
-        <p className="text-center text-white/30 text-xs mt-6">{isBn ? "সিলসিলা v1.0.0" : "Silsila v1.0.0"}</p>
+        <p className="text-center text-white/30 text-xs mt-6">{isBn ? "সিলসিলা v1.0.0" : "Sealsela v1.0.0"}</p>
       </div>
 
       {/* PDPA Erasure Modal */}
