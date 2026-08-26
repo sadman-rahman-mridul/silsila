@@ -70,9 +70,9 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
-      <div className="px-5 pt-8 pb-4">
-        <h1 className="font-display text-2xl font-black text-white mb-3 drop-shadow-sm">
+    <div className="flex flex-col h-full bg-transparent w-full">
+      <div className="px-3.5 pt-5 pb-3">
+        <h1 className="font-display text-xl font-black text-white mb-2.5 drop-shadow-sm">
           {isBn ? "আশেপাশের দোকান" : "Nearby Stores"}
         </h1>
         <div className="relative">
@@ -82,7 +82,7 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isBn ? "দোকান বা এলাকা খুঁজুন..." : "Search store or area..."}
-            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-4 py-3 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
+            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-4 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
           />
           {search && (
             <button
@@ -95,13 +95,13 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
         </div>
       </div>
 
-      <div className="px-5 pt-1">
+      <div className="px-3.5 pt-1">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 selectedCategory === cat.value
                   ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
                   : "bg-[#0E281C]/70 backdrop-blur-md text-white/70 border border-white/10 hover:text-white"
@@ -113,7 +113,7 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
+      <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-xs font-medium">
             {loading

@@ -142,14 +142,14 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-[100dvh] bg-transparent max-w-md mx-auto relative overflow-hidden">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-transparent w-full max-w-md mx-auto relative overflow-hidden">
       <div
-        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-4 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
-        style={{ paddingTop: "max(12px, env(safe-area-inset-top, 12px))" }}
+        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-3.5 pb-2 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
+        style={{ paddingTop: "max(10px, env(safe-area-inset-top, 10px))" }}
       >
         <button
           onClick={() => handleTabChange("home")}
-          className="flex items-center gap-2.5 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
+          className="flex items-center gap-2 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
           title={isBn ? "হোম ড্যাশবোর্ড" : "Home Dashboard"}
         >
           {activeMerchant?.logoUrl ? (
@@ -170,42 +170,42 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
           </span>
         </button>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             onClick={toggleLanguage}
-            className="px-2.5 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10 flex items-center gap-1 active:scale-95"
+            className="px-2 py-1 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10 flex items-center gap-1 active:scale-95"
             title={isBn ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
           >
-            <GlobeIcon size={13} className="text-[#34D399]" />
-            <span className="font-mono text-[11px] font-black uppercase text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
+            <GlobeIcon size={12} className="text-[#34D399]" />
+            <span className="font-mono text-[10px] font-black uppercase text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
           </button>
           <button
             onClick={handleOpenAnalytics}
             title={isBn ? "অ্যানালিটিক্স রিপোর্ট" : "Analytics Report"}
-            className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/10 transition-all cursor-pointer flex items-center gap-1 active:scale-95 backdrop-blur-md"
+            className="px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/10 transition-all cursor-pointer flex items-center gap-1 active:scale-95 backdrop-blur-md"
           >
-            <AnalyticsIcon size={13} className="text-[#34D399]" />
-            <span className="text-[11px] font-medium">{isBn ? "অ্যানালিটিক্স" : "Analytics"}</span>
+            <AnalyticsIcon size={12} className="text-[#34D399]" />
+            <span className="text-[10px] font-medium">{isBn ? "অ্যানালিটিক্স" : "Analytics"}</span>
           </button>
           <button
             onClick={() => setShowStaffMode(true)}
             title={isBn ? "স্টাফ মোড চালু করুন" : "Enter Staff Mode"}
-            className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 hover:text-white border border-amber-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md"
+            className="px-2 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 hover:text-white border border-amber-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md"
           >
-            <LockIcon size={14} className="text-[#F59E0B]" />
-            <span>{isBn ? "স্টাফ" : "Staff"}</span>
+            <LockIcon size={12} className="text-[#F59E0B]" />
+            <span className="text-[10px]">{isBn ? "স্টাফ" : "Staff"}</span>
           </button>
           <button
             onClick={handleLogout}
             title={isBn ? "লগ আউট করুন" : "Log Out"}
-            className="p-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs backdrop-blur-md"
+            className="p-1 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs backdrop-blur-md"
           >
-            <LogOutIcon size={14} />
+            <LogOutIcon size={13} />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-hidden relative w-full">
         <div className="absolute inset-0 overflow-y-auto">
           {tab === "home" && (
             <MerchantDashboard
@@ -240,8 +240,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
       </div>
 
       <nav
-        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 shadow-2xl z-20"
-        style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 shadow-2xl z-20 pb-safe w-full"
       >
         <div className="flex items-center justify-around py-1">
           <MerchantNavBtn

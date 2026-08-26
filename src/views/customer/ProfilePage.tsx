@@ -184,9 +184,9 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         onChange={handleFileSelect}
       />
 
-      <div className="px-5 pt-8 pb-4">
+      <div className="px-3.5 pt-5 pb-3 w-full">
         {/* Top Navigation Row */}
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
           <button
             onClick={onBack}
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
@@ -210,41 +210,41 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
 
         {/* Profile Card Header with 1:1 Avatar & Upload Button */}
-        <div className="flex items-center gap-4 bg-[#0E281C]/90 backdrop-blur-xl border border-emerald-500/25 p-4 rounded-3xl shadow-xl">
+        <div className="flex items-center gap-3.5 bg-[#0E281C]/90 backdrop-blur-xl border border-emerald-500/25 p-3.5 rounded-3xl shadow-xl">
           <div className="relative group flex-shrink-0">
-            <div className="w-18 h-18 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-xl glow-emerald relative">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-xl glow-emerald relative">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={customer.name} className="w-full h-full object-cover" />
               ) : (
-                <span className="font-display font-black text-white text-3xl">{initialLetter}</span>
+                <span className="font-display font-black text-white text-2xl">{initialLetter}</span>
               )}
             </div>
 
             <button
               onClick={() => fileInputRef.current?.click()}
               title={isBn ? "ছবি পরিবর্তন করুন" : "Change photo"}
-              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
             >
-              <CameraIcon size={14} />
+              <CameraIcon size={12} />
             </button>
           </div>
 
           <div className="flex-1 min-w-0">
-            <h1 className="font-display font-black text-white text-xl truncate drop-shadow-sm">{customer.name}</h1>
-            <p className="text-[#34D399] text-xs font-bold mt-0.5 font-mono">{customer.phone}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-white/50 text-[11px]">
-                {isBn ? `সদস্য হয়েছেন ${customer.joinedDate} থেকে` : `Member since ${customer.joinedDate}`}
+            <div className="flex items-center gap-1.5">
+              <h1 className="font-display text-lg font-black text-white truncate">{customer.name}</h1>
+              <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/20 px-1.5 py-0.5 rounded-md border border-[#34D399]/30">
+                {isBn ? "গ্রাহক" : "Customer"}
               </span>
-              {avatarUrl && (
-                <button
-                  onClick={handleRemovePhoto}
-                  className="text-[10px] text-red-400/80 hover:text-red-300 underline cursor-pointer"
-                >
-                  {isBn ? "ছবি সরান" : "Remove photo"}
-                </button>
-              )}
             </div>
+            <p className="text-white/60 font-mono text-xs mt-0.5">{customer.phone}</p>
+            {avatarUrl && (
+              <button
+                onClick={handleRemovePhoto}
+                className="mt-1 text-[11px] text-red-400 hover:text-red-300 font-semibold cursor-pointer underline transition-colors"
+              >
+                {isBn ? "ছবি মুছুন" : "Remove photo"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -257,7 +257,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
+      <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-1 w-full">
         {/* PDPA 2026 Compliance Badge */}
         <div className="bg-[#0E281C]/80 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-xl">
           <ShieldCheckIcon size={22} className="text-[#34D399] flex-shrink-0" />

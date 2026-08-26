@@ -97,8 +97,8 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
   const showCard = !!selectedMerchantId
 
   return (
-    <div className="flex flex-col h-full min-h-[100dvh] bg-transparent max-w-md mx-auto relative overflow-hidden">
-      <div className="flex-1 overflow-hidden relative">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-transparent w-full max-w-md mx-auto relative overflow-hidden">
+      <div className="flex-1 overflow-hidden relative w-full">
         {showCard ? (
           <div className="absolute inset-0 overflow-y-auto">
             <CardDetail merchantId={selectedMerchantId} onBack={() => navigate("/home")} />
@@ -127,25 +127,24 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
 
       {/* Static Bottom Navigation (Facebook style) */}
       <nav
-        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe shadow-2xl z-20"
-        style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-1 pb-safe shadow-2xl z-20 w-full"
       >
-        <div className="flex items-center justify-around">
-          <NavBtn icon={<HomeIcon size={22} />} label={isBn ? "হোম" : "Home"} active={!showCard && tab === "home"} onClick={() => handleTabChange("home")} />
-          <NavBtn icon={<CompassIcon size={22} />} label={isBn ? "খুঁজুন" : "Explore"} active={!showCard && tab === "explore"} onClick={() => handleTabChange("explore")} />
+        <div className="flex items-center justify-around py-0.5">
+          <NavBtn icon={<HomeIcon size={21} />} label={isBn ? "হোম" : "Home"} active={!showCard && tab === "home"} onClick={() => handleTabChange("home")} />
+          <NavBtn icon={<CompassIcon size={21} />} label={isBn ? "খুঁজুন" : "Explore"} active={!showCard && tab === "explore"} onClick={() => handleTabChange("explore")} />
 
           <button
             onClick={() => handleTabChange("scan")}
-            className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
+            className="flex flex-col items-center -mt-4 relative cursor-pointer active:scale-95 transition-transform group"
           >
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all ${!showCard && tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
-              <ScanIcon size={24} className="text-[#071D13]" />
+            <div className={`w-13 h-13 rounded-full flex items-center justify-center shadow-xl transition-all ${!showCard && tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
+              <ScanIcon size={22} className="text-[#071D13]" />
             </div>
-            <span className={`text-[10px] mt-1 font-bold ${!showCard && tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>{isBn ? "স্ক্যান" : "Scan"}</span>
+            <span className={`text-[10px] mt-0.5 font-bold ${!showCard && tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>{isBn ? "স্ক্যান" : "Scan"}</span>
           </button>
 
           <NavBtn
-            icon={<GiftIcon size={22} />}
+            icon={<GiftIcon size={21} />}
             label={isBn ? "পুরস্কার" : "Rewards"}
             active={!showCard && tab === "rewards"}
             onClick={() => handleTabChange("rewards")}
@@ -167,7 +166,7 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
                   />
                 </div>
               ) : (
-                <UserIcon size={22} />
+                <UserIcon size={21} />
               )
             }
             label={isBn ? "প্রোফাইল" : "Profile"}

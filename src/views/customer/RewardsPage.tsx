@@ -65,31 +65,31 @@ export default function RewardsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
-      <div className="px-5 pt-8 pb-4">
-        <h1 className="font-display text-2xl font-black text-white mb-1 drop-shadow-sm">
+    <div className="flex flex-col h-full bg-transparent w-full">
+      <div className="px-3.5 pt-5 pb-3 w-full">
+        <h1 className="font-display text-xl font-black text-white mb-0.5 drop-shadow-sm">
           {isBn ? "পুরস্কার" : "Rewards"}
         </h1>
         <p className="text-[#34D399] text-xs font-semibold">
           {isBn ? "আপনার অর্জিত সব উপহার ও ভাউচার" : "All your earned gifts and vouchers"}
         </p>
-        <div className="mt-4 flex gap-2.5">
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <p className="font-display font-black text-white text-2xl leading-none">{vouchers.length}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "মোট অর্জিত" : "Total Earned"}</p>
+        <div className="mt-3.5 flex gap-2">
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-white text-xl leading-none">{vouchers.length}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "মোট অর্জিত" : "Total Earned"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none">{activeVouchers.length}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "দাবিযোগ্য" : "Claimable"}</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{activeVouchers.length}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "দাবিযোগ্য" : "Claimable"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{redeemedVouchers.length}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "ব্যবহৃত" : "Redeemed"}</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-[#34D399] text-xl leading-none">{redeemedVouchers.length}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "ব্যবহৃত" : "Redeemed"}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
+      <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         {loading ? (
           <div className="py-16 text-center text-white/70 text-sm">
             <span className="inline-block animate-spin text-3xl mb-3">⏳</span>

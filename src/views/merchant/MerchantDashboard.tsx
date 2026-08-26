@@ -283,9 +283,9 @@ export default function MerchantDashboard({
   })
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
+    <div className="flex flex-col h-full bg-transparent w-full">
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-4 pt-3.5 pb-24 space-y-3.5">
+      <div className="flex-1 overflow-y-auto px-3.5 pt-3 pb-20 space-y-3 w-full">
         {/* Real-time Netflix-style Search Bar + Quick Voucher Redeem */}
         <div className="flex items-center gap-2">
           <div className="flex-1 bg-[#0E281C]/90 backdrop-blur-xl rounded-2xl p-2.5 border border-emerald-500/25 shadow-xl flex items-center gap-2.5">

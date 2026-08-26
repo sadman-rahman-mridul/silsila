@@ -132,25 +132,25 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
   })
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
+    <div className="flex flex-col h-full bg-transparent w-full">
       {/* Top Header with ambient lighting */}
-      <div className="px-5 pt-8 pb-4">
+      <div className="px-3.5 pt-4 pb-3 w-full">
         {/* Top Bar: Logo on Left, Logout on Right */}
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-2.5 cursor-pointer group active:scale-95 transition-transform"
+            className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title={isBn ? "হোম" : "Home"}
           >
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center font-display font-black text-[#0A2318] text-base shadow-lg glow-amber">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center font-display font-black text-[#0A2318] text-sm shadow-lg glow-amber">
               {isBn ? "স" : "S"}
             </div>
-            <span className="font-display font-black text-white text-xl tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
+            <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
               {isBn ? "সিলসিলা" : "Silsila"}
             </span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <div className="relative">
               <button
                 onClick={loadCards}
@@ -170,19 +170,19 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               <button
                 onClick={onLogout}
                 title={isBn ? "লগআউট করুন" : "Log Out"}
-                className="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center gap-1.5 border border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm backdrop-blur-md"
+                className="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center gap-1 border border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm backdrop-blur-md"
               >
-                <LogOutIcon size={14} />
+                <LogOutIcon size={13} />
                 <span>{isBn ? "লগ আউট" : "Log Out"}</span>
               </button>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-3.5 mb-1">
+        <div className="flex items-center gap-3 mb-1">
           <Link
             to="/profile"
-            className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-lg glow-emerald flex-shrink-0 cursor-pointer active:scale-95 transition-all group"
+            className="w-11 h-11 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-lg glow-emerald flex-shrink-0 cursor-pointer active:scale-95 transition-all group"
             title={isBn ? "প্রোফাইল দেখুন" : "View Profile"}
           >
             {(profile?.avatarUrl || profile?.photoURL) ? (
@@ -192,42 +192,42 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               />
             ) : (
-              <span className="font-display font-black text-white text-lg">
+              <span className="font-display font-black text-white text-base">
                 {displayName.trim().slice(0, 1) || (isBn ? "গ্র" : "C")}
               </span>
             )}
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">
+            <p className="text-[#34D399] text-[11px] font-bold uppercase tracking-wider">
               {isBn ? "স্বাগতম" : "Welcome"}
             </p>
-            <h1 className="font-display text-2xl font-black text-white truncate leading-tight mt-0.5 drop-shadow-sm">{displayName}</h1>
+            <h1 className="font-display text-xl font-black text-white truncate leading-tight mt-0.5 drop-shadow-sm">{displayName}</h1>
           </div>
         </div>
 
         {/* Glass Stats Bar */}
-        <div className="mt-3.5 bg-[#0F2A1E]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-4 flex items-center justify-around text-center shadow-2xl">
+        <div className="mt-3 bg-[#0F2A1E]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 flex items-center justify-around text-center shadow-2xl">
           <div>
-            <p className="font-display font-black text-white text-2xl leading-none">{totalStamps}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "মোট সিল" : "Total Stamps"}</p>
+            <p className="font-display font-black text-white text-xl leading-none">{totalStamps}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "মোট সিল" : "Total Stamps"}</p>
           </div>
-          <div className="w-px h-8 bg-white/10" />
+          <div className="w-px h-7 bg-white/10" />
           <div>
-            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{completedCardsCount}</p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "কার্ড সম্পন্ন" : "Completed"}</p>
+            <p className="font-display font-black text-[#34D399] text-xl leading-none">{completedCardsCount}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "কার্ড সম্পন্ন" : "Completed"}</p>
           </div>
-          <div className="w-px h-8 bg-white/10" />
+          <div className="w-px h-7 bg-white/10" />
           <div>
-            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none flex items-center justify-center gap-0.5 drop-shadow-xs">
-              <FireIcon size={20} className="text-[#F59E0B]" />
+            <p className="font-display font-black text-[#F59E0B] text-xl leading-none flex items-center justify-center gap-0.5 drop-shadow-xs">
+              <FireIcon size={18} className="text-[#F59E0B]" />
               {maxStreak}
             </p>
-            <p className="text-white/60 text-xs mt-1 font-medium">{isBn ? "সপ্তাহের সিলসিলা" : "Streak"}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "সপ্তাহের সিলসিলা" : "Streak"}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-2 pb-24">
+      <div className="flex-1 overflow-y-auto px-3.5 pt-1 pb-20 w-full">
         {/* Filter Tabs */}
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-white text-lg drop-shadow-xs">

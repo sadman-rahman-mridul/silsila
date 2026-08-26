@@ -422,8 +422,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             </div>
           )}
 
-          <div className="relative z-10 px-5 pt-10 pb-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="relative z-10 px-3.5 pt-6 pb-4">
+            <div className="flex items-center justify-between mb-4">
               <button
                 onClick={onBack}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/20 active:scale-95 shadow-md"
@@ -446,9 +446,9 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               </button>
             </div>
 
-            <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center gap-3 mb-4">
               <div
-                className="w-18 h-18 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/30 overflow-hidden flex-shrink-0 bg-[#0A2318] glow-emerald"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/30 overflow-hidden flex-shrink-0 bg-[#0A2318] glow-emerald"
                 style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
               >
                 {merchant.logoUrl ? (
@@ -459,7 +459,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-md">
+                  <h1 className="font-display font-black text-white text-xl truncate drop-shadow-md">
                     {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                   </h1>
                   {merchant.verified && (
@@ -514,7 +514,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             )}
 
             {/* Stamp Card Component */}
-            <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/25 shadow-2xl">
+            <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-4 border border-emerald-500/25 shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">
@@ -601,8 +601,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
         )}
 
         {/* Card Info & Rules */}
-        <div className="px-5 py-4 space-y-3.5 pb-28">
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
+        <div className="px-3.5 py-3 space-y-3 pb-24">
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-emerald-500/20">
             <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
               {isBn ? "পরবর্তী পুরস্কার" : "Upcoming Reward"}
             </p>
