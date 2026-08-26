@@ -16,6 +16,7 @@ import {
   FacebookIcon,
   GiftIcon,
   CheckIcon,
+  AlertTriangleIcon,
 } from "../../components/Icons"
 
 interface CardDetailProps {

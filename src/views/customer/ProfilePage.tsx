@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import { useLanguage } from "../../context/LanguageContext"
-import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon, ChevronLeftIcon } from "../../components/Icons"
+import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon, ChevronLeftIcon, BellIcon } from "../../components/Icons"
 
 interface ProfilePageProps {
   onBack: () => void

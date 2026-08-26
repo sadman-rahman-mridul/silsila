@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { api, type Merchant } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES, categoryLabel } from "../../constants/categories"
-import { MapPinIcon, SearchIcon, ShieldCheckIcon } from "../../components/Icons"
+import { MapPinIcon, SearchIcon, ShieldCheckIcon, RefreshIcon } from "../../components/Icons"
 
 interface ExplorePageProps {
   onSelectMerchant?: (merchantId: string) => void

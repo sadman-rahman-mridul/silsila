@@ -6,6 +6,7 @@ import { firebaseService } from "../../services/firebaseService"
 import {
   CheckIcon,
   XIcon,
+  MapPinIcon,
   RefreshIcon,
   UsersIcon,
   SettingsIcon,

@@ -3,7 +3,7 @@ import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import StampGrid from "../../components/StampGrid"
-import { FireIcon, GiftIcon, LogOutIcon } from "../../components/Icons"
+import { FireIcon, GiftIcon, LogOutIcon, CompassIcon, RefreshIcon } from "../../components/Icons"
 
 interface WalletHomeProps {
   onSelectCard: (merchantId: string) => void

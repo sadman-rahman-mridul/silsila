@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { api, type RewardProgram, type MerchantStats } from "../../services/api"
-import { CheckIcon } from "../../components/Icons"
+import { CheckIcon, GiftIcon } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 import { useAuth } from "../../context/AuthContext"
 
