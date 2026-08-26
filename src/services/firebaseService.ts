@@ -868,6 +868,18 @@ export const firebaseService = {
   },
 
   async getMerchantStats(merchantId: string): Promise<any> {
+    const DAYS_BN = ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহঃ", "শুক্র", "শনি"]
+    const now = Date.now()
+
+    const defaultDailyTrends = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(now - (6 - i) * 86400000)
+      return {
+        day: DAYS_BN[d.getDay()],
+        date: d.toLocaleDateString("bn-BD", { day: "numeric", month: "short" }),
+        stamps: 0,
+      }
+    })
+
     const defaultStats = {
       scansToday: 0,
       uniqueCustomers: 0,
@@ -879,15 +891,7 @@ export const firebaseService = {
       activeCards: 0,
       totalStamps: 0,
       hasActivity: false,
-      dailyTrends: [
-        { day: "রবি", date: "১৮ মে", stamps: 0 },
-        { day: "সোম", date: "১৯ মে", stamps: 0 },
-        { day: "মঙ্গল", date: "২০ মে", stamps: 0 },
-        { day: "বুধ", date: "২১ মে", stamps: 0 },
-        { day: "বৃহঃ", date: "২২ মে", stamps: 0 },
-        { day: "শুক্র", date: "২৩ মে", stamps: 0 },
-        { day: "শনি", date: "২৪ মে", stamps: 0 },
-      ],
+      dailyTrends: defaultDailyTrends,
       hourlyDistribution: [
         { hour: 8, label: "৮টা", stamps: 0 },
         { hour: 12, label: "১২টা", stamps: 0 },
@@ -924,27 +928,98 @@ export const firebaseService = {
         .map((d) => ({ id: d.id, ...d.data() } as any))
         .filter((a) => {
           const mId = (a.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-          return (a.merchantId === targetId || mId === cleanSlug || a.merchantId === merchantId) && (a.resolution === "approved" || a.status === "approved")
+          return (
+            (a.merchantId === targetId || mId === cleanSlug || a.merchantId === merchantId) &&
+            (a.resolution === "approved" || a.status === "approved")
+          )
         })
 
       const uniqueCustomers = matchedCards.length
-      const totalStamps = matchedCards.reduce((acc, c) => acc + (Number(c.stamps) || 0), 0) + (matchedApprovals.length > 0 ? matchedApprovals.length : 0)
+      const cardStampsTotal = matchedCards.reduce((acc, c) => acc + (Number(c.stamps) || 0), 0)
+      const totalStamps = Math.max(cardStampsTotal, matchedApprovals.length)
       const repeatCustomers = matchedCards.filter((c) => (Number(c.stamps) || 0) > 1 || (c.cycleNo || 1) > 1).length
       const repeatRate = uniqueCustomers > 0 ? Math.round((repeatCustomers / uniqueCustomers) * 100) : 0
-      const rewardsRedeemed = matchedCards.filter((c) => (c.cycleNo || 1) > 1).length
+      const rewardsRedeemed = matchedCards.filter((c) => (c.cycleNo || 1) > 1 || c.voucherReady).length
+
+      // Dynamic 7-day trends
+      const dailyTrends = Array.from({ length: 7 }).map((_, i) => {
+        const d = new Date(now - (6 - i) * 86400000)
+        const dayStart = new Date(d).setHours(0, 0, 0, 0)
+        const dayEnd = new Date(d).setHours(23, 59, 59, 999)
+
+        let dayStampCount = matchedApprovals.filter((a) => {
+          const t = new Date(a.resolvedAt || a.createdAt || a.timestamp || 0).getTime()
+          return t >= dayStart && t <= dayEnd
+        }).length
+
+        // If today is the last index and approvals count is 0, check today's card updates
+        if (i === 6 && dayStampCount === 0) {
+          dayStampCount = matchedCards.filter((c) => {
+            const lv = new Date(c.lastVisit || c.updatedAt || 0).getTime()
+            return lv >= dayStart && lv <= dayEnd
+          }).length
+        }
+
+        return {
+          day: DAYS_BN[d.getDay()],
+          date: d.toLocaleDateString("bn-BD", { day: "numeric", month: "short" }),
+          stamps: dayStampCount,
+        }
+      })
+
+      const stampsThisWeek =
+        dailyTrends.reduce((acc, d) => acc + d.stamps, 0) ||
+        matchedApprovals.length ||
+        (matchedCards.length > 0 ? cardStampsTotal : 0)
+
+      // Scans today
+      const todayStart = new Date().setHours(0, 0, 0, 0)
+      const todayEnd = new Date().setHours(23, 59, 59, 999)
+      const scansToday =
+        matchedApprovals.filter((a) => {
+          const t = new Date(a.resolvedAt || a.createdAt || a.timestamp || 0).getTime()
+          return t >= todayStart && t <= todayEnd
+        }).length || dailyTrends[6]?.stamps || 0
+
+      // Dynamic hourly distribution
+      const hourlyDistribution = [8, 12, 16, 20].map((hour) => {
+        const label = hour === 8 ? "৮টা" : hour === 12 ? "১২টা" : hour === 16 ? "৪টা" : "৮টা"
+        const count = matchedApprovals.filter((a) => {
+          const t = new Date(a.resolvedAt || a.createdAt || a.timestamp || 0)
+          const h = t.getHours()
+          return h >= hour - 2 && h < hour + 2
+        }).length
+        return { hour, label, stamps: count }
+      })
+
+      // Dynamic retention funnel
+      const atLeast = (n: number) =>
+        matchedCards.filter((c) => (Number(c.stamps) || 0) >= n || (c.cycleNo || 1) > 1).length
+      const retentionFunnel = [1, 2, 3, 4].map((visit) => ({
+        visit,
+        customers: atLeast(visit),
+        pct: uniqueCustomers > 0 ? Math.round((atLeast(visit) / uniqueCustomers) * 100) : 0,
+      }))
+      retentionFunnel.push({
+        visit: 0,
+        customers: rewardsRedeemed,
+        pct: uniqueCustomers > 0 ? Math.round((rewardsRedeemed / uniqueCustomers) * 100) : 0,
+      })
 
       return {
-        ...defaultStats,
-        scansToday: matchedApprovals.length,
+        scansToday,
         uniqueCustomers,
         rewardsRedeemed,
         repeatRate,
-        stampsThisWeek: matchedApprovals.length,
+        stampsThisWeek,
         newThisWeek: uniqueCustomers,
         activeCards: matchedCards.length,
         totalStamps,
-        hasActivity: uniqueCustomers > 0 || matchedApprovals.length > 0,
-        weeklyChange: matchedApprovals.length,
+        hasActivity: uniqueCustomers > 0 || totalStamps > 0 || matchedApprovals.length > 0,
+        weeklyChange: scansToday,
+        dailyTrends,
+        hourlyDistribution,
+        retentionFunnel,
       }
     } catch (err) {
       console.warn("Failed to get merchant stats from Firestore:", err)
