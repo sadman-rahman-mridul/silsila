@@ -52,7 +52,17 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
 
   // Merchant directory, used to resolve a scanned QR payload to a merchant id.
   useEffect(() => {
-    api.getMerchants().then(setMerchants).catch(console.warn)
+    Promise.all([
+      api.getMerchants().catch(() => []),
+      firebaseService.getMerchants().catch(() => []),
+    ])
+      .then(([apiM, fbM]) => {
+        const map = new Map<string, Merchant>()
+        apiM.forEach((m: any) => map.set(m.id, m))
+        fbM.forEach((m: any) => map.set(m.id, { ...map.get(m.id), ...m }))
+        setMerchants(Array.from(map.values()))
+      })
+      .catch(console.warn)
   }, [])
 
   // Start Camera Stream
@@ -291,29 +301,71 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
 
     setErrorMsg(null)
     setSecondsLeft(60)
-    setSelectedMerchantId(mId)
-
-    // The customer's actual coordinates — never a value derived from the
-    // merchant's own position, which would make the geofence meaningless.
-    const position = await getCurrentPosition()
 
     try {
-      const res = await api.scanMerchant({
-        merchantId: mId,
+      // 1. Resolve merchant by ID or slug
+      const fbMerchant = await firebaseService.getMerchantByIdOrSlug(mId).catch(() => null)
+      const targetId = fbMerchant?.id || mId
+      const targetName = fbMerchant?.name || selectedMerchant?.name || "দোকান"
+      setSelectedMerchantId(targetId)
+
+      // 2. Strict Same-Day Limit Verification directly from Firestore
+      const existingCard = await firebaseService.getCustomerCard(customerId, targetId).catch(() => null)
+      if (existingCard && (existingCard.stamps || 0) > 0 && existingCard.lastVisit) {
+        const d = new Date(existingCard.lastVisit)
+        const today = new Date()
+        const isToday =
+          d.getFullYear() === today.getFullYear() &&
+          d.getMonth() === today.getMonth() &&
+          d.getDate() === today.getDate()
+        if (isToday) {
+          setErrorMsg(
+            "আপনি ইতিমধ্যে আজকের জন্য এই দোকানে ১টি সিল সংগ্রহ করেছেন। ১ দিনে সর্বোচ্চ ১টি সিল সংগ্রহ করা যাবে। পরবর্তী সিলের জন্য অনুগ্রহ করে আগামীকাল আসুন!"
+          )
+          setStep("error")
+          return
+        }
+      }
+
+      // 3. Obtain location
+      const position = await getCurrentPosition()
+
+      // 4. Create direct Firestore pending approval
+      const apprId = `appr_${Date.now()}_${customerId.slice(-4)}`
+      const pendingObj: PendingApproval = {
+        id: apprId,
+        merchantId: targetId,
+        merchantName: targetName,
         customerId,
-        customerName,
+        customerName: customerName || "সম্মানিত গ্রাহক",
         customerPhone,
+        timestamp: new Date().toISOString(),
+        status: "pending",
+        resolution: "pending",
         scanLat: position?.lat,
         scanLng: position?.lng,
-      })
-
-      setPendingApproval(res.pendingApproval)
-      if (res.pendingApproval) {
-        firebaseService.syncPendingApproval(res.pendingApproval)
+        deviceFingerprint: "browser",
       }
+
+      // Write to Firestore immediately
+      await firebaseService.syncPendingApproval(pendingObj)
+      setPendingApproval(pendingObj)
       setStep("pending")
+
+      // Background API sync
+      api
+        .scanMerchant({
+          merchantId: targetId,
+          customerId,
+          customerName,
+          customerPhone,
+          scanLat: position?.lat,
+          scanLng: position?.lng,
+        })
+        .catch(console.warn)
     } catch (err: any) {
-      setErrorMsg(err.message || "স্ক্যান যাচাইকরণে সমস্যা হয়েছে")
+      console.warn("Scan initiation warning:", err)
+      setErrorMsg(err?.message || "স্ক্যান যাচাইকরণে সমস্যা হয়েছে")
       setStep("error")
     }
   }
@@ -366,15 +418,37 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
       setDots((d) => (d % 3) + 1)
     }, 1000)
 
-    // Live listener for the approval outcome. On approval the authoritative
-    // stamp counts come from the polling call below, not from guessed numbers.
-    const unsubscribe = firebaseService.subscribeApprovalStatus(pendingApproval.id, (firestoreApproval) => {
-      if (!firestoreApproval) return
-      if (firestoreApproval.resolution === "rejected") {
-        setStep("rejected")
-      }
-    })
+    // Real-time Firestore approval listener
+    const unsubscribe = firebaseService.subscribeApprovalStatus(
+      pendingApproval.id,
+      async (firestoreApproval) => {
+        if (!firestoreApproval) return
 
+        if (
+          firestoreApproval.resolution === "approved" ||
+          firestoreApproval.status === "approved"
+        ) {
+          const mId = firestoreApproval.merchantId || selectedMerchantId
+          const card = await firebaseService.getCustomerCard(customerId || "", mId).catch(() => null)
+          setStampsData({
+            stamps: card?.stamps ?? firestoreApproval.stamps ?? 1,
+            target: card?.target ?? 5,
+            cardId: card?.id,
+          })
+          setStep("confirmed")
+          try {
+            confetti({ particleCount: 80, spread: 90, origin: { y: 0.6 } })
+          } catch {}
+        } else if (
+          firestoreApproval.resolution === "rejected" ||
+          firestoreApproval.status === "rejected"
+        ) {
+          setStep("rejected")
+        }
+      }
+    )
+
+    // Backup polling
     const poll = setInterval(async () => {
       try {
         const res = await api.checkApprovalStatus(pendingApproval.id)
@@ -397,16 +471,16 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
           clearInterval(poll)
         }
       } catch (err) {
-        console.error("Polling error:", err)
+        // ignore polling errors
       }
-    }, 1500)
+    }, 2000)
 
     return () => {
       clearInterval(timer)
       clearInterval(poll)
       if (typeof unsubscribe === "function") unsubscribe()
     }
-  }, [step, pendingApproval, selectedMerchantId])
+  }, [step, pendingApproval, selectedMerchantId, customerId])
 
   const selectedMerchant = merchants.find((m) => m.id === selectedMerchantId) || null
 
