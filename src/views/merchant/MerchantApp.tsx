@@ -120,40 +120,11 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
     return <StaffMode onExit={handleExitSpecialMode} activeMerchantId={merchantId} />
   }
 
-  if (showAnalytics) {
-    return (
-      <div className="flex flex-col h-full min-h-[100dvh] bg-transparent w-full max-w-md mx-auto relative overflow-hidden">
-        {/* Top Navigation Bar */}
-        <div
-          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-3.5 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
-          style={{ paddingTop: "max(10px, env(safe-area-inset-top, 10px))" }}
-        >
-          <button
-            onClick={handleExitSpecialMode}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/20 active:scale-95 shadow-md"
-          >
-            <ChevronLeftIcon size={16} />
-            <span>{isBn ? "ড্যাশবোর্ড" : "Dashboard"}</span>
-          </button>
-          <span className="font-display font-black text-white text-sm">
-            {isBn ? "অ্যানালিটিক্স রিপোর্ট" : "Analytics Report"}
-          </span>
-          <div className="w-12" />
-        </div>
-
-        <div className="flex-1 overflow-hidden relative w-full">
-          <div className="absolute inset-0 overflow-y-auto">
-            <AnalyticsPage activeMerchantId={merchantId} />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col h-full min-h-[100dvh] bg-transparent w-full max-w-md mx-auto relative overflow-hidden">
+      {/* Luxury Glassmorphic Static Top Header */}
       <div
-        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-3.5 pb-2 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
+        className="flex-shrink-0 bg-[#092015]/80 backdrop-blur-2xl px-3.5 pb-2.5 flex items-center justify-between border-b border-emerald-500/20 shadow-2xl z-20"
         style={{ paddingTop: "max(10px, env(safe-area-inset-top, 10px))" }}
       >
         <button
@@ -174,7 +145,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
               {activeMerchant?.logoInitials || (isBn ? "সি" : "S")}
             </div>
           )}
-          <span className="text-white font-bold text-sm group-hover:text-[#34D399] transition-colors truncate max-w-[120px] drop-shadow-xs">
+          <span className="text-white font-bold text-sm group-hover:text-[#34D399] transition-colors truncate max-w-[110px] sm:max-w-[130px] drop-shadow-xs">
             {(!isBn && activeMerchant?.nameEn) ? activeMerchant.nameEn : (activeMerchant?.name || (isBn ? "সিলসিলা" : "Silsila"))}
           </span>
         </button>
@@ -182,68 +153,88 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={toggleLanguage}
-            className="px-2 py-1 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10 flex items-center gap-1 active:scale-95"
+            className="px-2 py-1 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/15 flex items-center gap-1 active:scale-95 shadow-sm"
             title={isBn ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
           >
             <GlobeIcon size={12} className="text-[#34D399]" />
             <span className="font-mono text-[10px] font-black uppercase text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
           </button>
+          
           <button
-            onClick={handleOpenAnalytics}
+            onClick={() => {
+              if (showAnalytics) {
+                handleTabChange("home")
+              } else {
+                handleOpenAnalytics()
+              }
+            }}
             title={isBn ? "অ্যানালিটিক্স রিপোর্ট" : "Analytics Report"}
-            className="px-2 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/10 transition-all cursor-pointer flex items-center gap-1 active:scale-95 backdrop-blur-md"
+            className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md shadow-sm border ${
+              showAnalytics
+                ? "bg-[#34D399] text-[#0A2318] border-[#34D399] shadow-lg glow-emerald"
+                : "bg-white/10 hover:bg-white/20 text-white border-white/15"
+            }`}
           >
-            <AnalyticsIcon size={12} className="text-[#34D399]" />
-            <span className="text-[10px] font-medium">{isBn ? "অ্যানালিটিক্স" : "Analytics"}</span>
+            <AnalyticsIcon size={12} className={showAnalytics ? "text-[#0A2318]" : "text-[#34D399]"} />
+            <span className="text-[10px] font-bold">{isBn ? "অ্যানালিটিক্স" : "Analytics"}</span>
           </button>
+
           <button
             onClick={() => setShowStaffMode(true)}
             title={isBn ? "স্টাফ মোড চালু করুন" : "Enter Staff Mode"}
-            className="px-2 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 hover:text-white border border-amber-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md"
+            className="px-2 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 hover:text-white border border-amber-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md shadow-sm"
           >
             <LockIcon size={12} className="text-[#F59E0B]" />
             <span className="text-[10px]">{isBn ? "স্টাফ" : "Staff"}</span>
           </button>
+
           <button
             onClick={handleLogout}
             title={isBn ? "লগ আউট করুন" : "Log Out"}
-            className="p-1 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs backdrop-blur-md"
+            className="p-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs backdrop-blur-md shadow-sm"
           >
             <LogOutIcon size={13} />
           </button>
         </div>
       </div>
 
+      {/* Main Central Scrollable Body */}
       <div className="flex-1 overflow-hidden relative w-full">
         <div className="absolute inset-0 overflow-y-auto">
-          {tab === "home" && (
-            <MerchantDashboard
-              merchantId={merchantId}
-              onMerchantChange={(id) => {
-                setMerchantId(id)
-              }}
-              onViewCustomers={() => handleTabChange("customers")}
-              onOpenSettings={() => handleTabChange("settings")}
-              onLogout={onBack}
-            />
-          )}
-          {tab === "customers" && <CustomersPage merchantId={merchantId} />}
-          {tab === "rewards" && (
-            <RewardsManager
-              merchantId={merchantId}
-              merchantName={activeMerchant?.name || ""}
-            />
-          )}
-          {tab === "marketing" && <MarketingPage merchantId={merchantId} />}
-          {tab === "settings" && (
-            <MerchantSettings
-              onBack={onBack}
-              onLogout={handleLogout}
-              activeMerchantId={merchantId}
-              onMerchantUpdated={(updated) => {
-                setActiveMerchant(updated)
-              }}
-            />
+          {showAnalytics ? (
+            <AnalyticsPage activeMerchantId={merchantId} />
+          ) : (
+            <>
+              {tab === "home" && (
+                <MerchantDashboard
+                  merchantId={merchantId}
+                  onMerchantChange={(id) => {
+                    setMerchantId(id)
+                  }}
+                  onViewCustomers={() => handleTabChange("customers")}
+                  onOpenSettings={() => handleTabChange("settings")}
+                  onLogout={onBack}
+                />
+              )}
+              {tab === "customers" && <CustomersPage merchantId={merchantId} />}
+              {tab === "rewards" && (
+                <RewardsManager
+                  merchantId={merchantId}
+                  merchantName={activeMerchant?.name || ""}
+                />
+              )}
+              {tab === "marketing" && <MarketingPage merchantId={merchantId} />}
+              {tab === "settings" && (
+                <MerchantSettings
+                  onBack={onBack}
+                  onLogout={handleLogout}
+                  activeMerchantId={merchantId}
+                  onMerchantUpdated={(updated) => {
+                    setActiveMerchant(updated)
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
@@ -255,32 +246,32 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
           <MerchantNavBtn
             icon={<ChartIcon size={22} />}
             label={isBn ? "হোম" : "Home"}
-            active={tab === "home"}
+            active={!showAnalytics && tab === "home"}
             badge={pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined}
             onClick={() => handleTabChange("home")}
           />
           <MerchantNavBtn
             icon={<UsersIcon size={22} />}
             label={isBn ? "কাস্টমার" : "Customers"}
-            active={tab === "customers"}
+            active={!showAnalytics && tab === "customers"}
             onClick={() => handleTabChange("customers")}
           />
           <MerchantNavBtn
             icon={<StarIcon size={22} />}
             label={isBn ? "রিওয়ার্ড" : "Rewards"}
-            active={tab === "rewards"}
+            active={!showAnalytics && tab === "rewards"}
             onClick={() => handleTabChange("rewards")}
           />
           <MerchantNavBtn
             icon={<MegaphoneIcon size={22} />}
             label={isBn ? "মার্কেটিং" : "Marketing"}
-            active={tab === "marketing"}
+            active={!showAnalytics && tab === "marketing"}
             onClick={() => handleTabChange("marketing")}
           />
           <MerchantNavBtn
             icon={<SettingsIcon size={22} />}
             label={isBn ? "সেটিংস" : "Settings"}
-            active={tab === "settings"}
+            active={!showAnalytics && tab === "settings"}
             onClick={() => handleTabChange("settings")}
           />
         </div>
