@@ -124,7 +124,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         setAvatarUrl(compressedDataUrl)
         setRawImage(null)
         setSavingPhoto(false)
-        setPhotoToast("প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে ✓")
+        setPhotoToast("Profile photo updated successfully ✓")
         setTimeout(() => setPhotoToast(null), 3000)
       }
       img.src = rawImage
@@ -143,7 +143,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
       photoURL: "",
     }).catch(console.warn)
     updateSessionProfile({ avatarUrl: "", photoURL: "" })
-    setPhotoToast("প্রোফাইল ছবি মুছে ফেলা হয়েছে")
+    setPhotoToast("Profile photo removed")
     setTimeout(() => setPhotoToast(null), 3000)
   }
 
@@ -220,7 +220,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              title="ছবি পরিবর্তন করুন"
+              title="Change photo"
               className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
             >
               <CameraIcon size={14} />
@@ -230,7 +230,17 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <div className="flex-1 min-w-0">
             <h1 className="font-display font-black text-white text-xl truncate drop-shadow-sm">{customer.name}</h1>
             <p className="text-[#34D399] text-xs font-bold mt-0.5 font-mono">{customer.phone}</p>
-            <p className="text-white/50 text-[11px] mt-0.5">সদস্য হয়েছেন {customer.joinedDate} থেকে</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-white/50 text-[11px]">সদস্য হয়েছেন {customer.joinedDate} থেকে</span>
+              {avatarUrl && (
+                <button
+                  onClick={handleRemovePhoto}
+                  className="text-[10px] text-red-400/80 hover:text-red-300 underline cursor-pointer"
+                >
+                  Remove photo
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -257,7 +267,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden mb-4">
           <button
-            onClick={handleToggleLang}
+            onClick={toggleLanguage}
             className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🌐</span>
@@ -354,12 +364,15 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
       )}
 
-      {/* Interactive 1:1 Circular Profile Picture Cropper Modal */}
+      {/* Interactive 1:1 Circular Profile Picture Cropper Modal with Coffee Themed Sliders */}
       {rawImage && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-[#0A2318] border border-emerald-500/30 rounded-3xl p-5 max-w-sm w-full shadow-2xl animate-scale-up text-white">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display font-black text-lg text-white">প্রোফাইল ছবি সেট করুন</h3>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">☕</span>
+                <h3 className="font-display font-black text-lg text-white">Set Profile Photo</h3>
+              </div>
               <button
                 onClick={() => setRawImage(null)}
                 className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 cursor-pointer"
@@ -369,11 +382,11 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             <p className="text-white/60 text-xs mb-4">
-              ১:১ বৃত্তাকার ফ্রেমে ছবি অ্যাডজাস্ট ও জুম করুন
+              Crop and adjust your photo to fit the frame
             </p>
 
-            {/* 1:1 Viewport Container */}
-            <div className="relative w-52 h-52 mx-auto rounded-full overflow-hidden border-4 border-[#34D399] shadow-2xl bg-black/40 flex items-center justify-center mb-5">
+            {/* 1:1 Viewport Container with Coffee Frame Ring */}
+            <div className="relative w-52 h-52 mx-auto rounded-full overflow-hidden border-4 border-[#34D399] shadow-2xl bg-black/40 flex items-center justify-center mb-5 glow-emerald">
               <div
                 className="w-full h-full relative"
                 style={{
@@ -389,39 +402,58 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               </div>
             </div>
 
-            {/* Zoom / Scale Slider */}
-            <div className="space-y-3 mb-5 px-2">
-              <div>
-                <div className="flex justify-between text-xs font-semibold text-white/70 mb-1">
-                  <span>জুম (Zoom)</span>
-                  <span className="font-mono text-[#34D399]">{imageScale.toFixed(1)}x</span>
+            {/* Coffee Themed Adjustment Sliders */}
+            <div className="space-y-4 mb-5 px-1">
+              {/* Zoom Slider */}
+              <div className="bg-[#0E281C]/90 border border-emerald-500/20 p-3 rounded-2xl">
+                <div className="flex justify-between items-center text-xs font-semibold text-white/80 mb-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-xs">🔍</span>
+                    <span>Zoom</span>
+                  </span>
+                  <span className="font-mono text-[#34D399] font-bold">{imageScale.toFixed(1)}x</span>
                 </div>
-                <input
-                  type="range"
-                  min="0.8"
-                  max="3"
-                  step="0.1"
-                  value={imageScale}
-                  onChange={(e) => setImageScale(parseFloat(e.target.value))}
-                  className="w-full accent-[#34D399] cursor-pointer"
-                />
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs text-white/40">1x</span>
+                  <div className="flex-1 relative flex items-center">
+                    <input
+                      type="range"
+                      min="0.8"
+                      max="3"
+                      step="0.1"
+                      value={imageScale}
+                      onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                      className="w-full accent-[#34D399] cursor-pointer h-2 bg-[#071D13] rounded-lg"
+                    />
+                  </div>
+                  <span className="text-sm text-[#F59E0B]" title="Coffee Zoom">☕</span>
+                </div>
               </div>
 
-              {/* Vertical Pan */}
-              <div>
-                <div className="flex justify-between text-xs font-semibold text-white/70 mb-1">
-                  <span>উল্লম্ব অবস্থান (Vertical Position)</span>
-                  <span className="font-mono text-[#34D399]">{imageOffsetY}px</span>
+              {/* Vertical Position Slider */}
+              <div className="bg-[#0E281C]/90 border border-emerald-500/20 p-3 rounded-2xl">
+                <div className="flex justify-between items-center text-xs font-semibold text-white/80 mb-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-xs">↕️</span>
+                    <span>Vertical Position</span>
+                  </span>
+                  <span className="font-mono text-[#34D399] font-bold">{imageOffsetY}px</span>
                 </div>
-                <input
-                  type="range"
-                  min="-80"
-                  max="80"
-                  step="2"
-                  value={imageOffsetY}
-                  onChange={(e) => setImageOffsetY(parseInt(e.target.value))}
-                  className="w-full accent-[#34D399] cursor-pointer"
-                />
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs text-white/40">-80</span>
+                  <div className="flex-1 relative flex items-center">
+                    <input
+                      type="range"
+                      min="-80"
+                      max="80"
+                      step="2"
+                      value={imageOffsetY}
+                      onChange={(e) => setImageOffsetY(parseInt(e.target.value))}
+                      className="w-full accent-[#34D399] cursor-pointer h-2 bg-[#071D13] rounded-lg"
+                    />
+                  </div>
+                  <span className="text-sm text-[#F59E0B]" title="Coffee Position">☕</span>
+                </div>
               </div>
             </div>
 
@@ -431,7 +463,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 onClick={() => setRawImage(null)}
                 className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white/80 rounded-2xl text-xs font-bold transition-all cursor-pointer"
               >
-                বাতিল
+                Cancel
               </button>
               <button
                 onClick={handleApplyCropAndSave}
@@ -441,10 +473,10 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 {savingPhoto ? (
                   <>
                     <RefreshIcon size={14} className="animate-spin" />
-                    <span>সংরক্ষণ হচ্ছে...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
-                  <span>সংরক্ষণ করুন ✓</span>
+                  <span>Save Photo ✓</span>
                 )}
               </button>
             </div>
