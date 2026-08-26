@@ -360,13 +360,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
   const currentRewardText = activeProg?.rewardText || card.rewardText || "১টি বিশেষ উপহার"
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0] overflow-y-auto" {...swipeHandlers}>
+    <div className="flex flex-col h-full bg-transparent overflow-y-auto" {...swipeHandlers}>
       {/* UNIFIED SCROLLING CONTAINER */}
       <div>
-        {/* Top Gradient Header (Scrolls naturally with content) */}
+        {/* Top Gradient Header */}
         <div
           className="relative overflow-hidden"
-          style={{ background: `linear-gradient(145deg, ${merchant.logoColor || "#1B4332"} 0%, #143427 100%)` }}
+          style={{ background: `linear-gradient(145deg, #155E3E 0%, #071D13 100%)` }}
         >
           <div className="absolute inset-0 opacity-10">
             {Array.from({ length: 20 }).map((_, i) => (
@@ -380,11 +380,11 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             ))}
           </div>
 
-          <div className="relative px-5 pt-12 pb-6">
+          <div className="relative px-5 pt-10 pb-6">
             <div className="flex items-center justify-between mb-5">
               <button
                 onClick={onBack}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10 active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10 active:scale-95 shadow-sm"
               >
                 <ChevronLeftIcon size={16} />
                 <span>হোম</span>
@@ -395,7 +395,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95"
                 title="হোমে ফিরুন"
               >
-                <div className="w-6 h-6 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-xs">
+                <div className="w-6 h-6 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs">
                   স
                 </div>
                 <span className="font-display font-black text-white text-sm">সিলসিলা</span>
@@ -404,8 +404,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
             <div className="flex items-center gap-4 mb-5">
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-lg border-2 border-white/20 overflow-hidden flex-shrink-0"
-                style={{ background: merchant.logoBg || "#D8EDDF", color: merchant.logoColor || "#1B4332" }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/20 overflow-hidden flex-shrink-0 bg-[#0A2318]"
+                style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
               >
                 {merchant.logoUrl ? (
                   <img src={merchant.logoUrl} alt="Logo" className="w-full h-full object-cover" />
@@ -415,9 +415,9 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="font-display font-black text-white text-2xl truncate">{merchant.name}</h1>
+                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-sm">{merchant.name}</h1>
                   {merchant.verified && (
-                    <ShieldCheckIcon size={18} className="text-[#52B788] flex-shrink-0" />
+                    <ShieldCheckIcon size={18} className="text-[#34D399] flex-shrink-0" />
                   )}
                 </div>
                 <p className="text-white/70 text-xs mt-0.5">{merchant.category} · {merchant.area || "ঢাকা"}</p>
@@ -443,14 +443,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                         onClick={() => setSelectedProgramId(p.id)}
                         className={`flex-shrink-0 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 border ${
                           isSelected
-                            ? "bg-[#F59E0B] text-[#1B4332] border-[#F59E0B] shadow-lg scale-[1.02]"
-                            : "bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-sm"
+                            ? "bg-[#F59E0B] text-[#0A2318] border-[#F59E0B] shadow-lg scale-[1.02] glow-amber"
+                            : "bg-[#0E281C]/80 text-white hover:bg-[#123827] border-white/15 backdrop-blur-md"
                         }`}
                       >
                         <span className="text-base">🎁</span>
                         <div className="text-left">
                           <p className="leading-tight font-black">{p.rewardText || "পুরস্কার"}</p>
-                          <p className={`text-[10px] font-normal ${isSelected ? "text-[#1B4332]/80" : "text-white/70"}`}>
+                          <p className={`text-[10px] font-normal ${isSelected ? "text-[#0A2318]/80" : "text-white/70"}`}>
                             {p.target}টি সিল প্রয়োজন
                           </p>
                         </div>
@@ -462,11 +462,11 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             )}
 
             {/* Stamp Card Component */}
-            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-5 border border-white/20 shadow-xl">
+            <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/25 shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">স্ট্যাম্প অগ্রগতি</p>
-                  <p className="text-white font-display font-black text-3xl leading-none">
+                  <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">স্ট্যাম্প অগ্রগতি</p>
+                  <p className="text-white font-display font-black text-3xl leading-none drop-shadow-sm">
                     {card.stamps}
                     <span className="text-white/40 text-lg font-medium">/{target}</span>
                   </p>
@@ -474,30 +474,32 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                     {card.voucherReady ? (
                       <span className="text-[#F59E0B] font-bold">✓ উপহার প্রস্তুত! এখনই রিডিম করুন</span>
                     ) : (
-                      <>আর <strong className="text-white font-bold">{remaining}টি</strong> সিল বাকি</>
+                      <>আর <strong className="text-[#34D399] font-bold">{remaining}টি</strong> সিল বাকি</>
                     )}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-white/50 text-xs">চক্র</p>
-                  <p className="text-white font-display font-bold text-xl">#{card.cycleNo || 1}</p>
+                  <p className="text-white/50 text-xs font-medium">চক্র</p>
+                  <p className="text-[#34D399] font-display font-bold text-xl">#{card.cycleNo || 1}</p>
                 </div>
               </div>
 
-              <StampGrid filled={card.stamps} total={target} size="md" />
+              <div className="bg-[#071D13] p-3.5 rounded-2xl border border-emerald-500/20 mb-3">
+                <StampGrid filled={card.stamps} total={target} size="md" variant="coffee" />
+              </div>
 
-              <div className="mt-4 h-2 rounded-full bg-white/20 overflow-hidden">
+              <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-[#F59E0B] transition-all duration-700"
+                  className="h-full rounded-full bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#F59E0B] transition-all duration-700 shadow-sm"
                   style={{ width: `${pct}%` }}
                 />
               </div>
 
               {/* ACTION BUTTON: "I'm here! Seal My Card" */}
               {hasStampToday ? (
-                <div className="mt-4 p-3 bg-white/15 border border-white/25 rounded-2xl text-center">
+                <div className="mt-4 p-3 bg-white/10 border border-white/15 rounded-2xl text-center backdrop-blur-md">
                   <p className="text-white text-xs font-bold flex items-center justify-center gap-1.5">
-                    <CheckIcon size={16} className="text-[#52B788]" />
+                    <CheckIcon size={16} className="text-[#34D399]" />
                     আজকের সিল সংগ্রহ করা হয়েছে (১টি/দিন)
                   </p>
                   <p className="text-white/70 text-[11px] mt-1">
@@ -508,7 +510,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 <button
                   onClick={handleRequestSeal}
                   disabled={requestingSeal || approvalStatus === "waiting"}
-                  className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-[#F59E0B] hover:bg-[#E58E00] text-[#1B4332] font-display font-black text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+                  className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
                 >
                   <span className="text-lg">📍</span>
                   <span>{requestingSeal ? "অনুরোধ পাঠানো হচ্ছে..." : "I'm here! Seal My Card"}</span>
@@ -519,78 +521,78 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
         </div>
 
         {error && (
-          <div className="mx-5 mt-4 bg-red-50 border border-red-200 text-red-600 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center justify-between">
+          <div className="mx-5 mt-4 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center justify-between backdrop-blur-md">
             <span>⚠️ {error}</span>
-            <button onClick={() => setError(null)} className="text-red-400 hover:text-red-700 text-xs ml-2 cursor-pointer">✕</button>
+            <button onClick={() => setError(null)} className="text-red-300 hover:text-white text-xs ml-2 cursor-pointer">✕</button>
           </div>
         )}
 
-        {/* Card Info & Rules (Flows smoothly below) */}
-        <div className="px-5 py-4 space-y-3 pb-28">
-          <div className="bg-white rounded-2xl p-4 card-shadow">
-            <p className="text-[#6B6158] text-xs font-medium uppercase tracking-wider mb-3">পরবর্তী পুরস্কার</p>
+        {/* Card Info & Rules */}
+        <div className="px-5 py-4 space-y-3.5 pb-28">
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">পরবর্তী পুরস্কার</p>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-2xl flex-shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
                 🎁
               </div>
               <div>
-                <p className="font-display font-bold text-[#1A1916] text-base">{card.rewardText || program?.rewardText || "১টি বিশেষ উপহার"}</p>
-                <p className="text-[#6B6158] text-xs mt-0.5">{target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে</p>
+                <p className="font-display font-bold text-white text-base">{card.rewardText || program?.rewardText || "১টি বিশেষ উপহার"}</p>
+                <p className="text-white/60 text-xs mt-0.5">{target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে</p>
               </div>
             </div>
             {card.voucherReady && card.voucherCode && (
-              <div className="mt-3 pt-3 border-t border-[#E9E5DC]">
-                <p className="text-[#6B6158] text-xs mb-1.5 font-medium">আপনার একক ভাউচার কোড</p>
-                <div className="flex items-center justify-between gap-2 bg-[#F0F7F2] rounded-xl p-3">
-                  <p className="font-display font-black text-[#1B4332] text-lg tracking-widest">
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <p className="text-white/70 text-xs mb-1.5 font-medium">আপনার একক ভাউচার কোড</p>
+                <div className="flex items-center justify-between gap-2 bg-[#0A2318] border border-[#34D399]/30 rounded-2xl p-3">
+                  <p className="font-display font-black text-[#34D399] text-lg tracking-widest">
                     {card.voucherCode}
                   </p>
                   <button
                     onClick={() => handleCopyCode(card.voucherCode!)}
-                    className="text-xs bg-[#1B4332] text-white px-3 py-1.5 rounded-lg font-bold cursor-pointer"
+                    className="text-xs bg-[#34D399] text-[#0A2318] px-3.5 py-1.5 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
                   >
                     {copied ? "কপি হয়েছে ✓" : "কপি"}
                   </button>
                 </div>
-                <p className="text-[#B0A99E] text-xs mt-2">কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।</p>
+                <p className="text-white/50 text-[11px] mt-2">কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।</p>
               </div>
             )}
           </div>
 
-          <div className="bg-white rounded-2xl p-4 card-shadow">
-            <p className="text-[#6B6158] text-xs font-medium uppercase tracking-wider mb-3">সিল অর্জনের ইতিহাস</p>
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">সিল অর্জনের ইতিহাস</p>
             <div className="space-y-3">
               {stampsHistory && stampsHistory.length > 0 ? (
                 stampsHistory.map((visit, i) => (
                   <div key={visit.id || i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-[#D8EDDF] text-[#1B4332] font-bold text-xs">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 font-bold text-xs">
                       ✓
                     </div>
                     <div className="flex-1">
-                      <p className="text-[#1A1916] text-sm font-medium">সিল #{stampsHistory.length - i}</p>
-                      <p className="text-[#B0A99E] text-xs">{visit.formattedDate}</p>
+                      <p className="text-white text-sm font-medium">সিল #{stampsHistory.length - i}</p>
+                      <p className="text-white/40 text-xs">{visit.formattedDate}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-[#B0A99E] py-2">কোনো অতীত ভিজিট রেকর্ড নেই</p>
+                <p className="text-xs text-white/50 py-2">কোনো অতীত ভিজিট রেকর্ড নেই</p>
               )}
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 card-shadow">
-            <p className="text-[#6B6158] text-xs font-medium uppercase tracking-wider mb-3">দোকানের অবস্থান ও সময়সূচি</p>
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">দোকানের অবস্থান ও সময়সূচি</p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <MapPinIcon size={16} className="text-[#6B6158] mt-0.5 flex-shrink-0" />
+                <MapPinIcon size={16} className="text-[#34D399] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-[#1A1916] text-sm">{merchant.address || "ঢাকা, বাংলাদেশ"}</p>
+                  <p className="text-white text-sm leading-relaxed">{merchant.address || "ঢাকা, বাংলাদেশ"}</p>
                   {merchant.lat && merchant.lng && (
                     <a
                       href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#1B4332] text-xs font-medium mt-1 flex items-center gap-1 hover:underline"
+                      className="text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
                     >
                       গুগল ম্যাপে দেখুন <ExternalLinkIcon size={11} />
                     </a>
@@ -598,21 +600,21 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <ClockIcon size={16} className="text-[#6B6158] flex-shrink-0" />
-                <p className="text-[#1A1916] text-sm">সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)</p>
+                <ClockIcon size={16} className="text-[#34D399] flex-shrink-0" />
+                <p className="text-white text-sm">সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 card-shadow">
-            <p className="text-[#6B6158] text-xs font-medium uppercase tracking-wider mb-3">সোশ্যাল মিডিয়া ও রিভিউ</p>
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
+            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">সোশ্যাল মিডিয়া ও রিভিউ</p>
             <div className="flex flex-wrap gap-2">
               {merchant.instagram && (
                 <a
                   href={`https://instagram.com/${merchant.instagram}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F5F0] text-[#1A1916] text-xs font-medium hover:bg-[#E9E5DC] transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/15 transition-colors border border-white/10"
                 >
                   <InstagramIcon size={14} />
                   Instagram
@@ -623,7 +625,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   href={`https://facebook.com/${merchant.facebook}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F7F5F0] text-[#1A1916] text-xs font-medium hover:bg-[#E9E5DC] transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/15 transition-colors border border-white/10"
                 >
                   <FacebookIcon size={14} />
                   Facebook
@@ -634,7 +636,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   href={merchant.reviewLink}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FEF3C7] text-[#B45309] text-xs font-bold hover:bg-[#FDE68A] transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] text-xs font-black shadow-md glow-amber"
                 >
                   ⭐ Google রিভিউ দিন
                 </a>

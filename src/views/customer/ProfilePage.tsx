@@ -87,8 +87,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
-      <div className="bg-[#1B4332] px-5 pt-10 pb-8">
+    <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
+      <div className="px-5 pt-8 pb-4">
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
           <button
@@ -96,17 +96,17 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title="হোমে ফিরুন"
           >
-            <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#1B4332] text-xs shadow-sm">
+            <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs shadow-sm">
               স
             </div>
-            <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#F59E0B] transition-colors">
+            <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#34D399] transition-colors">
               সিলসিলা
             </span>
           </button>
 
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10"
           >
             <ChevronLeftIcon size={14} />
             <span>হোমে ফিরুন</span>
@@ -114,90 +114,90 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center shadow-inner">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#10B981] to-[#047857] border-2 border-white/20 flex items-center justify-center shadow-xl glow-emerald">
             <span className="font-display font-black text-white text-2xl">{initialLetter}</span>
           </div>
           <div>
-            <h1 className="font-display font-bold text-white text-xl">{customer.name}</h1>
-            <p className="text-[#52B788] text-sm">{customer.phone}</p>
+            <h1 className="font-display font-bold text-white text-xl drop-shadow-sm">{customer.name}</h1>
+            <p className="text-[#34D399] text-xs font-bold mt-0.5">{customer.phone}</p>
             <p className="text-white/50 text-xs mt-0.5">সদস্য হয়েছেন {customer.joinedDate} থেকে</p>
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-3">
+        <div className="mt-4 grid grid-cols-3 gap-2.5">
           {[
             { label: "মোট সিল", value: customer.totalStamps, unit: "টি" },
             { label: "মোট ভিজিট", value: customer.totalVisits, unit: "বার" },
             { label: "কার্ড সম্পন্ন", value: customer.cardsCompleted, unit: "টি" },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white/10 rounded-xl p-3 text-center">
+            <div key={stat.label} className="bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
               <p className="font-display font-black text-white text-xl leading-none">
                 {stat.value}
-                <span className="text-sm font-medium text-white/60">{stat.unit}</span>
+                <span className="text-xs font-medium text-white/50">{stat.unit}</span>
               </p>
-              <p className="text-white/50 text-xs mt-1">{stat.label}</p>
+              <p className="text-white/50 text-[10px] mt-1 font-medium">{stat.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-4">
+      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
         {/* PDPA 2026 Compliance Badge */}
-        <div className="bg-[#F0F7F2] border border-[#52B788]/30 rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-sm">
-          <ShieldCheckIcon size={22} className="text-[#1B4332] flex-shrink-0" />
+        <div className="bg-[#0E281C]/80 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-xl">
+          <ShieldCheckIcon size={22} className="text-[#34D399] flex-shrink-0" />
           <div>
-            <p className="text-[#1B4332] font-bold text-sm">বাংলাদেশ PDPA ২০২৬ সুরক্ষিত</p>
-            <p className="text-[#6B6158] text-xs mt-0.5 leading-relaxed">
+            <p className="text-[#34D399] font-bold text-xs">বাংলাদেশ PDPA ২০২৬ সুরক্ষিত</p>
+            <p className="text-white/60 text-[11px] mt-0.5 leading-relaxed">
               আপনার ডেটা সম্পূর্ণ এনক্রিপ্ট করা ও আইনানুযায়ী যেকোনো সময় সম্পূর্ণ মুছে ফেলার অধিকার সংরক্ষিত।
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl card-shadow overflow-hidden mb-4">
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden mb-4">
           <button
             onClick={handleToggleLang}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-[#E9E5DC] hover:bg-[#F7F5F0] transition-colors cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🌐</span>
-            <p className="flex-1 text-left font-medium text-sm text-[#1A1916]">ভাষা (Language)</p>
-            <span className="text-xs bg-[#F0EDE6] px-2.5 py-1 rounded-full font-bold text-[#1B4332]">{lang}</span>
-            <ChevronRightIcon size={16} className="text-[#B0A99E]" />
+            <p className="flex-1 text-left font-semibold text-sm text-white">ভাষা (Language)</p>
+            <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-3 py-1 rounded-full font-bold">{lang}</span>
+            <ChevronRightIcon size={16} className="text-white/40" />
           </button>
 
           <button
             onClick={() => setNotifications((n) => !n)}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-[#E9E5DC] hover:bg-[#F7F5F0] transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🔔</span>
-            <p className="flex-1 text-left font-medium text-sm text-[#1A1916]">নোটিফিকেশন ও অ্যালার্ট</p>
-            <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${notifications ? "bg-[#D8EDDF] text-[#1B4332]" : "bg-gray-100 text-gray-500"}`}>
+            <p className="flex-1 text-left font-semibold text-sm text-white">নোটিফিকেশন ও অ্যালার্ট</p>
+            <span className={`text-xs px-3 py-1 rounded-full font-bold ${notifications ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30" : "bg-white/10 text-white/50"}`}>
               {notifications ? "চালু" : "বন্ধ"}
             </span>
-            <ChevronRightIcon size={16} className="text-[#B0A99E]" />
+            <ChevronRightIcon size={16} className="text-white/40" />
           </button>
 
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-50 transition-colors text-red-600"
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-500/10 transition-colors text-red-400 cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🗑️</span>
             <div className="flex-1 text-left">
-              <p className="font-semibold text-sm">আমার ডেটা ও সিল মুছে ফেলুন</p>
-              <p className="text-[11px] text-red-500/80">Right to erasure (PDPA ২০২৬ ধারা ৬৩)</p>
+              <p className="font-bold text-sm text-red-300">আমার ডেটা ও সিল মুছে ফেলুন</p>
+              <p className="text-[10px] text-red-400/70">Right to erasure (PDPA ২০২৬ ধারা ৬৩)</p>
             </div>
-            <ChevronRightIcon size={16} className="text-red-300" />
+            <ChevronRightIcon size={16} className="text-red-400/50" />
           </button>
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-[#E9E5DC] text-[#6B6158] font-bold text-sm hover:border-[#B0A99E] transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-bold text-sm transition-all cursor-pointer backdrop-blur-md active:scale-95"
         >
           <LogOutIcon size={16} />
           লগ আউট
         </button>
 
-        <p className="text-center text-[#B0A99E] text-xs mt-6">সিলসিলা v1.0.0</p>
+        <p className="text-center text-white/30 text-xs mt-6">সিলসিলা v1.0.0</p>
       </div>
 
       {/* PDPA Erasure Modal */}

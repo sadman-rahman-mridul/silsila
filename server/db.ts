@@ -99,7 +99,20 @@ class Database {
         const raw = fs.readFileSync(fileToRead, "utf-8")
         const parsed = JSON.parse(raw) as DatabaseSchema
         if (parsed && typeof parsed === "object" && parsed.merchants) {
-          return parsed
+          return {
+            ...getInitialData(),
+            ...parsed,
+            cards: parsed.cards || [],
+            vouchers: parsed.vouchers || [],
+            stamps: parsed.stamps || [],
+            pendingApprovals: parsed.pendingApprovals || [],
+            rewardPrograms: parsed.rewardPrograms || [],
+            merchants: parsed.merchants || [],
+            customers: parsed.customers || [],
+            staff: parsed.staff || [],
+            sponsors: parsed.sponsors || [],
+            fraudSignals: parsed.fraudSignals || [],
+          }
         }
       }
     } catch (err) {

@@ -384,28 +384,31 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   }
 
   return (
-    <div className="min-h-screen bg-[#1B4332] flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8">
+    <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] flex flex-col relative overflow-hidden">
+      {/* Ambient background glow orb */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#52B788]/15 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8 relative z-10">
         <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/10 mb-5 backdrop-blur-sm shadow-inner">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 mb-5 backdrop-blur-md border border-white/20 shadow-2xl glow-emerald">
             <span className="text-4xl">🔖</span>
           </div>
-          <h1 className="font-display text-5xl font-black text-white tracking-tight leading-none mb-2">
+          <h1 className="font-display text-5xl font-black text-white tracking-tight leading-none mb-2 drop-shadow-md">
             সিলসিলা
           </h1>
-          <p className="text-[#52B788] text-base font-semibold tracking-wide mt-1">
+          <p className="text-[#34D399] text-base font-semibold tracking-wide mt-1 drop-shadow-sm">
             আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!
           </p>
         </div>
 
         {error && (
-          <div className="w-full max-w-sm mb-4 bg-red-500/20 border border-red-400/40 text-red-200 px-4 py-3 rounded-xl text-sm animate-fade-in">
+          <div className="w-full max-w-sm mb-4 bg-red-500/20 border border-red-400/40 text-red-200 px-4 py-3 rounded-2xl text-sm animate-fade-in backdrop-blur-md shadow-lg">
             ⚠️ {error}
           </div>
         )}
 
         {infoMsg && (
-          <div className="w-full max-w-sm mb-4 bg-[#52B788]/20 border border-[#52B788]/40 text-[#D8EDDF] px-4 py-3 rounded-xl text-xs font-medium animate-fade-in">
+          <div className="w-full max-w-sm mb-4 bg-[#52B788]/20 border border-[#52B788]/40 text-[#D8EDDF] px-4 py-3 rounded-2xl text-xs font-medium animate-fade-in backdrop-blur-md shadow-lg">
             ✓ {infoMsg}
           </div>
         )}
@@ -416,7 +419,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             {/* Customer Button */}
             <button
               onClick={() => handleRoleSelect("customer")}
-              className="bg-white rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-white/95 text-center cursor-pointer shadow-xl border border-white/40 group"
+              className="bg-white/95 rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-white text-center cursor-pointer shadow-2xl border border-white/40 group backdrop-blur-md"
             >
               <div className="w-16 h-16 rounded-2xl bg-[#D8EDDF] text-[#1B4332] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -432,9 +435,9 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             {/* Merchant Button */}
             <button
               onClick={() => handleRoleSelect("merchant")}
-              className="bg-white/10 backdrop-blur-md rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-white/15 text-center cursor-pointer shadow-xl border border-white/20 group"
+              className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-[#123324] text-center cursor-pointer shadow-2xl border border-emerald-500/20 hover:border-emerald-500/40 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-[#F59E0B] text-[#1B4332] flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-[#1B4332] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 9l1.5-6h15L21 9" />
                   <path d="M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0" />

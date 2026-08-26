@@ -54,75 +54,75 @@ export default function RewardsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-10 pb-6">
-        <h1 className="font-display text-2xl font-bold text-white mb-1">পুরস্কার</h1>
-        <p className="text-[#52B788] text-sm">আপনার অর্জিত সব উপহার ও ভাউচার</p>
-        <div className="mt-4 flex gap-3">
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-white text-2xl">{vouchers.length}</p>
-            <p className="text-white/60 text-xs mt-0.5">মোট অর্জিত</p>
+    <div className="flex flex-col h-full bg-transparent">
+      <div className="px-5 pt-8 pb-4">
+        <h1 className="font-display text-2xl font-black text-white mb-1 drop-shadow-sm">পুরস্কার</h1>
+        <p className="text-[#34D399] text-xs font-semibold">আপনার অর্জিত সব উপহার ও ভাউচার</p>
+        <div className="mt-4 flex gap-2.5">
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
+            <p className="font-display font-black text-white text-2xl leading-none">{vouchers.length}</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">মোট অর্জিত</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-[#F59E0B] text-2xl">{activeVouchers.length}</p>
-            <p className="text-white/60 text-xs mt-0.5">দাবিযোগ্য</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
+            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none">{activeVouchers.length}</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">দাবিযোগ্য</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-white text-2xl">৳{totalSavedApprox}</p>
-            <p className="text-white/60 text-xs mt-0.5">সাশ্রয় করেছেন</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3.5 text-center shadow-lg">
+            <p className="font-display font-black text-[#34D399] text-2xl leading-none">৳{totalSavedApprox}</p>
+            <p className="text-white/60 text-xs mt-1 font-medium">সাশ্রয় করেছেন</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-4">
+      <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
         {loading ? (
-          <div className="py-12 text-center text-[#6B6158] text-sm">
+          <div className="py-12 text-center text-white/70 text-sm">
             <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
             <p>পুরস্কার লোড হচ্ছে...</p>
           </div>
         ) : (
           <>
             {activeVouchers.length > 0 && (
-              <div className="mb-5">
-                <h2 className="font-display font-semibold text-[#1A1916] text-base mb-3 flex items-center gap-1.5">
+              <div className="mb-6">
+                <h2 className="font-display font-bold text-white text-base mb-3 flex items-center gap-1.5 drop-shadow-xs">
                   <GiftIcon size={16} className="text-[#F59E0B]" />
                   দাবি করার অপেক্ষায় ({activeVouchers.length})
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   {activeVouchers.map((voucher) => (
-                    <div key={voucher.id} className="bg-[#1B4332] rounded-2xl overflow-hidden shadow-md">
-                      <div className="bg-[#F59E0B] px-4 py-2 flex items-center justify-between">
+                    <div key={voucher.id} className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-emerald-500/25">
+                      <div className="bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
                         <div className="flex items-center gap-2">
-                          <GiftIcon size={13} className="text-[#1B4332]" />
-                          <span className="text-[#1B4332] text-xs font-bold">পুরস্কার প্রস্তুত!</span>
+                          <GiftIcon size={13} className="text-[#0A2318]" />
+                          <span className="text-xs font-black">পুরস্কার প্রস্তুত!</span>
                         </div>
-                        <span className="text-[10px] bg-[#1B4332] text-[#F59E0B] px-2 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] bg-[#0A2318] text-[#F59E0B] px-2.5 py-0.5 rounded-full font-black">
                           কাউন্টারে দেখান
                         </span>
                       </div>
                       <div className="p-4">
                         <div className="mb-3">
                           <p className="text-white font-display font-bold text-base">{voucher.merchantName || "লয়্যালটি পুরস্কার"}</p>
-                          <p className="text-[#52B788] text-sm font-medium">{voucher.rewardText}</p>
+                          <p className="text-[#34D399] text-xs font-bold mt-0.5">{voucher.rewardText}</p>
                         </div>
-                        <div className="bg-white/10 rounded-xl p-3 mb-3 flex items-center justify-between">
+                        <div className="bg-[#071D13] border border-[#34D399]/30 rounded-2xl p-3.5 mb-3 flex items-center justify-between shadow-inner">
                           <div>
-                            <p className="text-white/50 text-[10px] mb-0.5">ভাউচার কোড</p>
-                            <p className="font-display font-black text-[#F59E0B] text-xl tracking-widest">{voucher.code}</p>
+                            <p className="text-white/50 text-[10px] mb-0.5 font-medium">ভাউচার কোড</p>
+                            <p className="font-display font-black text-[#34D399] text-xl tracking-widest">{voucher.code}</p>
                           </div>
                           <button
                             onClick={() => copyCode(voucher.code)}
-                            className="bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-white/30 font-medium"
+                            className="bg-[#34D399] text-[#0A2318] text-xs px-3.5 py-1.5 rounded-xl font-black shadow-sm active:scale-95 cursor-pointer"
                           >
                             {copiedCode === voucher.code ? "কপি হয়েছে ✓" : "কপি"}
                           </button>
                         </div>
-                        <div className="flex items-center justify-between text-white/60 text-xs">
+                        <div className="flex items-center justify-between text-white/50 text-xs">
                           <div className="flex items-center gap-1">
                             <ClockIcon size={11} className="text-[#F59E0B]" />
                             <span>মেয়াদ: {voucher.expiresAt}</span>
                           </div>
-                          <span className="text-[11px]">কাউন্টারে স্টাফ পিন দিয়ে ভেরিফাই হবে</span>
+                          <span className="text-[10px]">কাউন্টারে স্টাফ পিন দিয়ে ভেরিফাই হবে</span>
                         </div>
                       </div>
                     </div>
@@ -132,23 +132,22 @@ export default function RewardsPage() {
             )}
 
             <div>
-              <h2 className="font-display font-semibold text-[#1A1916] text-base mb-3">ইতিহাস (রিডিমকৃত)</h2>
-              <div className="space-y-2">
+              <h2 className="font-display font-bold text-white text-base mb-3 drop-shadow-xs">ইতিহাস (রিডিমকৃত)</h2>
+              <div className="space-y-2.5">
                 {redeemedVouchers.length > 0 ? (
                   redeemedVouchers.map((item) => (
-                    <div key={item.id} className="bg-white rounded-xl p-4 card-shadow flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#D8EDDF] flex items-center justify-center flex-shrink-0 text-[#1B4332] font-bold">
+                    <div key={item.id} className="bg-[#0E281C]/80 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-white/10 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 flex items-center justify-center flex-shrink-0 font-bold">
                         ✓
                       </div>
                       <div className="flex-1">
-                        <p className="text-[#1A1916] font-medium text-sm">{item.merchantName || "স্টোর রিওয়ার্ড"}</p>
-                        <p className="text-[#6B6158] text-xs">{item.rewardText}</p>
-                        <p className="text-[#B0A99E] text-xs mt-0.5">রিডিম তারিখ: {item.redeemedAt || "সম্প্রতি"}</p>
+                        <p className="font-display font-bold text-white text-sm">{item.merchantName}</p>
+                        <p className="text-[#34D399] text-xs font-medium">{item.rewardText}</p>
+                        <p className="text-white/40 text-[11px] mt-0.5">রিডিম: {item.redeemedAt}</p>
                       </div>
-                      <div className="text-right">
-                        <span className="text-xs text-[#B0A99E] font-mono">{item.code}</span>
-                        <p className="text-xs text-[#52B788] font-medium mt-0.5">গৃহীত ✓</p>
-                      </div>
+                      <span className="text-xs text-[#34D399] bg-[#34D399]/15 border border-[#34D399]/20 px-2.5 py-1 rounded-full font-bold">
+                        ব্যবহৃত
+                      </span>
                     </div>
                   ))
                 ) : (

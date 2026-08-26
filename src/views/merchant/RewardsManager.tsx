@@ -157,36 +157,36 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
-        <h1 className="font-display text-xl font-bold text-white mb-1">লয়্যালটি ও পুরস্কার</h1>
-        <p className="text-[#52B788] text-xs">ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি</p>
+    <div className="flex flex-col h-full bg-transparent">
+      <div className="px-5 pt-4 pb-3">
+        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">লয়্যালটি ও পুরস্কার</h1>
+        <p className="text-[#34D399] text-xs font-semibold">ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি</p>
 
-        <div className="mt-4 flex gap-3">
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-[#F59E0B] text-2xl">{stats?.rewardsRedeemed || 0}</p>
-            <p className="text-white/60 text-xs mt-0.5">রিডিম হয়েছে</p>
+        <div className="mt-4 flex gap-2.5">
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none">{stats?.rewardsRedeemed || 0}</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">রিডিম হয়েছে</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-white text-2xl">{stats?.repeatRate ?? 0}%</p>
-            <p className="text-white/60 text-xs mt-0.5">রিপিট রেট</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{stats?.repeatRate ?? 0}%</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">রিপিট রেট</p>
           </div>
-          <div className="flex-1 bg-white/10 rounded-xl p-3 text-center">
-            <p className="font-display font-black text-white text-2xl">{programs.length}</p>
-            <p className="text-white/60 text-xs mt-0.5">সক্রিয় প্রোগ্রাম</p>
+          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+            <p className="font-display font-black text-white text-2xl leading-none">{programs.length}</p>
+            <p className="text-white/50 text-[10px] mt-1 font-medium">সক্রিয় প্রোগ্রাম</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-4">
+      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-[#1A1916] text-base">সক্রিয় প্রোগ্রামসমূহ</h2>
+          <h2 className="font-display font-bold text-white text-base drop-shadow-xs">সক্রিয় প্রোগ্রামসমূহ</h2>
           <button
             onClick={() => {
               setEditingProgram(null)
               setShowCreate(!showCreate)
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold transition-all active:scale-[0.98] shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black transition-all active:scale-[0.98] shadow-lg glow-emerald cursor-pointer"
           >
             + নতুন প্রোগ্রাম
           </button>
@@ -194,20 +194,20 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
         {/* Edit Modal */}
         {editingProgram && (
-          <div className="bg-white rounded-2xl card-shadow p-4 mb-4 animate-slide-up border-2 border-[#1B4332]">
-            <h3 className="font-display font-bold text-[#1A1916] mb-3">রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন</h3>
+          <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
+            <h3 className="font-display font-bold text-white mb-3">রিওয়ার্ড প্রোগ্রাম সম্পাদনা করুন</h3>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
               <div className="flex gap-2">
                 {[3, 5, 7, 8, 10].map((n) => (
                   <button
                     key={n}
                     onClick={() => setEditingProgram({ ...editingProgram, target: n })}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                       editingProgram.target === n
-                        ? "bg-[#1B4332] text-white shadow-sm"
-                        : "bg-[#F7F5F0] text-[#6B6158] border border-[#E9E5DC]"
+                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
+                        : "bg-[#071D13] text-white/70 border border-white/10"
                     }`}
                   >
                     {n}
@@ -217,37 +217,37 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">পুরস্কারের বিবরণ</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">পুরস্কারের বিবরণ</label>
               <input
                 type="text"
                 value={editingProgram.rewardText}
                 onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
                 placeholder="যেমন: ১টি স্পেশাল হট কফি ফ্রি"
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332] font-medium"
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">মেয়াদ (দিন)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">মেয়াদ (দিন)</label>
               <input
                 type="number"
                 value={editingProgram.expiryDays}
                 onChange={(e) => setEditingProgram({ ...editingProgram, expiryDays: Number(e.target.value) })}
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-2.5 text-[#1A1916] text-sm outline-none font-medium"
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
               />
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => setEditingProgram(null)}
-                className="flex-1 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs"
+                className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleUpdateProgram}
                 disabled={savingEdit || !editingProgram.rewardText.trim()}
-                className="flex-[2] py-2.5 rounded-xl bg-[#1B4332] text-white font-display font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40"
+                className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
               >
                 <CheckIcon size={15} />
                 {savingEdit ? "সংরক্ষণ হচ্ছে..." : "আপডেট সংরক্ষণ করুন"}
@@ -258,20 +258,20 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
         {/* Create Modal */}
         {showCreate && !editingProgram && (
-          <div className="bg-white rounded-2xl card-shadow p-4 mb-4 animate-slide-up border border-[#52B788]/40">
-            <h3 className="font-display font-bold text-[#1A1916] mb-3">নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন</h3>
+          <div className="bg-[#0E281C] rounded-3xl p-5 mb-4 animate-slide-up border border-emerald-500/40 shadow-2xl text-white">
+            <h3 className="font-display font-bold text-white mb-3">নতুন রিওয়ার্ড প্রোগ্রাম তৈরি করুন</h3>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-2">প্রয়োজনীয় সিল সংখ্যা (Target)</label>
               <div className="flex gap-2">
                 {[3, 5, 7, 8, 10].map((n) => (
                   <button
                     key={n}
                     onClick={() => setPreviewStamps(n)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                       previewStamps === n
-                        ? "bg-[#1B4332] text-white shadow-sm"
-                        : "bg-[#F7F5F0] text-[#6B6158] border border-[#E9E5DC]"
+                        ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
+                        : "bg-[#071D13] text-white/70 border border-white/10"
                     }`}
                   >
                     {n}
@@ -281,43 +281,43 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">পুরস্কারের বিবরণ</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">পুরস্কারের বিবরণ</label>
               <input
                 type="text"
                 value={rewardText}
                 onChange={(e) => setRewardText(e.target.value)}
                 placeholder="যেমন: ১টি স্পেশাল হট কফি ফ্রি"
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-3 text-[#1A1916] text-sm outline-none focus:border-[#1B4332] font-medium"
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-1.5">মেয়াদ (দিন)</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">মেয়াদ (দিন)</label>
               <input
                 type="number"
                 value={expiryDays}
                 onChange={(e) => setExpiryDays(Number(e.target.value))}
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-4 py-2.5 text-[#1A1916] text-sm outline-none font-medium"
+                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-[#6B6158] text-xs font-medium block mb-2">লাইভ কাস্টমার প্রিভিউ</label>
-              <div className="bg-[#F0F7F2] rounded-xl p-3.5 border border-[#52B788]/20">
-                <div className="bg-white rounded-xl p-3.5 card-shadow">
+              <label className="text-white/70 text-xs font-semibold block mb-2">লাইভ কাস্টমার প্রিভিউ</label>
+              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
+                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-9 h-9 rounded-lg bg-[#D8EDDF] flex items-center justify-center font-display font-bold text-xs text-[#1B4332]">
+                    <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
                       {merchantName.slice(0, 2) || "—"}
                     </div>
                     <div>
-                      <p className="font-display font-bold text-[#1A1916] text-xs">
+                      <p className="font-display font-bold text-white text-xs">
                         {merchantName || "আপনার দোকান"}
                       </p>
-                      <p className="text-[#6B6158] text-[10px]">০/{previewStamps} সিল</p>
+                      <p className="text-white/50 text-[10px]">০/{previewStamps} সিল</p>
                     </div>
                   </div>
                   <StampGrid filled={0} total={previewStamps} size="sm" />
-                  <p className="text-[#1B4332] font-bold text-xs mt-2">
+                  <p className="text-[#34D399] font-bold text-xs mt-2">
                     🎁 {rewardText || "পুরস্কারের বিবরণ লিখুন"}
                   </p>
                 </div>
@@ -327,14 +327,14 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             <div className="flex gap-2">
               <button
                 onClick={() => setShowCreate(false)}
-                className="flex-1 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs"
+                className="flex-1 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleCreateProgram}
                 disabled={creating || !rewardText.trim()}
-                className="flex-[2] py-2.5 rounded-xl bg-[#1B4332] text-white font-display font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-40"
+                className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer"
               >
                 <CheckIcon size={15} />
                 {creating ? "চালু হচ্ছে..." : "প্রোগ্রাম চালু করুন"}
@@ -344,32 +344,32 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
         )}
 
         {error && (
-          <div className="mb-3 bg-red-50 border border-red-200 text-red-600 text-xs px-4 py-3 rounded-2xl">
+          <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
             ⚠️ {error}
           </div>
         )}
 
         {programs.length === 0 && !showCreate && (
-          <div className="bg-white rounded-2xl p-8 card-shadow text-center border border-[#E9E5DC]">
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
             <span className="text-3xl mb-2 block">🎁</span>
-            <p className="font-display font-bold text-[#1A1916]">কোনো প্রোগ্রাম নেই</p>
-            <p className="text-[#6B6158] text-xs mt-1">
+            <p className="font-display font-bold text-white">কোনো প্রোগ্রাম নেই</p>
+            <p className="text-white/60 text-xs mt-1">
               "নতুন প্রোগ্রাম" চেপে আপনার প্রথম স্ট্যাম্প কার্ড চালু করুন।
             </p>
           </div>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {programs.map((program) => (
-            <div key={program.id} className="bg-white rounded-2xl card-shadow p-4 border border-[#E9E5DC]">
+            <div key={program.id} className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-emerald-500/20">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-2xl">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl shadow-sm">
                     🎁
                   </div>
                   <div>
-                    <p className="font-display font-bold text-[#1A1916] text-sm">{program.rewardText}</p>
-                    <p className="text-[#6B6158] text-xs mt-0.5">
+                    <p className="font-display font-bold text-white text-sm">{program.rewardText}</p>
+                    <p className="text-[#34D399] text-xs font-semibold mt-0.5">
                       {program.target}টি সিলে · {program.expiryDays} দিনের মেয়াদ
                     </p>
                   </div>
@@ -380,13 +380,13 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                       setShowCreate(false)
                       setEditingProgram(program)
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-[#F0EDE6] hover:bg-[#E2DDD2] text-[#1B4332] transition-colors text-xs font-bold cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/15 text-white transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-white/10"
                   >
                     ✏️ Edit
                   </button>
                   <button
                     onClick={() => setDeleteConfirmId(program.id)}
-                    className="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1"
+                    className="px-3 py-1 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-red-500/30"
                   >
                     🗑️ Delete
                   </button>
@@ -395,19 +395,19 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
               {/* Delete confirmation inline */}
               {deleteConfirmId === program.id && (
-                <div className="mb-3 p-3.5 bg-red-50 rounded-xl border border-red-200 animate-slide-up">
-                  <p className="text-xs font-bold text-red-700 mb-2.5">Are you sure you want to delete this program?</p>
+                <div className="mb-3 p-3.5 bg-red-500/20 rounded-2xl border border-red-400/40 animate-slide-up backdrop-blur-md">
+                  <p className="text-xs font-bold text-red-200 mb-2.5">Are you sure you want to delete this program?</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setDeleteConfirmId(null)}
-                      className="px-3.5 py-1.5 bg-white border border-[#E9E5DC] text-[#6B6158] rounded-lg text-xs font-bold hover:bg-gray-50 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-white/10 border border-white/20 text-white rounded-xl text-xs font-bold hover:bg-white/20 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => handleDeleteProgram(program.id)}
                       disabled={deleting}
-                      className="px-3.5 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 disabled:opacity-50 cursor-pointer shadow-md"
                     >
                       {deleting ? "Deleting..." : "Yes, Delete"}
                     </button>
@@ -415,22 +415,22 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 </div>
               )}
 
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#E9E5DC] text-center">
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center">
                 <div>
-                  <p className="font-display font-black text-[#1A1916] text-base">{stats?.activeCards ?? 0}</p>
-                  <p className="text-[#6B6158] text-[10px]">চলমান কার্ড</p>
+                  <p className="font-display font-black text-white text-base">{stats?.activeCards ?? 0}</p>
+                  <p className="text-white/40 text-[10px] font-medium">চলমান কার্ড</p>
                 </div>
                 <div>
-                  <p className="font-display font-black text-[#52B788] text-base">
+                  <p className="font-display font-black text-[#34D399] text-base">
                     {stats?.rewardsRedeemed ?? 0}
                   </p>
-                  <p className="text-[#6B6158] text-[10px]">সম্পন্ন রিডিম</p>
+                  <p className="text-white/40 text-[10px] font-medium">সম্পন্ন রিডিম</p>
                 </div>
                 <div>
                   <p className="font-display font-black text-[#F59E0B] text-base">
                     {stats?.stampsThisWeek ?? 0}
                   </p>
-                  <p className="text-[#6B6158] text-[10px]">এই সপ্তাহের সিল</p>
+                  <p className="text-white/40 text-[10px] font-medium">এই সপ্তাহের সিল</p>
                 </div>
               </div>
             </div>

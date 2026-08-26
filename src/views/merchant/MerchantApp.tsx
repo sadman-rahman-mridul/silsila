@@ -139,27 +139,27 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0] max-w-md mx-auto relative overflow-hidden">
-      <div className="flex-shrink-0 bg-[#1B4332] px-4 pt-2.5 pb-2 flex items-center justify-between border-b border-white/10">
+    <div className="flex flex-col h-full bg-transparent max-w-md mx-auto relative overflow-hidden">
+      <div className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl px-4 pt-3 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20">
         <button
           onClick={() => handleTabChange("home")}
-          className="flex items-center gap-2 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
+          className="flex items-center gap-2.5 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
           title="হোম ড্যাশবোর্ড"
         >
           {activeMerchant?.logoUrl ? (
-            <img src={activeMerchant.logoUrl} alt="Logo" className="w-6 h-6 rounded-lg object-cover border border-white/20 shadow-sm" />
+            <img src={activeMerchant.logoUrl} alt="Logo" className="w-7 h-7 rounded-xl object-cover border border-white/20 shadow-md" />
           ) : (
             <div
-              className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[10px] shadow-sm"
+              className="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shadow-md border border-white/15"
               style={{
-                backgroundColor: activeMerchant?.logoBg || "#D8EDDF",
-                color: activeMerchant?.logoColor || "#1B4332",
+                backgroundColor: activeMerchant?.logoBg || "#0D3824",
+                color: activeMerchant?.logoColor || "#34D399",
               }}
             >
               {activeMerchant?.logoInitials || "সি"}
             </div>
           )}
-          <span className="text-white font-bold text-xs group-hover:text-[#F59E0B] transition-colors truncate max-w-[110px]">
+          <span className="text-white font-bold text-sm group-hover:text-[#34D399] transition-colors truncate max-w-[120px] drop-shadow-xs">
             {activeMerchant?.name || "সিলসিলা"}
           </span>
         </button>
@@ -167,20 +167,20 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
         <div className="flex items-center gap-1.5">
           <button
             onClick={handleOpenAnalytics}
-            className="px-2 py-1 rounded-lg bg-white/10 text-white/80 text-xs font-medium hover:bg-white/20 transition-all cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl bg-white/10 text-white/80 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10"
           >
             📊 রিপোর্ট
           </button>
           <button
             onClick={handleOpenStaff}
-            className="px-2 py-1 rounded-lg bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-medium hover:bg-[#F59E0B]/30 transition-all cursor-pointer"
+            className="px-2.5 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer backdrop-blur-md shadow-xs"
           >
             👷 স্টাফ
           </button>
           <button
             onClick={handleLogout}
             title="লগ আউট করুন"
-            className="p-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs"
+            className="p-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs backdrop-blur-md"
           >
             <LogOutIcon size={14} />
           </button>
@@ -220,7 +220,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
         </div>
       </div>
 
-      <nav className="flex-shrink-0 bg-white border-t border-[#E9E5DC]">
+      <nav className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 shadow-2xl z-20">
         <div className="flex items-center justify-around py-1">
           <MerchantNavBtn
             icon={<ChartIcon size={22} />}
@@ -275,22 +275,19 @@ function MerchantNavBtn({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center pt-2 pb-1 px-2 relative min-w-[3.5rem] cursor-pointer"
+      className="flex flex-col items-center pt-2.5 pb-1 px-2 relative min-w-[3.5rem] cursor-pointer group active:scale-95 transition-all"
     >
       <div className="relative">
-        <span className={active ? "text-[#1B4332]" : "text-[#B0A99E]"}>{icon}</span>
-        {badge && badge > 0 ? (
-          <span className="absolute -top-1 -right-1.5 w-4 h-4 bg-[#F59E0B] rounded-full text-[9px] font-black text-[#1B4332] flex items-center justify-center animate-pulse">
+        <span className={`transition-colors ${active ? "text-[#34D399] drop-shadow-sm" : "text-white/40 group-hover:text-white/70"}`}>{icon}</span>
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute -top-1 -right-2 bg-[#F59E0B] text-[#0A2318] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
             {badge}
           </span>
-        ) : null}
+        )}
       </div>
-      <span className={`text-[10px] mt-0.5 font-medium ${active ? "text-[#1B4332] font-bold" : "text-[#B0A99E]"}`}>
+      <span className={`text-[10px] mt-1 font-semibold transition-colors ${active ? "text-[#34D399]" : "text-white/40 group-hover:text-white/70"}`}>
         {label}
       </span>
-      {active && (
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1B4332]" />
-      )}
     </button>
   )
 }

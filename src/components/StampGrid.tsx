@@ -3,16 +3,28 @@ interface StampGridProps {
   total: number
   size?: "sm" | "md" | "lg"
   showNumbers?: boolean
+  variant?: "coffee" | "stamp"
 }
 
-export default function StampGrid({ filled, total, size = "md", showNumbers = false }: StampGridProps) {
+export default function StampGrid({
+  filled,
+  total,
+  size = "md",
+  showNumbers = false,
+  variant = "coffee",
+}: StampGridProps) {
   const stamps = Array.from({ length: total }, (_, i) => i)
   const isLast = (i: number) => i === total - 1
 
-  const dim = size === "sm" ? "w-8 h-8 text-xs" : size === "lg" ? "w-14 h-14 text-base" : "w-10 h-10 text-sm"
+  const dim =
+    size === "sm"
+      ? "w-8 h-8 text-xs rounded-xl"
+      : size === "lg"
+      ? "w-14 h-14 text-xl rounded-2xl"
+      : "w-11 h-11 text-base rounded-2xl"
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {stamps.map((i) => {
         const isFilled = i < filled
         const isReward = isLast(i)
@@ -22,54 +34,49 @@ export default function StampGrid({ filled, total, size = "md", showNumbers = fa
             key={i}
             className={[
               dim,
-              "rounded-full flex items-center justify-center relative transition-all duration-300",
+              "flex items-center justify-center relative transition-all duration-300 shadow-md",
               isFilled
-                ? "bg-[#1B4332] shadow-sm"
+                ? isReward
+                  ? "bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-[#0A2318] glow-amber scale-105 border border-[#FDE68A]"
+                  : "bg-gradient-to-br from-[#10B981] to-[#047857] text-white glow-emerald border border-[#34D399]/40"
                 : isReward
-                ? "border-2 border-dashed border-[#F59E0B] bg-[#FFFBEB]"
-                : "border-2 border-dashed border-[#E9E5DC] bg-[#F7F5F0]",
+                ? "border-2 border-dashed border-[#F59E0B]/50 bg-[#F59E0B]/10 text-[#F59E0B]"
+                : "border border-white/15 bg-[#071D13] text-white/40",
             ].join(" ")}
+            title={`সিল ${i + 1} (${isFilled ? "সংগৃহীত" : "বাকি"})`}
           >
-            {isFilled && isReward ? (
-              <span className="text-[#F59E0B]">
-                <GiftSvg size={size === "sm" ? 14 : size === "lg" ? 20 : 16} />
+            {isReward ? (
+              <span className={isFilled ? "text-xl drop-shadow-sm animate-bounce" : "text-base opacity-70"}>
+                🎁
               </span>
             ) : isFilled ? (
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={size === "sm" ? "w-4 h-4" : size === "lg" ? "w-7 h-7" : "w-5 h-5"}
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : isReward ? (
-              <GiftSvg size={size === "sm" ? 14 : size === "lg" ? 20 : 16} color="#F59E0B" />
+              variant === "coffee" ? (
+                <span className="text-sm drop-shadow-sm animate-fade-in">☕</span>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={size === "sm" ? "w-4 h-4" : size === "lg" ? "w-7 h-7" : "w-5 h-5"}
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )
+            ) : variant === "coffee" ? (
+              <span className="text-sm opacity-25 grayscale select-none">☕</span>
             ) : showNumbers ? (
-              <span className="text-[#B0A99E] font-display font-semibold">{i + 1}</span>
+              <span className="text-white/40 font-display font-bold text-xs">{i + 1}</span>
             ) : null}
 
             {isFilled && (
-              <span className="absolute inset-0 rounded-full bg-[#52B788] opacity-0 hover:opacity-20 transition-opacity" />
+              <span className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 hover:opacity-100 transition-opacity" />
             )}
           </div>
         )
       })}
     </div>
-  )
-}
-
-function GiftSvg({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 12 20 22 4 22 4 12" />
-      <rect x="2" y="7" width="20" height="5" />
-      <line x1="12" y1="22" x2="12" y2="7" />
-      <path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" />
-      <path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" />
-    </svg>
   )
 }

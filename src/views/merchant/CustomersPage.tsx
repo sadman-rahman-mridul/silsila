@@ -107,26 +107,26 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
     active: { bg: "bg-[#D8EDDF]", text: "text-[#1B4332]", label: "সক্রিয়" },
     new: { bg: "bg-[#EDE9FE]", text: "text-[#5B21B6]", label: "নতুন" },
     completed: { bg: "bg-[#FEF3C7]", text: "text-[#B45309]", label: "সম্পন্ন" },
-    at_risk: { bg: "bg-red-50", text: "text-red-500", label: "ঝুঁকিতে" },
+    at_risk: { bg: "bg-red-500/20", text: "text-red-300", label: "ঝুঁকিতে" },
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
-      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
-        <h1 className="font-display text-xl font-bold text-white mb-2.5">কাস্টমার সিআরএম</h1>
+    <div className="flex flex-col h-full bg-transparent">
+      <div className="px-5 pt-4 pb-3">
+        <h1 className="font-display text-xl font-black text-white mb-2.5 drop-shadow-xs">কাস্টমার সিআরএম</h1>
         <div className="relative">
-          <SearchIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="নাম বা মোবাইল নম্বর খুঁজুন..."
-            className="w-full bg-white/10 border border-white/20 rounded-xl pl-9 pr-4 py-2 text-white placeholder-white/40 text-sm outline-none focus:border-[#52B788] transition-colors"
+            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-4 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 text-xs"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 text-xs hover:text-white cursor-pointer"
             >
               ✕
             </button>
@@ -134,14 +134,16 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
       </div>
 
-      <div className="bg-white border-b border-[#E9E5DC] px-4 py-2">
-        <div className="flex gap-1">
+      <div className="px-4 py-1">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setFilter(t.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
-                filter === t.key ? "bg-[#1B4332] text-white shadow-sm" : "text-[#6B6158] hover:bg-[#F7F5F0]"
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                filter === t.key
+                  ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
+                  : "bg-[#0E281C]/70 backdrop-blur-md text-white/70 border border-white/10 hover:text-white"
               }`}
             >
               {t.label}
@@ -150,28 +152,28 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24">
-        <div className="px-4 py-1">
+      <div className="flex-1 overflow-y-auto pb-24 px-4 pt-2">
+        <div>
           {error && (
-            <div className="mt-3 bg-red-50 border border-red-200 text-red-600 text-xs px-4 py-3 rounded-2xl">
+            <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
               ⚠️ {error}
             </div>
           )}
-          <p className="text-[#B0A99E] text-xs py-3">
+          <p className="text-white/50 text-xs py-2 font-medium">
             {loading ? "লোড হচ্ছে..." : `${customers.length} জন কাস্টমার পাওয়া গেছে`}
           </p>
 
           {loading ? (
-            <div className="py-12 text-center text-[#6B6158] text-sm">
+            <div className="py-12 text-center text-white/70 text-sm">
               <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
               <p>কাস্টমার তালিকা প্রস্তুত হচ্ছে...</p>
             </div>
           ) : customers.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 card-shadow text-center">
-              <p className="text-sm font-bold text-[#1A1916]">কোনো কাস্টমার পাওয়া যায়নি</p>
+            <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
+              <p className="text-sm font-bold text-white">কোনো কাস্টমার পাওয়া যায়নি</p>
             </div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {customers.map((customer) => {
                 const badge = statusBadge[customer.status] || statusBadge.active
                 const totalCups = target || 5
@@ -180,41 +182,41 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                   <div
                     key={customer.id}
                     onClick={() => setSelectedCustomer(customer)}
-                    className="bg-white rounded-2xl card-shadow p-4 cursor-pointer hover:border-[#1B4332]/30 border border-transparent transition-all"
+                    className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-2xl cursor-pointer hover:border-emerald-400/40 border border-white/10 transition-all active:scale-[0.99]"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-[#F0F7F2] flex items-center justify-center font-display font-black text-[#1B4332] text-lg flex-shrink-0">
+                      <div className="w-11 h-11 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg flex-shrink-0 shadow-sm">
                         {customer.name?.slice(0, 1) || "ক"}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="font-display font-bold text-[#1A1916] truncate">{customer.name}</p>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${badge.bg} ${badge.text}`}>
+                          <p className="font-display font-bold text-white truncate">{customer.name}</p>
+                          <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold flex-shrink-0 border border-white/10 ${badge.bg} ${badge.text}`}>
                             {badge.label}
                           </span>
                         </div>
-                        <p className="text-[#B0A99E] text-xs font-mono">{customer.phone}</p>
+                        <p className="text-white/50 text-xs font-mono">{customer.phone}</p>
 
                         <div className="flex items-center gap-4 mt-2.5">
                           <div className="text-center">
-                            <p className="font-display font-bold text-[#1B4332] text-base leading-none">
+                            <p className="font-display font-bold text-[#34D399] text-base leading-none">
                               {customer.stamps}{target ? `/${target}` : ""}
                             </p>
-                            <p className="text-[#B0A99E] text-[10px] mt-0.5">সিল</p>
+                            <p className="text-white/40 text-[10px] mt-0.5 font-medium">সিল</p>
                           </div>
                           <div className="text-center">
-                            <p className="font-display font-bold text-[#1A1916] text-base leading-none">
+                            <p className="font-display font-bold text-white text-base leading-none">
                               {customer.totalVisits}
                             </p>
-                            <p className="text-[#B0A99E] text-[10px] mt-0.5">ভিজিট</p>
+                            <p className="text-white/40 text-[10px] mt-0.5 font-medium">ভিজিট</p>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-[#1B4332] font-bold text-[10px]">অগ্রগতি</span>
-                              <span className="text-[#B0A99E] text-[10px]">{customer.lastVisit}</span>
+                              <span className="text-[#34D399] font-bold text-[10px]">অগ্রগতি</span>
+                              <span className="text-white/40 text-[10px]">{customer.lastVisit}</span>
                             </div>
                             {/* Coffee Cup Progress Animation */}
-                            <div className="flex items-center gap-1 bg-[#F7F5F0] px-2 py-1 rounded-xl border border-[#E9E5DC]">
+                            <div className="flex items-center gap-1 bg-[#071D13] px-2.5 py-1.5 rounded-xl border border-emerald-500/20">
                               {Array.from({ length: totalCups }).map((_, i) => {
                                 const isFilled = i < customer.stamps
                                 return (
@@ -231,14 +233,14 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                                   </span>
                                 )
                               })}
-                              <span className="text-[10px] font-bold text-[#1B4332] ml-auto">
+                              <span className="text-[10px] font-black text-[#34D399] ml-auto font-mono">
                                 {customer.stamps}/{totalCups}
                               </span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <ChevronRightIcon size={16} className="text-[#B0A99E] flex-shrink-0 mt-1" />
+                      <ChevronRightIcon size={16} className="text-white/30 flex-shrink-0 mt-1" />
                     </div>
                   </div>
                 )
@@ -247,17 +249,17 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
           )}
         </div>
 
-        {/* PDPA Compliant CSV Export Box (PRD E6.2) */}
-        <div className="mx-4 mt-4 p-4 rounded-2xl bg-[#F0F7F2] border border-[#52B788]/30 flex items-center justify-between shadow-sm">
+        {/* PDPA Compliant CSV Export Box */}
+        <div className="mt-4 p-4 rounded-3xl bg-[#0E281C]/85 backdrop-blur-xl border border-emerald-500/20 flex items-center justify-between shadow-2xl">
           <div>
-            <p className="font-bold text-[#1B4332] text-sm flex items-center gap-1.5">
-              <DownloadIcon size={15} /> PDPA সম্মত CSV এক্সপোর্ট
+            <p className="font-bold text-white text-sm flex items-center gap-1.5">
+              <DownloadIcon size={15} className="text-[#34D399]" /> PDPA সম্মত CSV এক্সপোর্ট
             </p>
-            <p className="text-[#6B6158] text-xs mt-0.5">কাস্টমার তালিকা সরাসরি স্প্রেডশিটে ডাউনলোড করুন</p>
+            <p className="text-white/60 text-xs mt-0.5">কাস্টমার তালিকা সরাসরি স্প্রেডশিটে ডাউনলোড করুন</p>
           </div>
           <button
             onClick={() => setShowExportModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-[#1B4332] text-white text-xs font-bold hover:bg-[#143427] transition-all"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black shadow-md glow-emerald cursor-pointer transition-all active:scale-95"
           >
             এক্সপোর্ট
           </button>
@@ -266,48 +268,48 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
 
       {/* Customer Detail Drawer / Modal */}
       {selectedCustomer && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full max-h-[85vh] overflow-y-auto animate-slide-up">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#F0F7F2] flex items-center justify-center font-display font-black text-[#1B4332] text-xl">
+                <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-[#34D399] text-xl shadow-md">
                   {selectedCustomer.name?.slice(0, 1)}
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-lg text-[#1A1916]">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-[#6B6158] font-mono">{selectedCustomer.phone}</p>
+                  <h3 className="font-display font-bold text-lg text-white">{selectedCustomer.name}</h3>
+                  <p className="text-xs text-white/50 font-mono">{selectedCustomer.phone}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold"
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 font-bold hover:bg-white/20 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 bg-[#F7F5F0] p-3 rounded-2xl mb-3 text-center">
+            <div className="grid grid-cols-3 gap-2 bg-[#071D13] p-3.5 rounded-2xl mb-3 text-center border border-white/10">
               <div>
-                <p className="font-display font-black text-[#1B4332] text-xl">
+                <p className="font-display font-black text-[#34D399] text-xl">
                   {selectedCustomer.stamps}{target ? `/${target}` : ""}
                 </p>
-                <p className="text-[10px] text-[#6B6158]">বর্তমান সিল</p>
+                <p className="text-[10px] text-white/50">বর্তমান সিল</p>
               </div>
               <div>
-                <p className="font-display font-black text-[#1A1916] text-xl">{selectedCustomer.totalVisits}</p>
-                <p className="text-[10px] text-[#6B6158]">মোট ভিজিট</p>
+                <p className="font-display font-black text-white text-xl">{selectedCustomer.totalVisits}</p>
+                <p className="text-[10px] text-white/50">মোট ভিজিট</p>
               </div>
               <div>
-                <p className="font-display font-black text-[#B45309] text-xl">
+                <p className="font-display font-black text-[#F59E0B] text-xl">
                   {selectedCustomer.status === "completed" ? "১" : "০"}
                 </p>
-                <p className="text-[10px] text-[#6B6158]">প্রস্তুত পুরস্কার</p>
+                <p className="text-[10px] text-white/50">প্রস্তুত পুরস্কার</p>
               </div>
             </div>
 
             {/* Coffee Cups Progress in Modal */}
-            <div className="bg-[#F0F7F2] border border-[#52B788]/30 rounded-2xl p-3.5 mb-4 text-center">
-              <p className="text-xs font-bold text-[#1B4332] mb-2">
+            <div className="bg-[#071D13] border border-emerald-500/20 rounded-2xl p-3.5 mb-4 text-center">
+              <p className="text-xs font-bold text-[#34D399] mb-2">
                 কফি কাপ অগ্রগতি ({selectedCustomer.stamps}/{target || 5} কাপ সম্পন্ন)
               </p>
               <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -318,8 +320,8 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                       key={i}
                       className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all duration-300 ${
                         isFilled
-                          ? "bg-[#1B4332] shadow-sm scale-105"
-                          : "bg-white border border-[#E9E5DC] opacity-30 grayscale"
+                          ? "bg-[#10B981]/30 border border-[#34D399] shadow-sm scale-105"
+                          : "bg-white/5 border border-white/10 opacity-30 grayscale"
                       }`}
                     >
                       ☕
@@ -329,28 +331,28 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               </div>
             </div>
 
-            <h4 className="font-bold text-[#1A1916] text-sm mb-2">সিল অর্জনের অডিট ট্রেইল:</h4>
+            <h4 className="font-bold text-white text-sm mb-2">সিল অর্জনের অডিট ট্রেইল:</h4>
             <div className="space-y-2 mb-6">
               {selectedCustomer.history && selectedCustomer.history.length > 0 ? (
                 selectedCustomer.history.map((h, idx) => (
-                  <div key={idx} className="bg-[#F7F5F0] p-3 rounded-xl flex items-center justify-between text-xs">
+                  <div key={idx} className="bg-[#071D13] border border-white/10 p-3 rounded-2xl flex items-center justify-between text-xs">
                     <div>
-                      <p className="font-bold text-[#1B4332]">সিল #{h.stampNo}</p>
-                      <p className="text-[#6B6158] text-[10px]">{h.date} · {h.time}</p>
+                      <p className="font-bold text-[#34D399]">সিল #{h.stampNo}</p>
+                      <p className="text-white/50 text-[10px]">{h.date} · {h.time}</p>
                     </div>
-                    <span className="bg-white px-2 py-1 rounded text-[10px] font-mono text-gray-600">
+                    <span className="bg-white/10 px-2.5 py-1 rounded-lg text-[10px] font-mono text-white/70">
                       স্টাফ: {h.staffId}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-[#B0A99E] py-2">কোনো বিস্তারিত হিস্টোরি সংরক্ষিত নেই</p>
+                <p className="text-xs text-white/40 py-2">কোনো বিস্তারিত হিস্টোরি সংরক্ষিত নেই</p>
               )}
             </div>
 
             <button
               onClick={() => setSelectedCustomer(null)}
-              className="w-full py-3 bg-[#1B4332] text-white font-bold rounded-xl text-sm"
+              className="w-full py-3 bg-[#34D399] text-[#0A2318] font-black rounded-2xl text-sm shadow-md active:scale-95 transition-all cursor-pointer"
             >
               বন্ধ করুন
             </button>
@@ -358,26 +360,26 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
       )}
 
-      {/* PDPA Export Confirmation Modal (PRD E6.2, §12.1) */}
+      {/* PDPA Export Confirmation Modal */}
       {showExportModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full card-shadow-md animate-slide-up">
-            <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center mx-auto mb-3 text-2xl">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-slide-up text-white">
+            <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center mx-auto mb-3 text-2xl shadow-md">
               📋
             </div>
-            <h3 className="font-display font-black text-xl text-[#1A1916] text-center mb-1">
+            <h3 className="font-display font-black text-xl text-white text-center mb-1">
               কাস্টমার ডেটা এক্সপোর্ট
             </h3>
-            <p className="text-xs text-[#6B6158] text-center mb-4 leading-relaxed">
+            <p className="text-xs text-white/60 text-center mb-4 leading-relaxed">
               বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ (PDPA) ও সিলসিলা পলিসি অনুযায়ী কাস্টমারদের ফোন নম্বর ও ইতিহাস শুধুমাত্র আপনার নিজস্ব দোকানের যোগাযোগের কাজে ব্যবহারযোগ্য।
             </p>
 
-            <label className="flex items-start gap-2 mb-6 cursor-pointer text-xs text-[#1A1916] bg-[#F7F5F0] p-3 rounded-xl border border-[#E9E5DC]">
+            <label className="flex items-start gap-2 mb-6 cursor-pointer text-xs text-white/80 bg-[#071D13] p-3 rounded-2xl border border-white/10">
               <input
                 type="checkbox"
                 checked={consentAcknowledged}
                 onChange={(e) => setConsentAcknowledged(e.target.checked)}
-                className="mt-0.5 rounded text-[#1B4332] focus:ring-0"
+                className="mt-0.5 rounded text-[#34D399] focus:ring-0"
               />
               <span className="font-medium">
                 আমি স্বীকার করছি যে এই গ্রাহক ডেটা তৃতীয় পক্ষের কাছে বিক্রয় বা অননুমোদিত শেয়ার করা হবে না।
@@ -387,14 +389,14 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
             <div className="flex gap-2">
               <button
                 onClick={() => setShowExportModal(false)}
-                className="flex-1 py-3 bg-[#F0EDE6] text-[#6B6158] rounded-xl text-xs font-bold"
+                className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white rounded-2xl text-xs font-bold cursor-pointer"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleExportCsv}
                 disabled={!consentAcknowledged || exporting}
-                className="flex-1 py-3 bg-[#1B4332] text-white rounded-xl text-xs font-bold disabled:opacity-40"
+                className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] rounded-2xl text-xs font-black disabled:opacity-40 shadow-md glow-emerald cursor-pointer"
               >
                 {exporting ? "ডাউনলোড হচ্ছে..." : "CSV ডাউনলোড"}
               </button>

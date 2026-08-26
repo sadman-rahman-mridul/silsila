@@ -200,20 +200,20 @@ export default function MerchantDashboard({
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
+    <div className="flex flex-col h-full bg-transparent">
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-4">
         {/* Pending Approvals */}
         {approvals.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-[#1A1916] text-lg flex items-center gap-2">
+              <h2 className="font-display font-bold text-white text-lg flex items-center gap-2 drop-shadow-xs">
                 অনুমোদন প্রয়োজন
-                <span className="bg-[#F59E0B] text-[#1B4332] text-xs font-black w-6 h-6 rounded-full flex items-center justify-center animate-pulse">
+                <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black w-6 h-6 rounded-full flex items-center justify-center animate-pulse shadow-md">
                   {approvals.length}
                 </span>
               </h2>
-              <span className="text-[#6B6158] text-xs">মেয়াদ: ৩০ মিনিট</span>
+              <span className="text-white/60 text-xs font-medium">মেয়াদ: ৩০ মিনিট</span>
             </div>
 
             <div className="space-y-3">
@@ -224,27 +224,27 @@ export default function MerchantDashboard({
                 return (
                   <div
                     key={approval.id}
-                    className={`bg-white rounded-2xl card-shadow overflow-hidden transition-all duration-300 ${
+                    className={`bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${
                       isApproved
-                        ? "border-2 border-[#52B788] bg-green-50/50"
+                        ? "border-[#34D399] bg-[#10B981]/15"
                         : isRejected
-                        ? "border-2 border-red-300 opacity-50"
-                        : ""
+                        ? "border-red-400/40 opacity-50"
+                        : "border-emerald-500/30"
                     }`}
                   >
                     <div className="p-4">
                       <div className="flex items-start gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-xl bg-[#F0F7F2] flex items-center justify-center font-display font-black text-lg text-[#1B4332] flex-shrink-0">
+                        <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#34D399] flex-shrink-0">
                           {approval.customerName?.slice(0, 1) || "ক"}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-display font-bold text-[#1A1916] text-lg leading-tight">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-white text-lg leading-tight truncate">
                             {approval.customerName}
                           </p>
-                          <p className="text-[#6B6158] text-sm">{approval.customerPhone}</p>
+                          <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[#B0A99E] text-xs">{approval.scannedAt || "এইমাত্র"}</span>
-                            <span className="text-[#1B4332] text-xs font-medium bg-[#D8EDDF] px-2 py-0.5 rounded-full">
+                            <span className="text-white/40 text-[11px]">{approval.scannedAt || "এইমাত্র"}</span>
+                            <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full">
                               📍 {dist}মি. দূরত্বে
                             </span>
                           </div>
@@ -252,28 +252,28 @@ export default function MerchantDashboard({
                       </div>
 
                       {isApproved ? (
-                        <div className="flex items-center justify-center gap-2 py-3 bg-[#D8EDDF] rounded-xl text-[#1B4332] font-bold">
+                        <div className="flex items-center justify-center gap-2 py-3 bg-[#10B981]/20 border border-[#10B981]/40 rounded-2xl text-[#34D399] font-bold">
                           ✓ সিল দেওয়া সম্পন্ন!
                         </div>
                       ) : isRejected ? (
-                        <div className="flex items-center justify-center gap-2 py-3 bg-red-50 rounded-xl text-red-500 font-medium">
+                        <div className="flex items-center justify-center gap-2 py-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 font-medium">
                           প্রত্যাখ্যান করা হয়েছে
                         </div>
                       ) : (
                         <div className="flex gap-3">
                           <button
                             onClick={() => handleReject(approval.id)}
-                            className="flex-1 py-3.5 rounded-xl border-2 border-[#E9E5DC] flex items-center justify-center gap-2 text-[#6B6158] font-semibold transition-all active:scale-[0.97] hover:border-red-300 hover:text-red-500 cursor-pointer"
+                            className="flex-1 py-3.5 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-center gap-1.5 text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-300 cursor-pointer text-xs"
                           >
-                            <XIcon size={18} />
+                            <XIcon size={16} />
                             <span>বাতিল</span>
                           </button>
                           <button
                             onClick={() => handleApprove(approval.id)}
-                            className="flex-[2] py-3.5 rounded-xl bg-[#1B4332] flex items-center justify-center gap-2 text-white font-bold transition-all active:scale-[0.97] shadow-md hover:bg-[#143427] cursor-pointer"
+                            className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
                           >
-                            <CheckIcon size={20} />
-                            <span className="font-display text-lg">সিল দিন ✓</span>
+                            <CheckIcon size={18} />
+                            <span className="font-display text-base">সিল দিন ✓</span>
                           </button>
                         </div>
                       )}
@@ -286,10 +286,10 @@ export default function MerchantDashboard({
         )}
 
         {approvals.length === 0 && (
-          <div className="mx-4 mt-4 bg-white rounded-2xl p-6 card-shadow text-center border border-[#E9E5DC]">
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
             <span className="text-3xl mb-2 block">✅</span>
-            <p className="font-display font-bold text-[#1A1916]">সব অনুমোদন সম্পন্ন</p>
-            <p className="text-[#6B6158] text-xs mt-1">
+            <p className="font-display font-bold text-white text-base">সব অনুমোদন সম্পন্ন</p>
+            <p className="text-white/60 text-xs mt-1 leading-relaxed">
               কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে
             </p>
           </div>
@@ -297,93 +297,89 @@ export default function MerchantDashboard({
 
         {/* Active Loyalty Program */}
         {program && (
-          <div className="px-4 mt-4">
-            <div className="bg-white rounded-2xl card-shadow overflow-hidden border border-[#E9E5DC]">
-              <div className="px-4 py-3 border-b border-[#E9E5DC] flex items-center justify-between">
-                <h2 className="font-display font-bold text-[#1A1916]">সক্রিয় লয়্যালটি প্রোগ্রাম</h2>
-                <span className="bg-[#D8EDDF] text-[#1B4332] text-xs px-2.5 py-1 rounded-full font-bold">সক্রিয়</span>
+          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-emerald-500/20">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+              <h2 className="font-display font-bold text-white text-sm">সক্রিয় লয়্যালটি প্রোগ্রাম</h2>
+              <span className="bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 text-xs px-2.5 py-0.5 rounded-full font-bold">সক্রিয়</span>
+            </div>
+            <div className="p-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
+                🎁
               </div>
-              <div className="p-4 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-2xl flex-shrink-0">
-                  🎁
-                </div>
-                <div className="flex-1">
-                  <p className="text-[#1A1916] font-bold text-sm">{program.rewardText}</p>
-                  <p className="text-[#6B6158] text-xs mt-0.5">
-                    {program.target}টি সিলে সম্পূর্ণ — {program.expiryDays} দিনের মেয়াদ
-                  </p>
-                </div>
+              <div className="flex-1">
+                <p className="text-white font-bold text-sm">{program.rewardText}</p>
+                <p className="text-white/60 text-xs mt-0.5">
+                  {program.target}টি সিলে সম্পূর্ণ — {program.expiryDays} দিনের মেয়াদ
+                </p>
               </div>
             </div>
           </div>
         )}
 
         {/* Counter QR Code & Download */}
-        <div className="px-4 mt-4">
-          <div className="bg-white rounded-2xl card-shadow overflow-hidden border border-[#E9E5DC]">
-            <div className="px-4 py-3 border-b border-[#E9E5DC] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#D8EDDF] text-[#1B4332] flex items-center justify-center">
-                  <QRIcon size={16} />
-                </div>
-                <h2 className="font-display font-bold text-[#1A1916] text-sm">কাউন্টার QR কোড</h2>
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-emerald-500/20">
+          <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center">
+                <QRIcon size={16} />
               </div>
-              {qrDisplayLink && (
-                <span className="text-[#52B788] text-[11px] font-mono font-bold">
-                  {qrDisplayLink}
-                </span>
-              )}
+              <h2 className="font-display font-bold text-white text-sm">কাউন্টার QR কোড</h2>
             </div>
+            {qrDisplayLink && (
+              <span className="text-[#34D399] text-[11px] font-mono font-bold">
+                {qrDisplayLink}
+              </span>
+            )}
+          </div>
 
-            <div className="p-4">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                {/* QR Code Canvas/Image */}
-                <div className="w-32 h-32 bg-white rounded-2xl p-2 border border-gray-200 shadow-inner flex items-center justify-center flex-shrink-0">
-                  {dashboardQrDataUrl ? (
-                    <img
-                      src={dashboardQrDataUrl}
-                      alt="Counter QR Code"
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="text-[#B0A99E] text-xs font-mono">তৈরি হচ্ছে...</div>
-                  )}
-                </div>
+          <div className="p-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {/* QR Code Canvas/Image */}
+              <div className="w-32 h-32 bg-white rounded-2xl p-2 shadow-2xl flex items-center justify-center flex-shrink-0">
+                {dashboardQrDataUrl ? (
+                  <img
+                    src={dashboardQrDataUrl}
+                    alt="Counter QR Code"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="text-gray-400 text-xs font-mono">তৈরি হচ্ছে...</div>
+                )}
+              </div>
 
-                <div className="flex-1 space-y-2 text-center sm:text-left">
-                  <p className="font-bold text-[#1A1916] text-sm">
-                    {merchantName || "আপনার দোকান"} QR কোড
-                  </p>
-                  <p className="text-xs text-[#6B6158] leading-relaxed">
-                    কাস্টমারদের স্ক্যান করতে এটি ক্যাশ কাউন্টারে প্রিন্ট করে রাখুন।
-                  </p>
+              <div className="flex-1 space-y-2 text-center sm:text-left">
+                <p className="font-bold text-white text-sm">
+                  {merchantName || "আপনার দোকান"} QR কোড
+                </p>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  কাস্টমারদের স্ক্যান করতে এটি ক্যাশ কাউন্টারে প্রিন্ট করে রাখুন।
+                </p>
 
-                  {/* Toast notification */}
-                  {qrDownloadedToast && (
-                    <div className="bg-[#D8EDDF] border border-[#52B788] text-[#1B4332] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 justify-center sm:justify-start animate-fade-in">
-                      <CheckIcon size={14} />
-                      <span>QR কোড সফলভাবে ডাউনলোড হয়েছে!</span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
-                    <button
-                      onClick={handleDownloadCounterQr}
-                      disabled={downloadingQr || !dashboardQrDataUrl}
-                      className="px-4 py-2.5 bg-[#1B4332] hover:bg-[#143427] text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-                    >
-                      <DownloadIcon size={14} />
-                      <span>{downloadingQr ? "ডাউনলোড হচ্ছে..." : "QR ডাউনলোড (HD PNG)"}</span>
-                    </button>
-
-                    <button
-                      onClick={handleCopyStoreLink}
-                      className="px-3.5 py-2.5 border border-[#E9E5DC] bg-[#F7F5F0] hover:bg-white text-[#1A1916] text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                    >
-                      {copiedLink ? <CheckIcon size={14} className="text-[#52B788]" /> : <CopyIcon size={14} />}
-                      <span>{copiedLink ? "লিংক কপি হয়েছে!" : "লিংক কপি"}</span>
-                    </button>
+                {/* Toast notification */}
+                {qrDownloadedToast && (
+                  <div className="bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 justify-center sm:justify-start animate-fade-in backdrop-blur-md">
+                    <CheckIcon size={14} />
+                    <span>QR কোড সফলভাবে ডাউনলোড হয়েছে!</span>
                   </div>
+                )}
+
+                <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
+                  <button
+                    onClick={handleDownloadCounterQr}
+                    disabled={downloadingQr || !dashboardQrDataUrl}
+                    className="px-4 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                  >
+                    <DownloadIcon size={14} />
+                    <span>{downloadingQr ? "ডাউনলোড হচ্ছে..." : "QR ডাউনলোড (HD PNG)"}</span>
+                  </button>
+
+                  <button
+                    onClick={handleCopyStoreLink}
+                    className="px-3.5 py-2.5 border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 backdrop-blur-md"
+                  >
+                    {copiedLink ? <CheckIcon size={14} className="text-[#34D399]" /> : <CopyIcon size={14} />}
+                    <span>{copiedLink ? "লিংক কপি হয়েছে!" : "লিংক কপি"}</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -391,21 +387,19 @@ export default function MerchantDashboard({
         </div>
 
         {/* View Customers */}
-        <div className="px-4 mt-4">
-          <button
-            onClick={onViewCustomers}
-            className="w-full bg-white rounded-2xl card-shadow p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:bg-[#FAFAF8] border border-[#E9E5DC] cursor-pointer"
-          >
-            <div className="w-12 h-12 rounded-xl bg-[#F0F7F2] flex items-center justify-center">
-              <UsersIcon size={20} className="text-[#1B4332]" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="font-display font-bold text-[#1A1916]">কাস্টমার সিআরএম (CRM)</p>
-              <p className="text-[#6B6158] text-xs mt-0.5">গ্রাহকের তালিকা ও ডেটা এক্সপোর্ট</p>
-            </div>
-            <span className="text-[#B0A99E] font-bold">→</span>
-          </button>
-        </div>
+        <button
+          onClick={onViewCustomers}
+          className="w-full bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:border-emerald-400/40 border border-white/10 cursor-pointer group"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center shadow-md">
+            <UsersIcon size={20} className="text-[#34D399]" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="font-display font-bold text-white group-hover:text-[#34D399] transition-colors">কাস্টমার সিআরএম (CRM)</p>
+            <p className="text-white/60 text-xs mt-0.5">গ্রাহকের তালিকা ও ডেটা এক্সপোর্ট</p>
+          </div>
+          <span className="text-[#34D399] font-bold text-lg group-hover:translate-x-1 transition-transform">→</span>
+        </button>
       </div>
     </div>
   )

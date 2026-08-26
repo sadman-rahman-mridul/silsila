@@ -95,7 +95,7 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
   const showCard = !!selectedMerchantId
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0] max-w-md mx-auto relative overflow-hidden">
+    <div className="flex flex-col h-full bg-transparent max-w-md mx-auto relative overflow-hidden">
       <div className="flex-1 overflow-hidden relative">
         {showCard ? (
           <div className="absolute inset-0 overflow-y-auto">
@@ -124,19 +124,19 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
       </div>
 
       {!showCard && (
-        <nav className="flex-shrink-0 bg-white border-t border-[#E9E5DC] px-2 pb-safe safe-area-inset-bottom" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+        <nav className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           <div className="flex items-center justify-around">
             <NavBtn icon={<HomeIcon size={22} />} label="হোম" active={tab === "home"} onClick={() => handleTabChange("home")} />
             <NavBtn icon={<CompassIcon size={22} />} label="খুঁজুন" active={tab === "explore"} onClick={() => handleTabChange("explore")} />
 
             <button
               onClick={() => handleTabChange("scan")}
-              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform"
+              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${tab === "scan" ? "bg-[#F59E0B]" : "bg-[#1B4332]"}`}>
-                <ScanIcon size={24} className="text-white" />
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all ${tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
+                <ScanIcon size={24} className="text-[#071D13]" />
               </div>
-              <span className={`text-[10px] mt-1 font-medium ${tab === "scan" ? "text-[#F59E0B]" : "text-[#6B6158]"}`}>স্ক্যান</span>
+              <span className={`text-[10px] mt-1 font-bold ${tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>স্ক্যান</span>
             </button>
 
             <NavBtn icon={<GiftIcon size={22} />} label="পুরস্কার" active={tab === "rewards"} onClick={() => handleTabChange("rewards")} badge={readyRewardsCount > 0 ? readyRewardsCount : undefined} />
@@ -164,22 +164,19 @@ function NavBtn({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center pt-2 pb-1 px-3 relative"
+      className="flex flex-col items-center pt-2.5 pb-1 px-3 relative cursor-pointer group active:scale-95 transition-all"
     >
       <div className="relative">
-        <span className={active ? "text-[#1B4332]" : "text-[#B0A99E]"}>{icon}</span>
-        {badge && badge > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F59E0B] rounded-full text-[9px] font-bold text-[#1B4332] flex items-center justify-center">
+        <span className={`transition-colors ${active ? "text-[#34D399] drop-shadow-sm" : "text-white/40 group-hover:text-white/70"}`}>{icon}</span>
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute -top-1 -right-2 bg-[#F59E0B] text-[#0A2318] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
             {badge}
           </span>
         )}
       </div>
-      <span className={`text-[10px] mt-0.5 font-medium ${active ? "text-[#1B4332]" : "text-[#B0A99E]"}`}>
+      <span className={`text-[10px] mt-1 font-semibold transition-colors ${active ? "text-[#34D399]" : "text-white/40 group-hover:text-white/70"}`}>
         {label}
       </span>
-      {active && (
-        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1B4332]" />
-      )}
     </button>
   )
 }

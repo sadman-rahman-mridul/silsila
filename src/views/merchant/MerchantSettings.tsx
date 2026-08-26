@@ -372,19 +372,19 @@ export default function MerchantSettings({
   const swipeHandlers = useSwipeBack(onBack)
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
+    <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
       {/* Header */}
-      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
+      <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-white">সেটিংস</h1>
-            <p className="text-[#52B788] text-xs mt-0.5">লোগো, ব্র্যান্ডিং ও দোকান কনফিগারেশন</p>
+            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">সেটিংস</h1>
+            <p className="text-[#34D399] text-xs font-semibold mt-0.5">লোগো, ব্র্যান্ডিং ও দোকান কনফিগারেশন</p>
           </div>
 
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2.5 bg-[#F59E0B] hover:bg-[#E58E00] text-[#1B4332] font-black text-xs rounded-xl shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-black text-xs rounded-xl shadow-lg glow-amber active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             {saving ? (
               <>
@@ -403,42 +403,42 @@ export default function MerchantSettings({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2 space-y-4">
         {saved && (
-          <div className="bg-[#D8EDDF] border border-[#52B788] text-[#1B4332] px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-fade-in shadow-xs">
-            <CheckIcon size={16} className="text-[#1B4332]" />
+          <div className="bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-fade-in shadow-md backdrop-blur-md">
+            <CheckIcon size={16} className="text-[#34D399]" />
             <span>সেটিংস ডাটাবেজে সফলভাবে আপডেট হয়েছে!</span>
           </div>
         )}
 
         {loading && (
-          <div className="text-center py-8 text-[#6B6158] text-sm">
+          <div className="text-center py-8 text-white/70 text-sm">
             <span className="inline-block animate-spin mr-1">⏳</span> লোড হচ্ছে...
           </div>
         )}
 
         {/* 1. Logo Customizer */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-[#E9E5DC]">
-            <div className="w-8 h-8 rounded-xl bg-[#D8EDDF] flex items-center justify-center text-[#1B4332]">
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
+          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
+            <div className="w-8 h-8 rounded-xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center text-[#34D399]">
               <SparklesIcon size={16} />
             </div>
             <div>
-              <h2 className="font-display font-bold text-[#1A1916] text-base">লোগো কাস্টমাইজার</h2>
-              <p className="text-xs text-[#6B6158]">লোগো পরিবর্তন করুন ও লাইভ প্রিভিউ দেখুন</p>
+              <h2 className="font-display font-bold text-white text-base">লোগো কাস্টমাইজার</h2>
+              <p className="text-xs text-white/60">লোগো পরিবর্তন করুন ও লাইভ প্রিভিউ দেখুন</p>
             </div>
           </div>
 
           {/* Logo Preview & Upload */}
-          <div className="p-4 bg-[#F7F5F0] rounded-2xl border border-[#E9E5DC] mb-4">
+          <div className="p-4 bg-[#071D13] rounded-2xl border border-white/10 mb-4">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative">
                 <div
-                  className="w-20 h-20 rounded-2xl flex items-center justify-center font-display font-black text-2xl shadow-md border-2 overflow-hidden transition-all"
+                  className="w-20 h-20 rounded-2xl flex items-center justify-center font-display font-black text-2xl shadow-xl border-2 overflow-hidden transition-all bg-[#0A2318]"
                   style={{
-                    backgroundColor: merchant?.logoBg || "#D8EDDF",
-                    color: merchant?.logoColor || "#1B4332",
-                    borderColor: merchant?.logoColor || "#1B4332",
+                    backgroundColor: merchant?.logoBg || "#0D3824",
+                    color: merchant?.logoColor || "#34D399",
+                    borderColor: merchant?.logoColor || "#34D399",
                   }}
                 >
                   {logoUrl ? (
@@ -458,11 +458,11 @@ export default function MerchantSettings({
               </div>
 
               <div className="flex-1 space-y-2 text-center sm:text-left">
-                <p className="font-bold text-[#1A1916] text-sm">দোকানের লোগো নির্বাচন করুন</p>
-                <p className="text-xs text-[#6B6158]">
+                <p className="font-bold text-white text-sm">দোকানের লোগো নির্বাচন করুন</p>
+                <p className="text-xs text-white/60">
                   ব্র্যান্ড লোগো ফাইল আপলোড করুন অথবা সংক্ষেপ অক্ষর ব্যবহার করুন।
                 </p>
-                <div className="p-2.5 bg-[#FEF3C7]/60 border border-[#F59E0B]/30 rounded-xl text-[11px] text-[#92400E] font-medium">
+                <div className="p-2.5 bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl text-[11px] text-amber-200 font-medium">
                   📌 নোট: লোগো ফাইলের আকার ৫০০ KB এর নিচে হতে হবে (PNG, JPG, WebP)
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
@@ -476,14 +476,14 @@ export default function MerchantSettings({
                   />
                   <label
                     htmlFor="logo-file-input"
-                    className="px-4 py-2 bg-[#1B4332] hover:bg-[#143427] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 transition-all active:scale-95"
+                    className="px-4 py-2 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center gap-1.5 transition-all active:scale-95"
                   >
                     📁 নতুন লোগো আপলোড
                   </label>
                   {logoUrl && (
                     <button
                       onClick={handleRemoveLogoImage}
-                      className="px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                      className="px-3 py-2 border border-red-400/40 text-red-300 hover:bg-red-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
                     >
                       ছবি বাদ দিন
                     </button>
@@ -494,8 +494,8 @@ export default function MerchantSettings({
           </div>
 
           {/* Initials only */}
-          <div className="mb-4">
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+          <div className="mb-2">
+            <label className="text-white/70 text-xs font-semibold block mb-1">
               লোগো অক্ষর (১-৩ অক্ষর)
             </label>
             <input
@@ -504,33 +504,33 @@ export default function MerchantSettings({
               value={logoInitials}
               onChange={(e) => setLogoInitials(e.target.value)}
               placeholder="যেমন: কহ"
-              className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#1A1916] outline-none focus:border-[#1B4332]"
+              className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none focus:border-[#34D399]"
             />
           </div>
         </div>
 
-        {/* 2. Cover Photo / Banner (< 1 MB with Cropper) */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-[#E9E5DC]">
-            <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-[#92400E]">
+        {/* 2. Cover Photo / Banner */}
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
+          <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
+            <div className="w-8 h-8 rounded-xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 flex items-center justify-center text-[#F59E0B]">
               🖼️
             </div>
             <div>
-              <h2 className="font-display font-bold text-[#1A1916] text-base">কভার ফটো ও ব্যানার</h2>
-              <p className="text-xs text-[#6B6158]">খুঁজুন পেজ ও স্টোর পেজে প্রদর্শিত ব্যানার ছবি</p>
+              <h2 className="font-display font-bold text-white text-base">কভার ফটো ও ব্যানার</h2>
+              <p className="text-xs text-white/60">খুঁজুন পেজ ও স্টোর পেজে প্রদর্শিত ব্যানার ছবি</p>
             </div>
           </div>
 
           <div className="space-y-4">
             {/* Banner Preview */}
-            <div className="h-36 rounded-2xl overflow-hidden relative bg-[#1B4332] border-2 border-[#E9E5DC] shadow-inner flex items-center justify-center">
+            <div className="h-36 rounded-2xl overflow-hidden relative bg-[#071D13] border border-white/10 shadow-inner flex items-center justify-center">
               {coverUrl ? (
                 <img src={coverUrl} alt="Store Cover" className="w-full h-full object-cover" />
               ) : (
                 <div className="text-center p-4">
                   <p className="text-3xl mb-1 opacity-50">🏞️</p>
                   <p className="text-white/80 text-xs font-semibold">কোনো কভার ছবি আপলোড করা হয়নি</p>
-                  <p className="text-white/50 text-[11px]">খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে</p>
+                  <p className="text-white/40 text-[11px]">খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে</p>
                 </div>
               )}
 
@@ -544,9 +544,9 @@ export default function MerchantSettings({
               )}
             </div>
 
-            <div className="p-3 bg-[#F0F7F2] rounded-xl border border-[#52B788]/30 flex items-start gap-2">
+            <div className="p-3 bg-[#071D13] rounded-xl border border-white/10 flex items-start gap-2">
               <span className="text-sm">📌</span>
-              <p className="text-xs text-[#1B4332]">
+              <p className="text-xs text-[#34D399]">
                 <strong>নিয়মাবলী:</strong> কভার ছবির সাইজ অবশ্যই ১ MB এর নিচে হতে হবে। আপলোডের আগে ক্রপ ও পজিশন ঠিক করে নিন।
               </p>
             </div>
@@ -562,7 +562,7 @@ export default function MerchantSettings({
               />
               <label
                 htmlFor="cover-file-input"
-                className="flex-1 py-3 bg-[#1B4332] hover:bg-[#143427] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-95 text-center"
+                className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-95 text-center"
               >
                 📸 নতুন কভার ফটো নির্বাচন ও ক্রপ
               </label>
@@ -570,7 +570,7 @@ export default function MerchantSettings({
               {coverUrl && (
                 <button
                   onClick={handleRemoveCoverImage}
-                  className="px-4 py-3 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+                  className="px-4 py-3 border border-red-400/40 text-red-300 hover:bg-red-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
                 >
                   ছবি মুছুন
                 </button>
@@ -580,13 +580,13 @@ export default function MerchantSettings({
         </div>
 
         {/* 3. Business Details */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <h2 className="font-display font-bold text-[#1A1916] text-base mb-3">ব্যবসার বিবরণ</h2>
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
+          <h2 className="font-display font-bold text-white text-base mb-3">ব্যবসার বিবরণ</h2>
 
           <div className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+                <label className="text-white/70 text-xs font-semibold block mb-1">
                   ব্যবসার নাম (বাংলা) *
                 </label>
                 <input
@@ -594,12 +594,12 @@ export default function MerchantSettings({
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder="আপনার দোকানের নাম"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-sm text-[#1A1916] font-bold outline-none focus:border-[#1B4332]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm text-white font-bold outline-none focus:border-[#34D399]"
                 />
               </div>
 
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+                <label className="text-white/70 text-xs font-semibold block mb-1">
                   English Name (QR Slug URL) *
                 </label>
                 <input
@@ -607,23 +607,23 @@ export default function MerchantSettings({
                   value={businessNameEn}
                   onChange={(e) => setBusinessNameEn(e.target.value)}
                   placeholder="e.g. My Coffee Shop"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-sm text-[#1A1916] font-medium outline-none focus:border-[#1B4332]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm text-white font-medium outline-none focus:border-[#34D399]"
                 />
               </div>
             </div>
 
-            {/* Category — updated list */}
+            {/* Category */}
             <div>
-              <label className="text-[#6B6158] text-xs font-semibold block mb-1.5">ক্যাটাগরি</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">ক্যাটাগরি</label>
               <div className="flex flex-wrap gap-1.5">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       category === cat
-                        ? "bg-[#1B4332] text-white shadow-xs"
-                        : "bg-[#F7F5F0] text-[#6B6158] border border-[#E9E5DC]"
+                        ? "bg-[#34D399] text-[#0A2318] shadow-xs glow-emerald"
+                        : "bg-[#071D13] text-white/70 border border-white/10"
                     }`}
                   >
                     {cat}
@@ -633,19 +633,19 @@ export default function MerchantSettings({
             </div>
 
             {/* Open/Closed toggle */}
-            <div className="flex items-center justify-between py-2">
+            <div className="flex items-center justify-between py-2 border-t border-b border-white/10">
               <div>
-                <p className="text-[#1A1916] text-sm font-semibold">এখন খোলা আছে?</p>
-                <p className="text-[#6B6158] text-xs">কাস্টমাররা লাইভ স্ট্যাটাস দেখতে পাবেন</p>
+                <p className="text-white text-sm font-bold">এখন খোলা আছে?</p>
+                <p className="text-white/50 text-xs">কাস্টমাররা লাইভ স্ট্যাটাস দেখতে পাবেন</p>
               </div>
               <button
                 onClick={() => setIsOpen((v) => !v)}
                 className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
-                  isOpen ? "bg-[#1B4332]" : "bg-[#E9E5DC]"
+                  isOpen ? "bg-[#34D399]" : "bg-white/20"
                 }`}
               >
                 <span
-                  className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                  className={`absolute top-1 w-4 h-4 bg-[#0A2318] rounded-full shadow transition-transform ${
                     isOpen ? "translate-x-7" : "translate-x-1"
                   }`}
                 />
@@ -654,7 +654,7 @@ export default function MerchantSettings({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+                <label className="text-white/70 text-xs font-semibold block mb-1">
                   যোগাযোগ ফোন নম্বর
                 </label>
                 <input
@@ -662,12 +662,12 @@ export default function MerchantSettings({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="01XXXXXXXXX"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1916] font-medium outline-none focus:border-[#1B4332]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-xs text-white font-medium outline-none focus:border-[#34D399]"
                 />
               </div>
 
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+                <label className="text-white/70 text-xs font-semibold block mb-1">
                   <ClockIcon size={12} className="inline mr-1" />
                   খোলার সময়সূচি
                 </label>
@@ -676,30 +676,30 @@ export default function MerchantSettings({
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                   placeholder="যেমন: সকাল ৯টা – রাত ১০টা"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1916] font-medium outline-none focus:border-[#1B4332]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-xs text-white font-medium outline-none focus:border-[#34D399]"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* 3. Address & Geofence */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <h2 className="font-display font-bold text-[#1A1916] text-base mb-3 flex items-center gap-2">
-            <MapPinIcon size={16} className="text-[#1B4332]" />
+        {/* 4. Address & Geofence */}
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
+          <h2 className="font-display font-bold text-white text-base mb-3 flex items-center gap-2">
+            <MapPinIcon size={16} className="text-[#34D399]" />
             ঠিকানা ও জিওফেন্স সুরক্ষা
           </h2>
 
-          <div className="p-3.5 bg-[#F7F5F0] rounded-2xl mb-3 border border-[#E9E5DC]">
+          <div className="p-3.5 bg-[#071D13] rounded-2xl mb-3 border border-white/10">
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="বাড়ি নম্বর, রোড, এলাকা, শহর"
-              className="w-full bg-transparent text-[#1A1916] text-xs font-medium outline-none mb-1.5"
+              className="w-full bg-transparent text-white text-xs font-medium outline-none mb-1.5 placeholder-white/30"
             />
             {lat !== null && lng !== null && (
-              <p className="text-[#B0A99E] text-[11px] font-mono">
+              <p className="text-[#34D399] text-[11px] font-mono">
                 অক্ষাংশ: {lat}°, দ্রাঘিমাংশ: {lng}°
               </p>
             )}
@@ -707,87 +707,42 @@ export default function MerchantSettings({
 
           <button
             onClick={handleUseCurrentLocation}
-            className="w-full py-2.5 rounded-xl border border-[#1B4332] text-[#1B4332] text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#F0F7F2] transition-colors cursor-pointer"
+            className="w-full py-2.5 rounded-xl border border-[#34D399] text-[#34D399] bg-[#34D399]/10 text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#34D399]/20 transition-colors cursor-pointer"
           >
             <MapPinIcon size={14} />
             বর্তমান GPS অবস্থান সিঙ্ক করুন
           </button>
 
-          <div className="mt-3 p-3 bg-[#F0F7F2] rounded-xl border border-[#52B788]/30">
-            <p className="text-[#1B4332] text-xs font-semibold">
+          <div className="mt-3 p-3 bg-[#071D13] rounded-xl border border-white/10">
+            <p className="text-[#34D399] text-xs font-bold">
               🛡️ জিওফেন্স ব্যাসার্ধ: {geofenceM} মিটার
             </p>
-            <p className="text-[#6B6158] text-[11px] mt-0.5">
+            <p className="text-white/60 text-[11px] mt-0.5">
               দোকানের {geofenceM} মিটারের বাইরের স্ক্যান স্বয়ংক্রিয়ভাবে চিহ্নিত হবে।
             </p>
           </div>
         </div>
 
-        {/* 4. Social & Review Links */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <h2 className="font-display font-bold text-[#1A1916] text-base mb-3">
-            সোশ্যাল মিডিয়া ও রিভিউ লিংক
-          </h2>
-          <div className="space-y-3">
-            <div>
-              <label className="text-[#6B6158] text-xs font-semibold block mb-1">
-                WhatsApp নম্বর / লিংক
-              </label>
-              <input
-                type="text"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="+8801XXXXXXXXX"
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1916] outline-none focus:border-[#1B4332]"
-              />
-            </div>
-            <div>
-              <label className="text-[#6B6158] text-xs font-semibold block mb-1">
-                Instagram Username
-              </label>
-              <input
-                type="text"
-                value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                placeholder="@yourbrand"
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1916] outline-none focus:border-[#1B4332]"
-              />
-            </div>
-            <div>
-              <label className="text-[#6B6158] text-xs font-semibold block mb-1">
-                Google Maps / Review Link
-              </label>
-              <input
-                type="text"
-                value={reviewLink}
-                onChange={(e) => setReviewLink(e.target.value)}
-                placeholder="https://g.page/r/..."
-                className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-xs text-[#1A1916] outline-none focus:border-[#1B4332]"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* 5. Language Preference */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#D8EDDF] flex items-center justify-center text-xl">
+              <div className="w-10 h-10 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center text-xl text-[#34D399]">
                 🌐
               </div>
               <div>
-                <h2 className="font-display font-bold text-[#1A1916] text-base">ভাষা / Language</h2>
-                <p className="text-xs text-[#6B6158]">অ্যাপের ভাষা নির্বাচন করুন</p>
+                <h2 className="font-display font-bold text-white text-base">ভাষা / Language</h2>
+                <p className="text-xs text-white/60">অ্যাপের ভাষা নির্বাচন করুন</p>
               </div>
             </div>
-            <div className="flex bg-[#F7F5F0] p-1 rounded-xl border border-[#E9E5DC]">
+            <div className="flex bg-[#071D13] p-1 rounded-xl border border-white/10">
               <button
                 type="button"
                 onClick={() => handleSetLanguage("বাংলা")}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   currentLang === "বাংলা"
-                    ? "bg-[#1B4332] text-white shadow-xs"
-                    : "text-[#6B6158] hover:text-[#1A1916]"
+                    ? "bg-[#34D399] text-[#0A2318] shadow-xs glow-emerald"
+                    : "text-white/70 hover:text-white"
                 }`}
               >
                 বাংলা
@@ -797,8 +752,8 @@ export default function MerchantSettings({
                 onClick={() => handleSetLanguage("English")}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   currentLang === "English"
-                    ? "bg-[#1B4332] text-white shadow-xs"
-                    : "text-[#6B6158] hover:text-[#1A1916]"
+                    ? "bg-[#34D399] text-[#0A2318] shadow-xs glow-emerald"
+                    : "text-white/70 hover:text-white"
                 }`}
               >
                 English
@@ -808,14 +763,14 @@ export default function MerchantSettings({
         </div>
 
         {/* 6. Staff Mode PIN Setup */}
-        <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#E9E5DC]">
-            <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] flex items-center justify-center">
+        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
+            <div className="w-8 h-8 rounded-xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 flex items-center justify-center">
               <span className="text-base">🔐</span>
             </div>
             <div>
-              <h2 className="font-display font-bold text-[#1A1916] text-base">স্টাফ মোড পিন</h2>
-              <p className="text-xs text-[#6B6158]">
+              <h2 className="font-display font-bold text-white text-base">স্টাফ মোড পিন</h2>
+              <p className="text-xs text-white/60">
                 {pinStatus?.hasPin
                   ? `পিন সেট আছে · ${pinStatus.ownerPhoneMasked || "মালিকের নম্বরে OTP যাবে"}`
                   : "এখনো পিন সেট করা হয়নি"}
@@ -824,13 +779,13 @@ export default function MerchantSettings({
           </div>
 
           {pinSuccess && (
-            <div className="mb-3 bg-[#D8EDDF] border border-[#52B788] text-[#1B4332] px-3 py-2.5 rounded-xl text-xs font-bold">
+            <div className="mb-3 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3 py-2.5 rounded-xl text-xs font-bold">
               {pinSuccess}
             </div>
           )}
 
           {pinError && (
-            <div className="mb-3 bg-red-50 border border-red-200 text-red-600 px-3 py-2.5 rounded-xl text-xs font-bold">
+            <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-300 px-3 py-2.5 rounded-xl text-xs font-bold">
               {pinError}
             </div>
           )}
@@ -838,35 +793,35 @@ export default function MerchantSettings({
           {pinStep === "idle" && (
             <button
               onClick={handleRequestPinOtp}
-              className="w-full py-3 rounded-xl bg-[#1B4332] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#143427] transition-all cursor-pointer"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
             >
               🔑 {pinStatus?.hasPin ? "পিন পরিবর্তন করুন" : "পিন সেট করুন"}
             </button>
           )}
 
           {pinStep === "sending_otp" && (
-            <div className="text-center py-3 text-[#6B6158] text-sm">
+            <div className="text-center py-3 text-white/70 text-sm">
               <span className="inline-block animate-spin mr-1">⏳</span> OTP পাঠানো হচ্ছে...
             </div>
           )}
 
           {pinStep === "enter_otp_and_pin" && (
             <div className="space-y-3">
-              <div className="bg-[#FEF3C7]/50 border border-[#F59E0B]/30 rounded-xl px-3 py-2.5 text-xs text-[#B45309]">
+              <div className="bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl px-3 py-2.5 text-xs text-amber-200">
                 📱 মালিকের ফোনে ({pinStatus?.ownerPhoneMasked || "নিবন্ধিত নম্বরে"}) OTP পাঠানো হয়েছে
               </div>
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">OTP কোড</label>
+                <label className="text-white/70 text-xs font-semibold block mb-1">OTP কোড</label>
                 <input
                   type="text"
                   value={pinOtp}
                   onChange={(e) => setPinOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="6-সংখ্যার OTP"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-sm font-mono text-[#1A1916] outline-none focus:border-[#1B4332] tracking-widest"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm font-mono text-white outline-none focus:border-[#34D399] tracking-widest"
                 />
               </div>
               <div>
-                <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+                <label className="text-white/70 text-xs font-semibold block mb-1">
                   নতুন ৪-সংখ্যার পিন
                 </label>
                 <input
@@ -874,19 +829,19 @@ export default function MerchantSettings({
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
                   placeholder="••••"
-                  className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-2xl font-mono text-[#1A1916] outline-none focus:border-[#1B4332] tracking-[0.5em]"
+                  className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-2xl font-mono text-white outline-none focus:border-[#34D399] tracking-[0.5em]"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => { setPinStep("idle"); setPinError(""); setNewPin(""); setPinOtp("") }}
-                  className="flex-1 py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] text-sm font-semibold hover:bg-[#F7F5F0] transition-all cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition-all cursor-pointer"
                 >
                   বাতিল
                 </button>
                 <button
                   onClick={handleSetPin}
-                  className="flex-[2] py-2.5 rounded-xl bg-[#1B4332] text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#143427] transition-all cursor-pointer"
+                  className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
                 >
                   <CheckIcon size={16} />
                   Save PIN
@@ -896,7 +851,7 @@ export default function MerchantSettings({
           )}
 
           {pinStep === "saving" && (
-            <div className="text-center py-3 text-[#6B6158] text-sm">
+            <div className="text-center py-3 text-white/70 text-sm">
               <span className="inline-block animate-spin mr-1">⏳</span> Saving PIN...
             </div>
           )}
@@ -906,7 +861,7 @@ export default function MerchantSettings({
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-4 rounded-2xl bg-[#1B4332] hover:bg-[#143427] text-white font-display font-black text-base shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] font-display font-black text-base shadow-xl glow-emerald active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
           {saving ? (
             <>
@@ -924,7 +879,7 @@ export default function MerchantSettings({
         {/* Log Out */}
         <button
           onClick={onBack}
-          className="w-full py-3 rounded-2xl border border-[#E9E5DC] text-[#6B6158] hover:text-[#1A1916] font-bold text-xs flex items-center justify-center gap-2 hover:bg-white transition-colors cursor-pointer"
+          className="w-full py-3 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
         >
           <LogOutIcon size={14} />
           লগ আউট
@@ -934,22 +889,22 @@ export default function MerchantSettings({
       {/* Interactive Cover Photo Cropper Modal */}
       {rawCoverImage && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full card-shadow-md animate-slide-up">
+          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-slide-up text-white">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-display font-black text-lg text-[#1A1916]">কভার ছবি ক্রপ করুন</h3>
-                <p className="text-xs text-[#6B6158]">ব্যানার ফ্রেমের সাথে ছবি মিলিয়ে নিন</p>
+                <h3 className="font-display font-black text-lg text-white">কভার ছবি ক্রপ করুন</h3>
+                <p className="text-xs text-white/60">ব্যানার ফ্রেমের সাথে ছবি মিলিয়ে নিন</p>
               </div>
               <button
                 onClick={() => setRawCoverImage(null)}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold hover:bg-gray-200 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white font-bold hover:bg-white/20 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Viewport Frame */}
-            <div className="relative w-full h-48 bg-black rounded-2xl overflow-hidden mb-4 flex items-center justify-center border-2 border-[#52B788]">
+            <div className="relative w-full h-48 bg-black rounded-2xl overflow-hidden mb-4 flex items-center justify-center border-2 border-[#34D399]">
               <img
                 src={rawCoverImage}
                 alt="Crop preview"
@@ -964,13 +919,13 @@ export default function MerchantSettings({
             </div>
 
             {/* Zoom Slider */}
-            <div className="space-y-2 mb-4 bg-[#F7F5F0] p-3 rounded-2xl border border-[#E9E5DC]">
-              <div className="flex items-center justify-between text-xs text-[#1A1916] font-bold">
+            <div className="space-y-2 mb-4 bg-[#071D13] p-3.5 rounded-2xl border border-white/10">
+              <div className="flex items-center justify-between text-xs text-white font-bold">
                 <span>🔍 জুম (Zoom): {coverScale.toFixed(1)}x</span>
                 <button
                   type="button"
                   onClick={() => { setCoverScale(1); setCoverOffsetY(0) }}
-                  className="text-[#1B4332] text-[11px] underline"
+                  className="text-[#34D399] text-[11px] underline cursor-pointer"
                 >
                   রিসেট
                 </button>
@@ -982,23 +937,23 @@ export default function MerchantSettings({
                 step="0.1"
                 value={coverScale}
                 onChange={(e) => setCoverScale(parseFloat(e.target.value))}
-                className="w-full accent-[#1B4332] cursor-pointer"
+                className="w-full accent-[#34D399] cursor-pointer"
               />
 
-              <div className="flex items-center justify-between text-xs text-[#1A1916] font-bold pt-2 border-t border-[#E9E5DC]">
+              <div className="flex items-center justify-between text-xs text-white font-bold pt-2 border-t border-white/10">
                 <span>↕️ উচ্চতা পজিশন:</span>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setCoverOffsetY((y) => y - 15)}
-                    className="px-2.5 py-1 bg-white border border-[#E9E5DC] rounded-lg text-xs font-bold text-[#1B4332]"
+                    className="px-3 py-1 bg-[#0E281C] border border-white/15 rounded-lg text-xs font-bold text-[#34D399] cursor-pointer"
                   >
                     ▲ উপরে
                   </button>
                   <button
                     type="button"
                     onClick={() => setCoverOffsetY((y) => y + 15)}
-                    className="px-2.5 py-1 bg-white border border-[#E9E5DC] rounded-lg text-xs font-bold text-[#1B4332]"
+                    className="px-3 py-1 bg-[#0E281C] border border-white/15 rounded-lg text-xs font-bold text-[#34D399] cursor-pointer"
                   >
                     ▼ নিচে
                   </button>
@@ -1009,13 +964,13 @@ export default function MerchantSettings({
             <div className="flex gap-2">
               <button
                 onClick={() => setRawCoverImage(null)}
-                className="flex-1 py-3 bg-[#F0EDE6] text-[#6B6158] rounded-xl text-xs font-bold hover:bg-[#E5E0D6] cursor-pointer"
+                className="flex-1 py-3 bg-white/10 text-white rounded-2xl text-xs font-bold hover:bg-white/15 cursor-pointer"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleApplyCrop}
-                className="flex-[2] py-3 bg-[#1B4332] text-white rounded-xl text-xs font-bold hover:bg-[#143427] cursor-pointer shadow-sm"
+                className="flex-[2] py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] rounded-2xl text-xs font-black hover:brightness-105 cursor-pointer shadow-lg glow-emerald"
               >
                 ✓ ক্রপ ও ব্যানার নিশ্চিত করুন
               </button>
