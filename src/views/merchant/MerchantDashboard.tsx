@@ -16,6 +16,7 @@ import {
   LogOutIcon,
   ShieldCheckIcon,
   GiftIcon,
+  SearchIcon,
 } from "../../components/Icons"
 
 interface MerchantDashboardProps {
@@ -38,6 +39,7 @@ export default function MerchantDashboard({
   const [ownedMerchants, setOwnedMerchants] = useState<Merchant[]>([])
   const [activeMerchant, setActiveMerchant] = useState<Merchant | null>(null)
   const [approvals, setApprovals] = useState<PendingApproval[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
   const [program, setProgram] = useState<RewardProgram | null>(null)
   const [approved, setApproved] = useState<string[]>([])
   const [rejected, setRejected] = useState<string[]>([])
@@ -202,90 +204,136 @@ export default function MerchantDashboard({
     setTimeout(() => setCopiedLink(false), 2500)
   }
 
+  const filteredApprovals = approvals.filter((a) => {
+    if (!searchQuery.trim()) return true
+    const q = searchQuery.toLowerCase().trim()
+    const nameMatch = (a.customerName || "").toLowerCase().includes(q)
+    const phoneMatch =
+      (a.customerPhone || "").replace(/\D/g, "").includes(q.replace(/\D/g, "")) ||
+      (a.customerPhone || "").includes(q)
+    return nameMatch || phoneMatch
+  })
+
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 pt-3.5 pb-24 space-y-3.5">
+        {/* Real-time Netflix-style Search Bar */}
+        <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-2xl p-2.5 border border-emerald-500/25 shadow-xl flex items-center gap-2.5">
+          <SearchIcon size={18} className="text-[#34D399] flex-shrink-0 ml-1.5" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="কাস্টমারের নাম বা ফোন নম্বর দিয়ে খুঁজুন..."
+            className="flex-1 bg-transparent text-white text-xs font-medium placeholder-white/40 outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white flex items-center justify-center text-xs transition-all cursor-pointer mr-1"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         {/* Pending Approvals */}
         {approvals.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-white text-lg flex items-center gap-2 drop-shadow-xs">
-                অনুমোদন প্রয়োজন
-                <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black w-6 h-6 rounded-full flex items-center justify-center animate-pulse shadow-md">
-                  {approvals.length}
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h2 className="font-display font-bold text-white text-base flex items-center gap-2 drop-shadow-xs">
+                <span>অনুমোদন প্রয়োজন</span>
+                <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black px-2 py-0.5 rounded-full flex items-center justify-center shadow-md">
+                  {filteredApprovals.length}{searchQuery ? ` / ${approvals.length}` : ""}
                 </span>
               </h2>
               <span className="text-white/60 text-xs font-medium">মেয়াদ: ৩০ মিনিট</span>
             </div>
 
-            <div className="space-y-3">
-              {approvals.map((approval) => {
-                const isApproved = approved.includes(approval.id)
-                const isRejected = rejected.includes(approval.id)
-                const dist = approval.distanceMeters ?? approval.distance ?? 12
-                return (
-                  <div
-                    key={approval.id}
-                    className={`bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${
-                      isApproved
-                        ? "border-[#34D399] bg-[#10B981]/15"
-                        : isRejected
-                        ? "border-red-400/40 opacity-50"
-                        : "border-emerald-500/30"
-                    }`}
-                  >
-                    <div className="p-4">
-                      <div className="flex items-start gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#34D399] flex-shrink-0">
-                          {approval.customerName?.slice(0, 1) || "ক"}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-display font-bold text-white text-lg leading-tight truncate">
-                            {approval.customerName}
-                          </p>
-                          <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-white/40 text-[11px]">{approval.scannedAt || "এইমাত্র"}</span>
-                            <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                              <MapPinIcon size={11} />
-                              <span>{dist}মি. দূরত্বে</span>
-                            </span>
+            {filteredApprovals.length === 0 ? (
+              <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
+                <SearchIcon size={28} className="text-white/40 mx-auto mb-2" />
+                <p className="font-display font-bold text-white text-sm">
+                  "{searchQuery}" দিয়ে কোনো অনুরোধ পাওয়া যায়নি
+                </p>
+                <p className="text-white/50 text-xs mt-1">নাম বা সঠিক ফোন নম্বর দিয়ে আবার চেষ্টা করুন</p>
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="mt-3 px-4 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
+                >
+                  ফিল্টার মুছুন
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredApprovals.map((approval) => {
+                  const isApproved = approved.includes(approval.id)
+                  const isRejected = rejected.includes(approval.id)
+                  const dist = approval.distanceMeters ?? approval.distance ?? 12
+                  return (
+                    <div
+                      key={approval.id}
+                      className={`bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${
+                        isApproved
+                          ? "border-[#34D399] bg-[#10B981]/15"
+                          : isRejected
+                          ? "border-red-400/40 opacity-50"
+                          : "border-emerald-500/30"
+                      }`}
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start gap-3 mb-4">
+                          <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#34D399] flex-shrink-0">
+                            {approval.customerName?.slice(0, 1) || "ক"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-display font-bold text-white text-lg leading-tight truncate">
+                              {approval.customerName}
+                            </p>
+                            <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-white/40 text-[11px]">{approval.scannedAt || "এইমাত্র"}</span>
+                              <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                <MapPinIcon size={11} />
+                                <span>{dist}মি. দূরত্বে</span>
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {isApproved ? (
-                        <div className="flex items-center justify-center gap-2 py-3 bg-[#10B981]/20 border border-[#10B981]/40 rounded-2xl text-[#34D399] font-bold">
-                          ✓ সিল দেওয়া সম্পন্ন!
-                        </div>
-                      ) : isRejected ? (
-                        <div className="flex items-center justify-center gap-2 py-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 font-medium">
-                          প্রত্যাখ্যান করা হয়েছে
-                        </div>
-                      ) : (
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => handleReject(approval.id)}
-                            className="flex-1 py-3.5 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-center gap-1.5 text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-300 cursor-pointer text-xs"
-                          >
-                            <XIcon size={16} />
-                            <span>বাতিল</span>
-                          </button>
-                          <button
-                            onClick={() => handleApprove(approval.id)}
-                            className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
-                          >
-                            <CheckIcon size={18} />
-                            <span className="font-display text-base">সিল দিন ✓</span>
-                          </button>
-                        </div>
-                      )}
+                        {isApproved ? (
+                          <div className="flex items-center justify-center gap-2 py-3 bg-[#10B981]/20 border border-[#10B981]/40 rounded-2xl text-[#34D399] font-bold">
+                            ✓ সিল দেওয়া সম্পন্ন!
+                          </div>
+                        ) : isRejected ? (
+                          <div className="flex items-center justify-center gap-2 py-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 font-medium">
+                            প্রত্যাখ্যান করা হয়েছে
+                          </div>
+                        ) : (
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => handleReject(approval.id)}
+                              className="flex-1 py-3.5 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-center gap-1.5 text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-300 cursor-pointer text-xs"
+                            >
+                              <XIcon size={16} />
+                              <span>বাতিল</span>
+                            </button>
+                            <button
+                              onClick={() => handleApprove(approval.id)}
+                              className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
+                            >
+                              <CheckIcon size={18} />
+                              <span className="font-display text-base">সিল দিন ✓</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -391,21 +439,6 @@ export default function MerchantDashboard({
             </div>
           </div>
         </div>
-
-        {/* View Customers */}
-        <button
-          onClick={onViewCustomers}
-          className="w-full bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl p-4 flex items-center gap-3 transition-all active:scale-[0.99] hover:border-emerald-400/40 border border-white/10 cursor-pointer group"
-        >
-          <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center shadow-md">
-            <UsersIcon size={20} className="text-[#34D399]" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-display font-bold text-white group-hover:text-[#34D399] transition-colors">কাস্টমার সিআরএম (CRM)</p>
-            <p className="text-white/60 text-xs mt-0.5">গ্রাহকের তালিকা ও ডেটা এক্সপোর্ট</p>
-          </div>
-          <span className="text-[#34D399] font-bold text-lg group-hover:translate-x-1 transition-transform">→</span>
-        </button>
       </div>
     </div>
   )
