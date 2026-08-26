@@ -88,6 +88,7 @@ export interface MerchantCustomer {
   name: string
   phone: string
   rawPhone?: string
+  avatarUrl?: string
   stamps: number
   totalVisits: number
   lastVisit: string

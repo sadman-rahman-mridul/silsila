@@ -1075,6 +1075,7 @@ export const firebaseService = {
         const u = userMap.get(c.customerId) || userMap.get(c.customerId?.replace(/^c_/, "")) || {}
         const name = u.name || c.customerName || "সম্মানিত গ্রাহক"
         const phone = u.phone || c.customerPhone || (c.customerId?.startsWith("c_") ? c.customerId.replace("c_", "") : "—")
+        const avatarUrl = u.avatarUrl || u.photoURL || u.profilePicture || c.customerAvatar || ""
         const stamps = Number(c.stamps) || 0
         const totalVisits = stamps + ((c.cycleNo || 1) - 1) * (c.target || 5)
         const lastVisitDate = c.lastVisit ? new Date(c.lastVisit) : new Date(c.updatedAt || Date.now())
@@ -1095,6 +1096,7 @@ export const firebaseService = {
           name,
           phone: formattedPhone,
           rawPhone: phone,
+          avatarUrl,
           stamps,
           totalVisits,
           lastVisit: diffDays === 0 ? "আজ" : diffDays === 1 ? "গতকাল" : `${diffDays} দিন আগে`,
@@ -1105,9 +1107,12 @@ export const firebaseService = {
 
       return customers.filter((cust) => {
         if (filterTab !== "all" && cust.status !== filterTab) return false
-        if (search) {
-          const s = search.toLowerCase()
-          return cust.name.toLowerCase().includes(s) || (cust.rawPhone && cust.rawPhone.includes(s))
+        if (search && search.trim()) {
+          const s = search.toLowerCase().trim()
+          const digits = s.replace(/[^0-9]/g, "")
+          const matchesName = cust.name?.toLowerCase().includes(s)
+          const matchesPhone = cust.rawPhone && (cust.rawPhone.includes(s) || (digits && cust.rawPhone.includes(digits)))
+          return matchesName || matchesPhone
         }
         return true
       })

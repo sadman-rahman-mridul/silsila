@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { api, type MerchantCustomer, type RewardProgram } from "../../services/api"
 import { SearchIcon, ChevronRightIcon, DownloadIcon } from "../../components/Icons"
 import { useAuth } from "../../context/AuthContext"
@@ -11,11 +11,27 @@ interface CustomersPageProps {
   merchantId?: string
 }
 
+export function formatMaskedPhone(phone?: string): string {
+  if (!phone || phone === "—") return "—"
+  const digits = phone.replace(/[^0-9]/g, "")
+  if (digits.length < 6) return phone
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)} •••• ${digits.slice(-4)}`
+  }
+  if (digits.length === 10) {
+    return `0${digits.slice(0, 2)} •••• ${digits.slice(-4)}`
+  }
+  if (digits.length > 11) {
+    return `${digits.slice(0, 4)} •••• ${digits.slice(-4)}`
+  }
+  return `${digits.slice(0, 3)} •••• ${digits.slice(-2)}`
+}
+
 export default function CustomersPage({ merchantId: propId }: CustomersPageProps) {
   const { profile } = useAuth()
   const { isBn } = useLanguage()
   const merchantId = propId || profile?.merchantId || profile?.id || ""
-  const [customers, setCustomers] = useState<MerchantCustomer[]>([])
+  const [allCustomers, setAllCustomers] = useState<MerchantCustomer[]>([])
   const [filter, setFilter] = useState<FilterTab>("all")
   const [search, setSearch] = useState("")
   const [selectedCustomer, setSelectedCustomer] = useState<MerchantCustomer | null>(null)
@@ -29,7 +45,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
 
   useEffect(() => {
     loadCustomers()
-  }, [filter, search, merchantId])
+  }, [merchantId])
 
   useEffect(() => {
     api
@@ -46,20 +62,41 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
       setLoading(true)
       setError(null)
       const [apiList, fbList] = await Promise.all([
-        api.getCrmCustomers(merchantId, filter, search).catch(() => []),
-        firebaseService.getMerchantCustomers(merchantId, filter, search).catch(() => []),
+        api.getCrmCustomers(merchantId, "all").catch(() => []),
+        firebaseService.getMerchantCustomers(merchantId, "all").catch(() => []),
       ])
 
       const map = new Map<string, any>()
       apiList.forEach((c: any) => map.set(c.id, c))
       fbList.forEach((c: any) => map.set(c.id, { ...map.get(c.id), ...c }))
-      setCustomers(Array.from(map.values()))
+      setAllCustomers(Array.from(map.values()))
     } catch (err: any) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
   }
+
+  // Instant real-time search & filter
+  const customers = useMemo(() => {
+    return allCustomers.filter((c) => {
+      // 1. Status Filter
+      if (filter !== "all" && c.status !== filter) return false
+
+      // 2. Search Query
+      if (search && search.trim()) {
+        const query = search.toLowerCase().trim()
+        const digits = query.replace(/[^0-9]/g, "")
+        const matchesName = (c.name || "").toLowerCase().includes(query)
+        const matchesRaw = c.rawPhone && c.rawPhone.includes(query)
+        const matchesDigits = digits && c.rawPhone && c.rawPhone.includes(digits)
+        const matchesPhone = (c.phone || "").toLowerCase().includes(query)
+        return matchesName || matchesRaw || matchesDigits || matchesPhone
+      }
+
+      return true
+    })
+  }, [allCustomers, filter, search])
 
   function handleExportCsv() {
     if (customers.length === 0) {
@@ -113,9 +150,9 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent">
-      <div className="px-5 pt-4 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-2.5 drop-shadow-xs">
+    <div className="flex flex-col h-full bg-transparent w-full">
+      <div className="px-3.5 pt-4 pb-2 w-full">
+        <h1 className="font-display text-xl font-black text-white mb-2 drop-shadow-xs">
           {isBn ? "কাস্টমার সিআরএম" : "Customer CRM"}
         </h1>
         <div className="relative">
@@ -125,12 +162,12 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isBn ? "নাম বা মোবাইল নম্বর খুঁজুন..." : "Search name or phone number..."}
-            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-4 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
+            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-9 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 text-xs hover:text-white cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center text-xs cursor-pointer transition-colors"
             >
               ✕
             </button>
@@ -138,7 +175,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
       </div>
 
-      <div className="px-4 py-1">
+      <div className="px-3.5 py-1 w-full">
         <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {tabs.map((t) => (
             <button
@@ -156,7 +193,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24 px-4 pt-2">
+      <div className="flex-1 overflow-y-auto pb-20 px-3.5 pt-2 w-full">
         <div>
           {error && (
             <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
@@ -195,9 +232,17 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                     className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-2xl cursor-pointer hover:border-emerald-400/40 border border-white/10 transition-all active:scale-[0.99]"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg flex-shrink-0 shadow-sm">
-                        {customer.name?.slice(0, 1) || (isBn ? "ক" : "C")}
-                      </div>
+                      {customer.avatarUrl ? (
+                        <img
+                          src={customer.avatarUrl}
+                          alt={customer.name}
+                          className="w-11 h-11 rounded-2xl object-cover border border-[#10B981]/30 flex-shrink-0 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-11 h-11 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg flex-shrink-0 shadow-sm">
+                          {customer.name?.slice(0, 1) || (isBn ? "ক" : "C")}
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <p className="font-display font-bold text-white truncate">{customer.name}</p>
@@ -205,7 +250,9 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                             {badge.label}
                           </span>
                         </div>
-                        <p className="text-white/50 text-xs font-mono">{customer.phone}</p>
+                        <p className="text-white/50 text-xs font-mono tracking-wider">
+                          {formatMaskedPhone(customer.rawPhone || customer.phone)}
+                        </p>
 
                         <div className="flex items-center gap-4 mt-2.5">
                           <div className="text-center">
@@ -284,12 +331,22 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
           <div className="bg-[#0E281C] border border-emerald-500/30 rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-[#34D399] text-xl shadow-md">
-                  {selectedCustomer.name?.slice(0, 1)}
-                </div>
+                {selectedCustomer.avatarUrl ? (
+                  <img
+                    src={selectedCustomer.avatarUrl}
+                    alt={selectedCustomer.name}
+                    className="w-12 h-12 rounded-2xl object-cover border border-[#10B981]/30 flex-shrink-0 shadow-md"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-[#34D399] text-xl shadow-md flex-shrink-0">
+                    {selectedCustomer.name?.slice(0, 1) || (isBn ? "ক" : "C")}
+                  </div>
+                )}
                 <div>
                   <h3 className="font-display font-bold text-lg text-white">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-white/50 font-mono">{selectedCustomer.phone}</p>
+                  <p className="text-xs text-white/50 font-mono tracking-wider">
+                    {formatMaskedPhone(selectedCustomer.rawPhone || selectedCustomer.phone)}
+                  </p>
                 </div>
               </div>
               <button
