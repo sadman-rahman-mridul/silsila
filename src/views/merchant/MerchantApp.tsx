@@ -142,8 +142,11 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent max-w-md mx-auto relative overflow-hidden">
-      <div className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl px-4 pt-3 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-transparent max-w-md mx-auto relative overflow-hidden">
+      <div
+        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl px-4 pb-2.5 flex items-center justify-between border-b border-white/10 shadow-lg z-20"
+        style={{ paddingTop: "max(12px, env(safe-area-inset-top, 12px))" }}
+      >
         <button
           onClick={() => handleTabChange("home")}
           className="flex items-center gap-2.5 cursor-pointer group hover:opacity-90 transition-opacity active:scale-95 text-left"
@@ -178,14 +181,16 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
           </button>
           <button
             onClick={handleOpenAnalytics}
-            className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/10 flex items-center gap-1.5"
+            title={isBn ? "অ্যানালিটিক্স রিপোর্ট" : "Analytics Report"}
+            className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold border border-white/10 transition-all cursor-pointer flex items-center gap-1 active:scale-95 backdrop-blur-md"
           >
-            <BarChartIcon size={14} className="text-[#34D399]" />
-            <span>{isBn ? "রিপোর্ট" : "Analytics"}</span>
+            <AnalyticsIcon size={13} className="text-[#34D399]" />
+            <span className="text-[11px] font-medium">{isBn ? "অ্যানালিটিক্স" : "Analytics"}</span>
           </button>
           <button
-            onClick={handleOpenStaff}
-            className="px-3 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-amber-300 text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer backdrop-blur-md shadow-xs flex items-center gap-1.5"
+            onClick={() => setShowStaffMode(true)}
+            title={isBn ? "স্টাফ মোড চালু করুন" : "Enter Staff Mode"}
+            className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 hover:text-white border border-amber-500/30 transition-all cursor-pointer flex items-center gap-1 active:scale-95 text-xs font-bold backdrop-blur-md"
           >
             <LockIcon size={14} className="text-[#F59E0B]" />
             <span>{isBn ? "স্টাফ" : "Staff"}</span>
@@ -234,7 +239,10 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
         </div>
       </div>
 
-      <nav className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 shadow-2xl z-20">
+      <nav
+        className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 shadow-2xl z-20"
+        style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
+      >
         <div className="flex items-center justify-around py-1">
           <MerchantNavBtn
             icon={<ChartIcon size={22} />}

@@ -100,7 +100,7 @@ function PublicMerchantRoute() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#071D13] bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] text-white max-w-md mx-auto relative overflow-hidden">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-[#071D13] bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] text-white max-w-md mx-auto relative overflow-hidden">
       <div className="flex-1 overflow-hidden relative">
         <div className="absolute inset-0 overflow-y-auto">
           <CardDetail
@@ -119,8 +119,8 @@ function PublicMerchantRoute() {
       {/* Static Bottom Navigation (Facebook style) */}
       {profile?.role === "customer" ? (
         <nav
-          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe shadow-2xl z-20"
+          style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
         >
           <div className="flex items-center justify-around">
             <button
@@ -178,8 +178,8 @@ function PublicMerchantRoute() {
         </nav>
       ) : (
         <div
-          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 pb-safe safe-area-inset-bottom shadow-2xl z-20 flex items-center justify-between gap-3"
-          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 pb-safe shadow-2xl z-20 flex items-center justify-between gap-3"
+          style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}
         >
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-black text-xs text-[#0A2318]">
