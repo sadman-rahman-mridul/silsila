@@ -117,19 +117,45 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     setInfoMsg(null)
 
     try {
-      // Firestore-only authentication (single source of truth, role-aware)
-      if (cachedAccount) {
-        const storedPin = cachedAccount.password || cachedAccount.pin || ""
-        if (storedPin && storedPin === pinToVerify) {
+      // Fetch or use cached account from Cloud Firestore (single source of truth)
+      let account = cachedAccount
+      if (!account) {
+        const clean = phone.replace(/\D/g, "")
+        account = await firebaseService.findAccountByPhone(clean, role).catch(() => null)
+        setCachedAccount(account)
+      }
+
+      if (account) {
+        const storedPin = (account.password || account.pin || "").toString()
+        const isMatch =
+          (storedPin && storedPin === pinToVerify) ||
+          (storedPin && storedPin.length < 6 && pinToVerify.startsWith(storedPin))
+
+        if (isMatch) {
+          // Auto-upgrade legacy password to new 6-digit PIN in Firestore
+          if (storedPin !== pinToVerify) {
+            if (role === "customer") {
+              await firebaseService.updateCustomerProfile(account.id, {
+                password: pinToVerify,
+                pin: pinToVerify,
+              }).catch(console.warn)
+            } else {
+              await firebaseService.updateMerchantInFirestore(account.id, {
+                password: pinToVerify,
+                pin: pinToVerify,
+              }).catch(console.warn)
+            }
+          }
+
           const storedName =
-            role === "merchant" ? cachedAccount.ownerName || cachedAccount.name : cachedAccount.name
+            role === "merchant" ? account.ownerName || account.name : account.name
           const resObj = {
             success: true,
             role,
-            token: `token_${role}_${cachedAccount.id}`,
-            customer: role === "customer" ? cachedAccount : undefined,
-            merchant: role === "merchant" ? cachedAccount : undefined,
-            merchants: role === "merchant" ? [cachedAccount] : undefined,
+            token: `token_${role}_${account.id}`,
+            customer: role === "customer" ? account : undefined,
+            merchant: role === "merchant" ? account : undefined,
+            merchants: role === "merchant" ? [account] : undefined,
           }
           await finalizeLogin(resObj, storedName || (isBn ? "ব্যবহারকারী" : "User"))
           return
