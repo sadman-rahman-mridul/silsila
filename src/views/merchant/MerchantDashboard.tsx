@@ -244,8 +244,9 @@ export default function MerchantDashboard({
                           <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-white/40 text-[11px]">{approval.scannedAt || "এইমাত্র"}</span>
-                            <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full">
-                              📍 {dist}মি. দূরত্বে
+                            <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                              <MapPinIcon size={11} />
+                              <span>{dist}মি. দূরত্বে</span>
                             </span>
                           </div>
                         </div>

@@ -512,7 +512,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   disabled={requestingSeal || approvalStatus === "waiting"}
                   className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
                 >
-                  <span className="text-lg">📍</span>
+                  <MapPinIcon size={18} />
                   <span>{requestingSeal ? "অনুরোধ পাঠানো হচ্ছে..." : "I'm here! Seal My Card"}</span>
                 </button>
               )}
@@ -522,7 +522,10 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
         {error && (
           <div className="mx-5 mt-4 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center justify-between backdrop-blur-md">
-            <span>⚠️ {error}</span>
+            <div className="flex items-center gap-2">
+              <AlertTriangleIcon size={14} className="text-red-300 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
             <button onClick={() => setError(null)} className="text-red-300 hover:text-white text-xs ml-2 cursor-pointer">✕</button>
           </div>
         )}
@@ -703,8 +706,8 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               <div>
                 <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-[#F59E0B]/20 animate-ping" />
-                  <div className="w-16 h-16 rounded-full bg-[#FEF3C7] border-2 border-[#F59E0B] flex items-center justify-center text-3xl shadow-inner">
-                    📍
+                  <div className="w-16 h-16 rounded-full bg-[#FEF3C7] border-2 border-[#F59E0B] flex items-center justify-center text-[#F59E0B] shadow-inner">
+                    <MapPinIcon size={28} />
                   </div>
                 </div>
 

@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react"
 import { api, type MerchantStats, type MerchantCustomer, emptyMerchantStats } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
-import { TrendingUpIcon, UsersIcon, GiftIcon } from "../../components/Icons"
+import {
+  TrendingUpIcon,
+  UsersIcon,
+  GiftIcon,
+  BarChartIcon,
+  RefreshIcon,
+  TrophyIcon,
+  MedalIcon,
+  CheckIcon,
+} from "../../components/Icons"
 import { firebaseService } from "../../services/firebaseService"
 
 interface AnalyticsPageProps {
@@ -83,8 +92,8 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
   return (
     <div className="flex flex-col h-full bg-transparent">
       {/* Header */}
-      <div className="px-5 pt-8 pb-4">
-        <h1 className="font-display text-2xl font-black text-white mb-1 drop-shadow-xs">রিপোর্ট</h1>
+      <div className="px-5 pt-4 pb-3">
+        <h1 className="font-display text-xl font-black text-white mb-1 drop-shadow-xs">রিপোর্ট ও পরিসংখ্যান</h1>
         <p className="text-[#34D399] text-xs font-semibold">লাইভ মেট্রিক্স ও পারফরম্যান্স ডেটা</p>
 
         {/* 4-Stat tiles */}
@@ -135,14 +144,17 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
 
       <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2 space-y-4">
         {loading && (
-          <div className="py-4 text-center text-xs text-white/70">
-            <span className="inline-block animate-spin mr-1">⏳</span> ডেটা লোড হচ্ছে...
+          <div className="py-6 text-center text-xs text-white/70 flex items-center justify-center gap-2">
+            <RefreshIcon size={16} className="animate-spin text-[#34D399]" />
+            <span>ডেটা লোড হচ্ছে...</span>
           </div>
         )}
 
         {!loading && hasNoData && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 text-center border border-emerald-500/20 shadow-2xl mb-4">
-            <span className="text-4xl mb-3 block">📊</span>
+            <div className="w-14 h-14 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#34D399]">
+              <BarChartIcon size={28} />
+            </div>
             <p className="font-display font-bold text-white text-lg">এখনো কোনো ডেটা নেই</p>
             <p className="text-white/60 text-xs mt-2">
               কাস্টমাররা আপনার QR কোড স্ক্যান করলে এখানে রিপোর্ট দেখা যাবে।
@@ -154,7 +166,10 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         {weeklyData.length > 0 && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20 text-white">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-bold text-white">সাপ্তাহিক সিল ট্রেন্ড</h2>
+              <div className="flex items-center gap-2">
+                <BarChartIcon size={18} className="text-[#34D399]" />
+                <h2 className="font-display font-bold text-white text-base">সাপ্তাহিক সিল ট্রেন্ড</h2>
+              </div>
               <span className="text-white/40 text-xs">গত ৭ দিন</span>
             </div>
             <div className="flex items-end gap-1.5 h-32">
@@ -191,7 +206,10 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         {/* Retention Funnel */}
         {retentionData.length > 0 && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20 text-white">
-            <h2 className="font-display font-bold text-white mb-1">কাস্টমার রিটেনশন ফানেল</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUpIcon size={18} className="text-[#34D399]" />
+              <h2 className="font-display font-bold text-white text-base">কাস্টমার রিটেনশন ফানেল</h2>
+            </div>
             <p className="text-white/60 text-xs mb-4">
               কত শতাংশ কাস্টমার পরবর্তী ভিজিটে ফিরে আসছেন
             </p>
@@ -226,9 +244,10 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
                 </div>
               ))}
             </div>
-            <div className="mt-4 p-3 bg-[#071D13] rounded-2xl border border-emerald-500/20">
+            <div className="mt-4 p-3 bg-[#071D13] rounded-2xl border border-emerald-500/20 flex items-center gap-2">
+              <CheckIcon size={14} className="text-[#34D399] flex-shrink-0" />
               <p className="text-[#34D399] text-xs font-bold">
-                ✓ {stats.repeatRate}% কাস্টমার দ্বিতীয়বার আসছেন
+                {stats.repeatRate}% কাস্টমার দ্বিতীয়বার আসছেন
               </p>
             </div>
           </div>
@@ -237,18 +256,30 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
         {/* Top Loyal Customers */}
         {topCustomers.length > 0 && (
           <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20 text-white">
-            <h2 className="font-display font-bold text-white mb-3">শীর্ষ বিশ্বস্ত কাস্টমার</h2>
+            <div className="flex items-center gap-2 mb-3">
+              <TrophyIcon size={18} className="text-[#F59E0B]" />
+              <h2 className="font-display font-bold text-white text-base">শীর্ষ বিশ্বস্ত কাস্টমার</h2>
+            </div>
             <div className="space-y-3">
               {topCustomers.map((c, i) => {
-                const badges = ["🥇", "🥈", "🥉", "৪", "৫"]
                 return (
-                  <div key={c.id || i} className="flex items-center gap-3">
-                    <span className="text-xl w-7 text-center">{badges[i] || (i + 1)}</span>
-                    <div className="w-8 h-8 rounded-xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-bold text-xs text-[#34D399]">
+                  <div key={c.id || i} className="flex items-center gap-3 p-2 rounded-2xl bg-[#071D13] border border-white/10">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 bg-white/10">
+                      {i === 0 ? (
+                        <TrophyIcon size={16} className="text-[#F59E0B]" />
+                      ) : i === 1 ? (
+                        <MedalIcon size={16} className="text-[#34D399]" />
+                      ) : i === 2 ? (
+                        <MedalIcon size={16} className="text-amber-400" />
+                      ) : (
+                        <span className="text-white/60 font-mono">{i + 1}</span>
+                      )}
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-bold text-xs text-[#34D399]">
                       {c.name ? c.name.slice(0, 1) : "ক"}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-white">{c.name}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">{c.name}</p>
                       <p className="text-xs text-white/50">{c.totalVisits || c.stamps} বার মোট ভিজিট</p>
                     </div>
                     <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-2.5 py-1 rounded-full font-bold">

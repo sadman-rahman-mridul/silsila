@@ -2,7 +2,18 @@ import { useState, useEffect } from "react"
 import { api } from "../../services/api"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
-import { InstagramIcon, FacebookIcon, ExternalLinkIcon, CheckIcon, RefreshIcon } from "../../components/Icons"
+import {
+  InstagramIcon,
+  FacebookIcon,
+  ExternalLinkIcon,
+  CheckIcon,
+  RefreshIcon,
+  SmartphoneIcon,
+  StarIcon,
+  AlertTriangleIcon,
+  FileTextIcon,
+  ImageIcon,
+} from "../../components/Icons"
 import { useAuth } from "../../context/AuthContext"
 
 interface MarketingPageProps {
@@ -76,17 +87,17 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]" {...swipeHandlers}>
-      <div className="bg-[#1B4332] px-5 pt-4 pb-4">
+    <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
+      <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-bold text-white mb-1">মার্কেটিং ও রিভিউ</h1>
-            <p className="text-[#52B788] text-xs">কাস্টমারদের সাথে যোগাযোগের লিঙ্ক ও চ্যানেল</p>
+            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">মার্কেটিং ও রিভিউ</h1>
+            <p className="text-[#34D399] text-xs font-semibold mt-0.5">কাস্টমারদের সাথে যোগাযোগের লিঙ্ক ও চ্যানেল</p>
           </div>
           <button
             onClick={handleSaveMarketing}
             disabled={saving}
-            className="px-4 py-2 bg-[#F59E0B] text-[#1B4332] font-black text-xs rounded-xl shadow-sm active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+            className="px-4 py-2 bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-black text-xs rounded-xl shadow-lg glow-amber active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
           >
             {saving ? (
               <>
@@ -107,13 +118,15 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
 
       <div className="flex-1 overflow-y-auto px-4 pb-24 pt-2">
         {error && (
-          <div className="mb-4 bg-red-500/20 border border-red-400/40 text-red-200 px-4 py-2.5 rounded-2xl text-xs font-medium backdrop-blur-md">
-            ⚠️ {error}
+          <div className="mb-4 bg-red-500/20 border border-red-400/40 text-red-200 px-4 py-2.5 rounded-2xl text-xs font-medium backdrop-blur-md flex items-center gap-2">
+            <AlertTriangleIcon size={14} className="text-red-300 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
         {savedSuccess && (
-          <div className="mb-4 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-4 py-2.5 rounded-2xl text-xs font-bold animate-fade-in backdrop-blur-md shadow-md">
-            ✓ সোশ্যাল লিঙ্ক ও রিভিউ সেটিংস সফলভাবে আপডেট হয়েছে!
+          <div className="mb-4 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-4 py-2.5 rounded-2xl text-xs font-bold animate-fade-in backdrop-blur-md shadow-md flex items-center gap-2">
+            <CheckIcon size={14} className="text-[#34D399]" />
+            <span>সোশ্যাল লিঙ্ক ও রিভিউ সেটিংস সফলভাবে আপডেট হয়েছে!</span>
           </div>
         )}
 
@@ -147,7 +160,7 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
               <span className="text-[#34D399] text-xs font-bold">✓</span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-[#071D13] rounded-2xl border border-white/10">
-              <span className="text-xl flex-shrink-0">📱</span>
+              <SmartphoneIcon size={20} className="text-[#34D399] flex-shrink-0" />
               <input
                 type="tel"
                 value={whatsapp}
@@ -165,7 +178,7 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
             <h2 className="font-display font-bold text-white">Google রিভিউ লিংক</h2>
           </div>
           <div className="p-3 bg-[#071D13] rounded-2xl flex items-center gap-3 mb-3 border border-white/10">
-            <span className="text-xl">⭐</span>
+            <StarIcon size={18} className="text-[#F59E0B] flex-shrink-0 fill-[#F59E0B]/20" />
             <input
               type="text"
               value={reviewLink}
@@ -176,14 +189,14 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
             <ExternalLinkIcon size={14} className="text-white/40" />
           </div>
           <div className="bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-2xl p-3 flex items-start gap-2">
-            <span className="text-sm">⚠️</span>
+            <AlertTriangleIcon size={14} className="text-amber-300 flex-shrink-0 mt-0.5" />
             <p className="text-amber-200 text-xs leading-relaxed">
               Google-এর সততা নীতি অনুসারে কাস্টমারকে কেবল অফিসিয়াল রিভিউ লিংক দেখানো হয় — কোনো স্ক্রিপ্ট করা বা কৃত্রিম রিভিউ টেক্সট প্রদান করা হয় না।
             </p>
           </div>
         </div>
 
-        {/* SMS Campaigns (Opt-in only) */}
+        {/* SMS Campaigns */}
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 mb-4 shadow-2xl border border-emerald-500/20 text-white">
           <div className="flex items-center justify-between mb-2">
             <h2 className="font-display font-bold text-white">SMS রিমাইন্ডার (Opt-in)</h2>
@@ -203,7 +216,7 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-[#34D399] bg-[#34D399]/15 px-2.5 py-0.5 rounded-full">{s.count}</span>
                   <button
-                    onClick={() => alert(`কাস্টমার সেগমেন্ট "${s.segment}"-এ ড্রাফট ক্যাম্পেইন প্রস্তুত করা হয়েছে।`)}
+                    onClick={() => alert("কাস্টমার সেগমেন্ট " + s.segment + "-এ ড্রাফট ক্যাম্পেইন প্রস্তুত করা হয়েছে।")}
                     className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer"
                   >
                     ড্রাফট
@@ -220,15 +233,15 @@ export default function MarketingPage({ merchantId: propId, onBack }: MarketingP
           <p className="text-white/60 text-xs mb-4 leading-relaxed">আপনার দোকানে টানানোর জন্য এবং সোশ্যাল মিডিয়ায় প্রচারের জন্য</p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { title: "কাউন্টার QR টেন্ট", icon: "📋", desc: "A4 সাইজ, স্ট্যান্ড টেন্ট" },
-              { title: "স্টোরি ব্যানার", icon: "📱", desc: "Instagram & FB Story 9:16" },
+              { title: "কাউন্টার QR টেন্ট", icon: <FileTextIcon size={28} className="text-[#34D399] mx-auto mb-2" />, desc: "A4 সাইজ, স্ট্যান্ড টেন্ট" },
+              { title: "স্টোরি ব্যানার", icon: <ImageIcon size={28} className="text-[#F59E0B] mx-auto mb-2" />, desc: "Instagram & FB Story 9:16" },
             ].map((p) => (
               <div key={p.title} className="bg-[#071D13] rounded-2xl p-3.5 text-center border border-white/10">
-                <span className="text-3xl block mb-2">{p.icon}</span>
+                {p.icon}
                 <p className="font-bold text-white text-xs">{p.title}</p>
                 <p className="text-white/50 text-[10px] mt-0.5">{p.desc}</p>
                 <button
-                  onClick={() => alert(`পোস্টার "${p.title}" ডাউনলোড শুরু হয়েছে`)}
+                  onClick={() => alert("পোস্টার " + p.title + " ডাউনলোড শুরু হয়েছে")}
                   className="mt-3 px-3 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-xs font-black w-full shadow-md glow-emerald cursor-pointer active:scale-95 transition-all"
                 >
                   ডাউনলোড

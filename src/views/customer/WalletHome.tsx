@@ -134,7 +134,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 title="রিফ্রেশ করুন"
                 className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all cursor-pointer active:scale-95 text-xs backdrop-blur-md border border-white/15"
               >
-                <span className={loading ? "animate-spin inline-block" : ""}>🔄</span>
+                <RefreshIcon size={14} className={loading ? "animate-spin text-[#34D399]" : "text-white"} />
               </button>
               {cards.some((c) => c.voucherReady) && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#F59E0B] rounded-full text-[10px] font-bold text-[#1B4332] flex items-center justify-center animate-pulse shadow-md">
@@ -211,7 +211,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
 
         {loading ? (
           <div className="py-12 text-center text-white/70 text-sm">
-            <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
+            <RefreshIcon size={24} className="animate-spin text-[#34D399] mx-auto mb-2" />
             <p>কার্ড লোড হচ্ছে...</p>
           </div>
         ) : filteredCards.length > 0 ? (
@@ -336,7 +336,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           /* When 0 cards scanned yet, show available restaurants & cafes */
           <div className="space-y-4">
             <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
-              <span className="text-4xl mb-2 block">🔖</span>
+              <CompassIcon size={32} className="text-[#34D399] mx-auto mb-2" />
               <p className="font-display font-bold text-white text-lg drop-shadow-sm">উপলব্ধ ক্যাফে ও রেস্তোরাঁ</p>
               <p className="text-white/60 text-xs leading-relaxed mt-1">
                 নিচের যেকোনো দোকানে ক্লিক করে স্ট্যাম্প কার্ড দেখুন ও সিল সংগ্রহ করুন

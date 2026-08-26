@@ -13,6 +13,13 @@ import {
   RefreshIcon,
   QRIcon,
   ChevronLeftIcon,
+  LockIcon,
+  KeyIcon,
+  GlobeIcon,
+  ImageIcon,
+  CameraIcon,
+  SmartphoneIcon,
+  ShieldIcon,
 } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
 
@@ -413,7 +420,7 @@ export default function MerchantSettings({
 
         {loading && (
           <div className="text-center py-8 text-white/70 text-sm">
-            <span className="inline-block animate-spin mr-1">⏳</span> লোড হচ্ছে...
+            <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> লোড হচ্ছে...
           </div>
         )}
 
@@ -463,7 +470,7 @@ export default function MerchantSettings({
                   ব্র্যান্ড লোগো ফাইল আপলোড করুন অথবা সংক্ষেপ অক্ষর ব্যবহার করুন।
                 </p>
                 <div className="p-2.5 bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl text-[11px] text-amber-200 font-medium">
-                  📌 নোট: লোগো ফাইলের আকার ৫০০ KB এর নিচে হতে হবে (PNG, JPG, WebP)
+                  নোট: লোগো ফাইলের আকার ৫০০ KB এর নিচে হতে হবে (PNG, JPG, WebP)
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
                   <input
@@ -478,7 +485,7 @@ export default function MerchantSettings({
                     htmlFor="logo-file-input"
                     className="px-4 py-2 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center gap-1.5 transition-all active:scale-95"
                   >
-                    📁 নতুন লোগো আপলোড
+                    নতুন লোগো আপলোড
                   </label>
                   {logoUrl && (
                     <button
@@ -513,7 +520,7 @@ export default function MerchantSettings({
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
           <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
             <div className="w-8 h-8 rounded-xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 flex items-center justify-center text-[#F59E0B]">
-              🖼️
+              <ImageIcon size={18} className="text-[#F59E0B]" />
             </div>
             <div>
               <h2 className="font-display font-bold text-white text-base">কভার ফটো ও ব্যানার</h2>
@@ -528,7 +535,7 @@ export default function MerchantSettings({
                 <img src={coverUrl} alt="Store Cover" className="w-full h-full object-cover" />
               ) : (
                 <div className="text-center p-4">
-                  <p className="text-3xl mb-1 opacity-50">🏞️</p>
+                  <ImageIcon size={36} className="text-white/30 mb-2 mx-auto" />
                   <p className="text-white/80 text-xs font-semibold">কোনো কভার ছবি আপলোড করা হয়নি</p>
                   <p className="text-white/40 text-[11px]">খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে</p>
                 </div>
@@ -545,7 +552,7 @@ export default function MerchantSettings({
             </div>
 
             <div className="p-3 bg-[#071D13] rounded-xl border border-white/10 flex items-start gap-2">
-              <span className="text-sm">📌</span>
+              <ShieldIcon size={16} className="text-[#34D399] flex-shrink-0 mt-0.5" />
               <p className="text-xs text-[#34D399]">
                 <strong>নিয়মাবলী:</strong> কভার ছবির সাইজ অবশ্যই ১ MB এর নিচে হতে হবে। আপলোডের আগে ক্রপ ও পজিশন ঠিক করে নিন।
               </p>
@@ -564,7 +571,7 @@ export default function MerchantSettings({
                 htmlFor="cover-file-input"
                 className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-95 text-center"
               >
-                📸 নতুন কভার ফটো নির্বাচন ও ক্রপ
+                নতুন কভার ফটো নির্বাচন ও ক্রপ
               </label>
 
               {coverUrl && (
@@ -715,7 +722,7 @@ export default function MerchantSettings({
 
           <div className="mt-3 p-3 bg-[#071D13] rounded-xl border border-white/10">
             <p className="text-[#34D399] text-xs font-bold">
-              🛡️ জিওফেন্স ব্যাসার্ধ: {geofenceM} মিটার
+              জিওফেন্স ব্যাসার্ধ: {geofenceM} মিটার
             </p>
             <p className="text-white/60 text-[11px] mt-0.5">
               দোকানের {geofenceM} মিটারের বাইরের স্ক্যান স্বয়ংক্রিয়ভাবে চিহ্নিত হবে।
@@ -728,7 +735,7 @@ export default function MerchantSettings({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center text-xl text-[#34D399]">
-                🌐
+                <GlobeIcon size={20} className="text-[#34D399]" />
               </div>
               <div>
                 <h2 className="font-display font-bold text-white text-base">ভাষা / Language</h2>
@@ -766,7 +773,7 @@ export default function MerchantSettings({
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
           <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
             <div className="w-8 h-8 rounded-xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 flex items-center justify-center">
-              <span className="text-base">🔐</span>
+              <LockIcon size={18} className="text-[#F59E0B]" />
             </div>
             <div>
               <h2 className="font-display font-bold text-white text-base">স্টাফ মোড পিন</h2>
@@ -795,20 +802,20 @@ export default function MerchantSettings({
               onClick={handleRequestPinOtp}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
             >
-              🔑 {pinStatus?.hasPin ? "পিন পরিবর্তন করুন" : "পিন সেট করুন"}
+              {pinStatus?.hasPin ? "পিন পরিবর্তন করুন" : "পিন সেট করুন"}
             </button>
           )}
 
           {pinStep === "sending_otp" && (
             <div className="text-center py-3 text-white/70 text-sm">
-              <span className="inline-block animate-spin mr-1">⏳</span> OTP পাঠানো হচ্ছে...
+              <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> OTP পাঠানো হচ্ছে...
             </div>
           )}
 
           {pinStep === "enter_otp_and_pin" && (
             <div className="space-y-3">
               <div className="bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl px-3 py-2.5 text-xs text-amber-200">
-                📱 মালিকের ফোনে ({pinStatus?.ownerPhoneMasked || "নিবন্ধিত নম্বরে"}) OTP পাঠানো হয়েছে
+                মালিকের ফোনে ({pinStatus?.ownerPhoneMasked || "নিবন্ধিত নম্বরে"}) OTP পাঠানো হয়েছে
               </div>
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">OTP কোড</label>
@@ -852,7 +859,7 @@ export default function MerchantSettings({
 
           {pinStep === "saving" && (
             <div className="text-center py-3 text-white/70 text-sm">
-              <span className="inline-block animate-spin mr-1">⏳</span> Saving PIN...
+              <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> Saving PIN...
             </div>
           )}
         </div>

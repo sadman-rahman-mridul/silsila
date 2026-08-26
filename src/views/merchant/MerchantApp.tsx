@@ -120,18 +120,19 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
 
   if (showAnalytics) {
     return (
-      <div className="flex flex-col h-full max-w-md mx-auto">
+      <div className="flex flex-col h-full bg-transparent max-w-md mx-auto relative overflow-hidden">
         <div className="flex-1 overflow-hidden relative">
           <div className="absolute inset-0 overflow-y-auto">
             <AnalyticsPage activeMerchantId={merchantId} />
           </div>
         </div>
-        <div className="bg-white border-t border-[#E9E5DC] px-4 py-3">
+        <div className="bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 px-4 py-3 shadow-2xl z-20">
           <button
             onClick={handleExitSpecialMode}
-            className="w-full py-3 rounded-2xl border border-[#E9E5DC] text-[#6B6158] font-medium text-sm hover:bg-[#F7F5F0] transition-colors cursor-pointer"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-emerald active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
           >
-            ← ড্যাশবোর্ডে ফিরুন
+            <ChevronLeftIcon size={18} />
+            <span>ড্যাশবোর্ডে ফিরুন</span>
           </button>
         </div>
       </div>

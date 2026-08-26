@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react"
 import { api, type PendingApproval } from "../../services/api"
-import { CheckIcon, XIcon } from "../../components/Icons"
+import { CheckIcon, XIcon, LockIcon, KeyIcon, MapPinIcon, ShieldCheckIcon } from "../../components/Icons"
 import { firebaseService } from "../../services/firebaseService"
 
 interface StaffModeProps {
   onExit: () => void
-  merchantId: string
+  merchantId?: string
+  activeMerchantId?: string
   merchantName?: string
 }
 
 type StaffStep = "pin" | "approvals"
 
-export default function StaffMode({ onExit, merchantId, merchantName }: StaffModeProps) {
+export default function StaffMode({ onExit, merchantId: propId, activeMerchantId, merchantName }: StaffModeProps) {
+  const merchantId = propId || activeMerchantId || ""
   const [step, setStep] = useState<StaffStep>("pin")
   const [pin, setPin] = useState("")
   const [pinError, setPinError] = useState<string | null>(null)
@@ -96,8 +98,8 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
       <div className="flex flex-col h-full bg-transparent items-center justify-center px-6">
         <div className="w-full max-w-xs bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/25 shadow-2xl">
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center mx-auto mb-3 shadow-lg glow-amber">
-              <span className="font-display font-black text-[#0A2318] text-2xl">সি</span>
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center mx-auto mb-3 shadow-lg glow-amber text-[#0A2318]">
+              <LockIcon size={26} />
             </div>
             <h1 className="font-display font-black text-white text-xl">কাউন্টার স্টাফ মোড</h1>
             <p className="text-white/60 text-xs mt-1">৪ সংখ্যার স্টাফ PIN দিন</p>
@@ -152,9 +154,9 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
 
           <button
             onClick={onExit}
-            className="w-full mt-5 py-2.5 rounded-xl text-white/50 text-xs font-bold hover:text-white transition-colors text-center cursor-pointer"
+            className="w-full mt-5 py-2.5 rounded-xl text-white/50 text-xs font-bold hover:text-white transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
           >
-            ← মালিকের ভিউতে ফিরুন
+            <span>← মালিকের ভিউতে ফিরুন</span>
           </button>
         </div>
       </div>
@@ -163,7 +165,7 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
 
   return (
     <div className="flex flex-col h-full bg-transparent">
-      <div className="px-5 pt-8 pb-4">
+      <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">স্টাফ মোড{merchantName ? " · " + merchantName : ""}</p>
@@ -171,9 +173,10 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
           </div>
           <button
             onClick={() => setStep("pin")}
-            className="px-3.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
+            className="px-3.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1.5"
           >
-            লক করুন
+            <LockIcon size={12} />
+            <span>লক করুন</span>
           </button>
         </div>
 
@@ -188,8 +191,8 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
       <div className="flex-1 overflow-y-auto px-4 pb-8 pt-2">
         {approvals.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-16 bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl border border-emerald-500/20 shadow-2xl p-6">
-            <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mb-3 text-3xl">
-              ✅
+            <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mb-3 text-[#34D399]">
+              <ShieldCheckIcon size={32} />
             </div>
             <p className="font-display font-black text-white text-lg mb-1">সব অনুমোদন সম্পন্ন</p>
             <p className="text-white/60 text-xs">কাউন্টারে কোনো কাস্টমার স্ক্যান করলে এখানে দৃশ্যমান হবে</p>
@@ -220,9 +223,10 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
                       </p>
                       <p className="text-white/60 text-xs mt-0.5">{approval.customerPhone}</p>
                       {dist !== undefined && dist >= 0 && (
-                        <div className="flex items-center justify-center gap-2 mt-2">
-                          <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/15 border border-[#34D399]/30 px-3 py-0.5 rounded-full">
-                            📍 {dist} মি. দূরে
+                        <div className="flex items-center justify-center gap-1.5 mt-2">
+                          <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/15 border border-[#34D399]/30 px-3 py-0.5 rounded-full flex items-center gap-1">
+                            <MapPinIcon size={12} />
+                            <span>{dist} মি. দূরে</span>
                           </span>
                         </div>
                       )}
@@ -230,11 +234,21 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
 
                     {res ? (
                       <div
-                        className={"text-center py-3.5 rounded-2xl font-display font-black text-sm " + (
+                        className={"text-center py-3.5 rounded-2xl font-display font-black text-sm flex items-center justify-center gap-2 " + (
                           res.result === "approved" ? "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30" : "bg-red-500/20 text-red-300 border border-red-500/30"
                         )}
                       >
-                        {res.result === "approved" ? "✓ সিল দেওয়া সম্পন্ন!" : "✗ প্রত্যাখ্যাত"}
+                        {res.result === "approved" ? (
+                          <>
+                            <CheckIcon size={16} />
+                            <span>সিল দেওয়া সম্পন্ন!</span>
+                          </>
+                        ) : (
+                          <>
+                            <XIcon size={16} />
+                            <span>প্রত্যাখ্যাত</span>
+                          </>
+                        )}
                       </div>
                     ) : (
                       <div className="flex gap-3">
@@ -250,7 +264,7 @@ export default function StaffMode({ onExit, merchantId, merchantName }: StaffMod
                           className="flex-1 h-16 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex flex-col items-center justify-center gap-0.5 text-[#0A2318] transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
                         >
                           <CheckIcon size={28} />
-                          <span className="font-display font-black text-base">সিল দিন ✓</span>
+                          <span className="font-display font-black text-base">সিল দিন</span>
                         </button>
                       </div>
                     )}

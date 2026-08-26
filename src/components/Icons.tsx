@@ -168,4 +168,128 @@ export function SparklesIcon({ size = 24, ...p }: IconProps) {
   )
 }
 
+export function TrophyIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" />
+      <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
+      <path d="M4 5h16v6a7 7 0 0 1-14 0V5z" />
+      <path d="M12 18v4" />
+      <path d="M8 22h8" />
+    </svg>
+  )
+}
+
+export function MedalIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="12" cy="14" r="6" />
+      <path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.12" />
+      <path d="M12 2v6" />
+      <path d="M7 3h10" />
+    </svg>
+  )
+}
+
+export function LockIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  )
+}
+
+export function KeyIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="7.5" cy="15.5" r="4.5" />
+      <path d="m21 3-9.5 9.5" />
+      <path d="m15.5 7.5 3 3L22 7l-3-3" />
+    </svg>
+  )
+}
+
+export function SmartphoneIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+      <line x1="12" y1="18" x2="12.01" y2="18" />
+    </svg>
+  )
+}
+
+export function FileTextIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
+  )
+}
+
+export function GlobeIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  )
+}
+
+export function ImageIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21 15 16 10 5 21" />
+    </svg>
+  )
+}
+
+export function AlertTriangleIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+  )
+}
+
+export function ShieldIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  )
+}
+
+export function CoffeeIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+      <line x1="6" y1="1" x2="6" y2="4" />
+      <line x1="10" y1="1" x2="10" y2="4" />
+      <line x1="14" y1="1" x2="14" y2="4" />
+    </svg>
+  )
+}
+
+export function BarChartIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <line x1="12" y1="20" x2="12" y2="10" />
+      <line x1="18" y1="20" x2="18" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="16" />
+    </svg>
+  )
+}
+
+
 
