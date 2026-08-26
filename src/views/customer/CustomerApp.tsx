@@ -139,8 +139,28 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
               <span className={`text-[10px] mt-1 font-bold ${tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>স্ক্যান</span>
             </button>
 
-            <NavBtn icon={<GiftIcon size={22} />} label="পুরস্কার" active={tab === "rewards"} onClick={() => handleTabChange("rewards")} badge={readyRewardsCount > 0 ? readyRewardsCount : undefined} />
-            <NavBtn icon={<UserIcon size={22} />} label="প্রোফাইল" active={tab === "profile"} onClick={() => handleTabChange("profile")} />
+            <NavBtn
+              icon={
+                (profile?.avatarUrl || profile?.photoURL) ? (
+                  <div
+                    className={`w-6 h-6 rounded-full overflow-hidden border transition-all ${
+                      tab === "profile" ? "border-[#34D399] ring-2 ring-[#34D399]/40 shadow-sm" : "border-white/40 opacity-70 group-hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={profile?.avatarUrl || profile?.photoURL}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <UserIcon size={22} />
+                )
+              }
+              label="প্রোফাইল"
+              active={tab === "profile"}
+              onClick={() => handleTabChange("profile")}
+            />
           </div>
         </nav>
       )}

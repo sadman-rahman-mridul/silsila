@@ -1,17 +1,27 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import { useLanguage } from "../../context/LanguageContext"
-import { LogOutIcon, ChevronRightIcon, ShieldCheckIcon, ChevronLeftIcon, BellIcon } from "../../components/Icons"
+import {
+  LogOutIcon,
+  ChevronRightIcon,
+  ShieldCheckIcon,
+  ChevronLeftIcon,
+  BellIcon,
+  CameraIcon,
+  CheckIcon,
+  RefreshIcon,
+  XIcon,
+} from "../../components/Icons"
 
 interface ProfilePageProps {
   onBack: () => void
 }
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
-  const { user, profile, logout } = useAuth()
+  const { user, profile, logout, updateSessionProfile } = useAuth()
   const { language, setLanguage, toggleLanguage, t } = useLanguage()
   const swipeHandlers = useSwipeBack(onBack)
   const lang = language === "en" ? "English" : "বাংলা"
@@ -24,43 +34,118 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
   const [deleteSuccess, setDeleteSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [cards, setCards] = useState<CustomerCard[]>([])
+
+  // Profile Photo & In-Browser 1:1 Cropper states
+  const [avatarUrl, setAvatarUrl] = useState<string>(profile?.avatarUrl || profile?.photoURL || "")
+  const [rawImage, setRawImage] = useState<string | null>(null)
+  const [imageScale, setImageScale] = useState(1)
+  const [imageOffsetY, setImageOffsetY] = useState(0)
+  const [imageOffsetX, setImageOffsetX] = useState(0)
+  const [savingPhoto, setSavingPhoto] = useState(false)
+  const [photoToast, setPhotoToast] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const customerId = profile?.id || user?.uid || null
 
   useEffect(() => {
-    if (!customerId) return
-    api.getCustomerCards(customerId).then(setCards).catch(console.warn)
-
-    const unsubscribe = firebaseService.subscribeCustomerCards(customerId, (firestoreCards) => {
-      if (firestoreCards.length > 0) setCards(firestoreCards)
-    })
-
-    return () => {
-      if (typeof unsubscribe === "function") unsubscribe()
+    if (profile?.avatarUrl || profile?.photoURL) {
+      setAvatarUrl(profile.avatarUrl || profile.photoURL || "")
     }
-  }, [customerId])
-
-  const totalStamps = cards.reduce((acc, c) => acc + (c.stamps || 0), 0)
-  const completedCount = cards.filter((c) => c.voucherReady || (c.cycleNo && c.cycleNo > 1)).length
-  // Completed cycles are counted with each card's own target, not a fixed 5.
-  const totalVisits = cards.reduce(
-    (acc, c) => acc + (c.stamps || 0) + ((c.cycleNo || 1) - 1) * (c.target || 0),
-    0
-  )
+  }, [profile?.avatarUrl, profile?.photoURL])
 
   const customer = {
     name: profile?.name || user?.displayName || "সম্মানিত গ্রাহক",
     phone: profile?.phone || user?.phoneNumber || "",
     joinedDate: profile?.createdAt
       ? new Date(profile.createdAt).toLocaleDateString("bn-BD", { year: "numeric", month: "long" })
-      : "",
-    totalStamps,
-    totalVisits,
-    cardsCompleted: completedCount,
+      : "আগস্ট ২০২৬",
   }
 
   const initialLetter = customer.name.trim().slice(0, 1) || "গ্র"
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith("image/")) {
+      alert("অনুগ্রহ করে একটি ছবি (PNG, JPG, WebP) নির্বাচন করুন")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setRawImage(reader.result as string)
+      setImageScale(1)
+      setImageOffsetY(0)
+      setImageOffsetX(0)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  async function handleApplyCropAndSave() {
+    if (!rawImage || !customerId) return
+    setSavingPhoto(true)
+    try {
+      const img = new Image()
+      img.onload = async () => {
+        const canvas = document.createElement("canvas")
+        const targetSize = 256 // 256x256 resolution
+        canvas.width = targetSize
+        canvas.height = targetSize
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return
+
+        ctx.fillStyle = "#071D13"
+        ctx.fillRect(0, 0, targetSize, targetSize)
+
+        const minDim = Math.min(img.width, img.height)
+        const scaleFactor = (targetSize / minDim) * imageScale
+
+        const scaledW = img.width * scaleFactor
+        const scaledH = img.height * scaleFactor
+        const posX = (targetSize - scaledW) / 2 + imageOffsetX
+        const posY = (targetSize - scaledH) / 2 + imageOffsetY
+
+        ctx.drawImage(img, posX, posY, scaledW, scaledH)
+
+        // Compress to efficient JPEG (~15-25 KB)
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.8)
+
+        // 1. Save to Firestore
+        await firebaseService.updateCustomerProfile(customerId, {
+          avatarUrl: compressedDataUrl,
+          photoURL: compressedDataUrl,
+        }).catch(console.warn)
+
+        // 2. Update local session profile
+        updateSessionProfile({
+          avatarUrl: compressedDataUrl,
+          photoURL: compressedDataUrl,
+        })
+        setAvatarUrl(compressedDataUrl)
+        setRawImage(null)
+        setSavingPhoto(false)
+        setPhotoToast("প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে ✓")
+        setTimeout(() => setPhotoToast(null), 3000)
+      }
+      img.src = rawImage
+    } catch (err) {
+      console.error("Failed to save cropped photo:", err)
+      setSavingPhoto(false)
+    }
+  }
+
+  async function handleRemovePhoto() {
+    if (!customerId) return
+    setAvatarUrl("")
+    if (fileInputRef.current) fileInputRef.current.value = ""
+    await firebaseService.updateCustomerProfile(customerId, {
+      avatarUrl: "",
+      photoURL: "",
+    }).catch(console.warn)
+    updateSessionProfile({ avatarUrl: "", photoURL: "" })
+    setPhotoToast("প্রোফাইল ছবি মুছে ফেলা হয়েছে")
+    setTimeout(() => setPhotoToast(null), 3000)
+  }
 
   async function handleLogout() {
     await logout()
@@ -88,6 +173,15 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
   return (
     <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelect}
+      />
+
       <div className="px-5 pt-8 pb-4">
         {/* Top Navigation Row */}
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
@@ -113,32 +207,40 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#10B981] to-[#047857] border-2 border-white/20 flex items-center justify-center shadow-xl glow-emerald">
-            <span className="font-display font-black text-white text-2xl">{initialLetter}</span>
+        {/* Profile Card Header with 1:1 Avatar & Upload Button */}
+        <div className="flex items-center gap-4 bg-[#0E281C]/90 backdrop-blur-xl border border-emerald-500/25 p-4 rounded-3xl shadow-xl">
+          <div className="relative group flex-shrink-0">
+            <div className="w-18 h-18 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-xl glow-emerald relative">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={customer.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-display font-black text-white text-3xl">{initialLetter}</span>
+              )}
+            </div>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              title="ছবি পরিবর্তন করুন"
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
+            >
+              <CameraIcon size={14} />
+            </button>
           </div>
-          <div>
-            <h1 className="font-display font-bold text-white text-xl drop-shadow-sm">{customer.name}</h1>
-            <p className="text-[#34D399] text-xs font-bold mt-0.5">{customer.phone}</p>
-            <p className="text-white/50 text-xs mt-0.5">সদস্য হয়েছেন {customer.joinedDate} থেকে</p>
+
+          <div className="flex-1 min-w-0">
+            <h1 className="font-display font-black text-white text-xl truncate drop-shadow-sm">{customer.name}</h1>
+            <p className="text-[#34D399] text-xs font-bold mt-0.5 font-mono">{customer.phone}</p>
+            <p className="text-white/50 text-[11px] mt-0.5">সদস্য হয়েছেন {customer.joinedDate} থেকে</p>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2.5">
-          {[
-            { label: "মোট সিল", value: customer.totalStamps, unit: "টি" },
-            { label: "মোট ভিজিট", value: customer.totalVisits, unit: "বার" },
-            { label: "কার্ড সম্পন্ন", value: customer.cardsCompleted, unit: "টি" },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-              <p className="font-display font-black text-white text-xl leading-none">
-                {stat.value}
-                <span className="text-xs font-medium text-white/50">{stat.unit}</span>
-              </p>
-              <p className="text-white/50 text-[10px] mt-1 font-medium">{stat.label}</p>
-            </div>
-          ))}
-        </div>
+        {/* Toast notification */}
+        {photoToast && (
+          <div className="mt-3 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in backdrop-blur-md">
+            <CheckIcon size={14} />
+            <span>{photoToast}</span>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 pb-24 pt-2">
@@ -248,6 +350,104 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Interactive 1:1 Circular Profile Picture Cropper Modal */}
+      {rawImage && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0A2318] border border-emerald-500/30 rounded-3xl p-5 max-w-sm w-full shadow-2xl animate-scale-up text-white">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-display font-black text-lg text-white">প্রোফাইল ছবি সেট করুন</h3>
+              <button
+                onClick={() => setRawImage(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 cursor-pointer"
+              >
+                <XIcon size={16} />
+              </button>
+            </div>
+
+            <p className="text-white/60 text-xs mb-4">
+              ১:১ বৃত্তাকার ফ্রেমে ছবি অ্যাডজাস্ট ও জুম করুন
+            </p>
+
+            {/* 1:1 Viewport Container */}
+            <div className="relative w-52 h-52 mx-auto rounded-full overflow-hidden border-4 border-[#34D399] shadow-2xl bg-black/40 flex items-center justify-center mb-5">
+              <div
+                className="w-full h-full relative"
+                style={{
+                  transform: `scale(${imageScale}) translate(${imageOffsetX}px, ${imageOffsetY}px)`,
+                  transition: "transform 0.05s linear",
+                }}
+              >
+                <img
+                  src={rawImage}
+                  alt="Cropper preview"
+                  className="w-full h-full object-cover select-none pointer-events-none"
+                />
+              </div>
+            </div>
+
+            {/* Zoom / Scale Slider */}
+            <div className="space-y-3 mb-5 px-2">
+              <div>
+                <div className="flex justify-between text-xs font-semibold text-white/70 mb-1">
+                  <span>জুম (Zoom)</span>
+                  <span className="font-mono text-[#34D399]">{imageScale.toFixed(1)}x</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.8"
+                  max="3"
+                  step="0.1"
+                  value={imageScale}
+                  onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                  className="w-full accent-[#34D399] cursor-pointer"
+                />
+              </div>
+
+              {/* Vertical Pan */}
+              <div>
+                <div className="flex justify-between text-xs font-semibold text-white/70 mb-1">
+                  <span>উল্লম্ব অবস্থান (Vertical Position)</span>
+                  <span className="font-mono text-[#34D399]">{imageOffsetY}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="-80"
+                  max="80"
+                  step="2"
+                  value={imageOffsetY}
+                  onChange={(e) => setImageOffsetY(parseInt(e.target.value))}
+                  className="w-full accent-[#34D399] cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setRawImage(null)}
+                className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white/80 rounded-2xl text-xs font-bold transition-all cursor-pointer"
+              >
+                বাতিল
+              </button>
+              <button
+                onClick={handleApplyCropAndSave}
+                disabled={savingPhoto}
+                className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-110 text-[#0A2318] rounded-2xl text-xs font-black transition-all cursor-pointer shadow-lg glow-emerald disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {savingPhoto ? (
+                  <>
+                    <RefreshIcon size={14} className="animate-spin" />
+                    <span>সংরক্ষণ হচ্ছে...</span>
+                  </>
+                ) : (
+                  <span>সংরক্ষণ করুন ✓</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

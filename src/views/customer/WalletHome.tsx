@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
@@ -156,7 +157,24 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           </div>
         </div>
 
-        <div className="flex items-start justify-between gap-3 mb-1">
+        <div className="flex items-center gap-3.5 mb-1">
+          <Link
+            to="/profile"
+            className="w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-lg glow-emerald flex-shrink-0 cursor-pointer active:scale-95 transition-all group"
+            title="প্রোফাইল দেখুন"
+          >
+            {(profile?.avatarUrl || profile?.photoURL) ? (
+              <img
+                src={profile?.avatarUrl || profile?.photoURL}
+                alt={displayName}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <span className="font-display font-black text-white text-lg">
+                {displayName.trim().slice(0, 1) || "গ্র"}
+              </span>
+            )}
+          </Link>
           <div className="flex-1 min-w-0">
             <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">স্বাগতম</p>
             <h1 className="font-display text-2xl font-black text-white truncate leading-tight mt-0.5 drop-shadow-sm">{displayName}</h1>

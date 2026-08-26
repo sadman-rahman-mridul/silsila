@@ -163,6 +163,29 @@ export const firebaseService = {
     }
   },
 
+  /** Update a customer profile in `users`. */
+  async updateCustomerProfile(customerId: string, updates: Record<string, unknown>) {
+    if (!customerId) return
+    try {
+      let docId = customerId
+      if (!docId.startsWith("c_") && /^\d+$/.test(docId)) {
+        docId = `c_${docId.slice(-10)}`
+      }
+      const data: Record<string, unknown> = {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+      }
+      Object.keys(data).forEach((k) => {
+        if (data[k] === undefined) delete data[k]
+      })
+      await setDoc(doc(firestore, USERS, docId), data, { merge: true })
+      return true
+    } catch (err) {
+      console.warn("Failed to update customer in Firestore:", err)
+      throw err
+    }
+  },
+
   /** Write a merchant/brand document to `merchants`, keyed by merchant id. */
   async saveMerchantProfile(merchant: {
     id: string

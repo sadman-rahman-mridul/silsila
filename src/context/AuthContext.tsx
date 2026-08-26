@@ -10,6 +10,8 @@ export interface UserProfile {
   phone: string
   name: string
   role: UserRole
+  avatarUrl?: string
+  photoURL?: string
   /** Set for merchants only: the brand this console session is managing. */
   merchantId?: string
   /** Every brand owned by this merchant. A merchant can switch only between these. */
