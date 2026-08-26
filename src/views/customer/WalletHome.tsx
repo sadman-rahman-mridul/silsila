@@ -271,8 +271,20 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 <button
                   key={card.id}
                   onClick={() => onSelectCard(card.merchantId)}
-                  className="w-full text-left rounded-3xl overflow-hidden shadow-2xl transition-all active:scale-[0.99] cursor-pointer hover:border-emerald-400/40 border border-white/10 bg-[#0E281C]/85 backdrop-blur-xl group relative"
+                  className="w-full text-left rounded-3xl overflow-hidden shadow-2xl transition-all active:scale-[0.99] cursor-pointer hover:border-emerald-400/40 border border-white/10 bg-[#0E281C]/90 backdrop-blur-xl group relative"
                 >
+                  {/* Realistic Merchant Cover Photo Banner */}
+                  {merchant.coverUrl && (
+                    <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-[#0A2318]">
+                      <img
+                        src={merchant.coverUrl}
+                        alt={merchant.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0E281C]/40 to-[#0E281C]" />
+                    </div>
+                  )}
+
                   {card.voucherReady && (
                     <div className="bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
                       <div className="flex items-center gap-2">
@@ -287,10 +299,12 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     </div>
                   )}
 
-                  <div className="p-4">
+                  <div className={`p-4 ${merchant.coverUrl ? "pt-2" : ""}`}>
                     <div className="flex items-start gap-3 mb-3">
                       <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-md border border-white/15 overflow-hidden bg-[#0A2318]"
+                        className={`w-13 h-13 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-xl border-2 border-white/20 overflow-hidden bg-[#0A2318] glow-emerald ${
+                          merchant.coverUrl ? "-mt-7 relative z-10" : ""
+                        }`}
                         style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
                       >
                         {merchant.logoUrl ? (
