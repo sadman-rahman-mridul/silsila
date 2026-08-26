@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import WalletHome from "./WalletHome"
 import CardDetail from "./CardDetail"
 import ScanFlow from "./ScanFlow"
@@ -12,13 +13,26 @@ import { HomeIcon, CompassIcon, ScanIcon, GiftIcon, UserIcon } from "../../compo
 type CustomerTab = "home" | "explore" | "scan" | "rewards" | "profile"
 
 interface CustomerAppProps {
-  onBack: () => void
+  onBack?: () => void
   initialMerchantId?: string | null
+  initialTab?: CustomerTab
 }
 
-export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppProps) {
-  const { user, profile } = useAuth()
-  const [tab, setTab] = useState<CustomerTab>("home")
+export default function CustomerApp({ onBack, initialMerchantId, initialTab }: CustomerAppProps) {
+  const { user, profile, logout } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  function getTabFromPath(): CustomerTab {
+    const path = location.pathname.replace(/^\/+|\/+$/g, "").toLowerCase()
+    if (path === "explore") return "explore"
+    if (path === "scan") return "scan"
+    if (path === "rewards") return "rewards"
+    if (path === "profile") return "profile"
+    return "home"
+  }
+
+  const [tab, setTab] = useState<CustomerTab>(() => initialTab || getTabFromPath())
   const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(() => initialMerchantId || null)
   const [readyRewardsCount, setReadyRewardsCount] = useState<number>(0)
 
@@ -29,6 +43,11 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
       setSelectedMerchantId(initialMerchantId)
     }
   }, [initialMerchantId])
+
+  useEffect(() => {
+    const currentTab = getTabFromPath()
+    setTab(currentTab)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!customerId) return
@@ -44,51 +63,34 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
 
   async function handleOpenMerchant(idOrSlug: string) {
     if (!idOrSlug) return
-    setSelectedMerchantId(idOrSlug)
-
     try {
       let slug = idOrSlug.toLowerCase().trim()
-      // If it looks like a database ID (e.g. m_...), resolve its friendly business slug
       if (slug.startsWith("m_")) {
         const m = await firebaseService.getMerchantByIdOrSlug(idOrSlug).catch(() => null)
         if (m) {
           slug = m.slug || (m.nameEn ? m.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "") || (m.name ? m.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") : idOrSlug)
         }
       }
-      if (typeof window !== "undefined") {
-        const targetPath = `/${slug}`
-        if (window.location.pathname !== targetPath) {
-          window.history.pushState({ merchantId: idOrSlug, slug }, "", targetPath)
-        }
-      }
+      navigate(`/${slug}`)
     } catch {
-      if (typeof window !== "undefined") {
-        window.history.pushState({ merchantId: idOrSlug }, "", `/${idOrSlug}`)
-      }
+      navigate(`/${idOrSlug}`)
     }
   }
 
-  function handleCloseCard() {
+  function handleTabChange(nextTab: CustomerTab) {
+    setTab(nextTab)
     setSelectedMerchantId(null)
-    if (typeof window !== "undefined" && window.location.pathname !== "/") {
-      window.history.pushState({}, "", "/")
-    }
+    navigate(`/${nextTab}`)
   }
 
-  useEffect(() => {
-    function handlePopState() {
-      const path = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
-      const firstSegment = path.split("/")[0].toLowerCase().trim()
-      const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined", "home", "explore", "scan", "rewards", "profile"]
-      if (firstSegment && !reserved.includes(firstSegment)) {
-        setSelectedMerchantId(firstSegment)
-      } else {
-        setSelectedMerchantId(null)
-      }
+  async function handleLogout() {
+    if (onBack) {
+      onBack()
+    } else {
+      await logout()
+      navigate("/")
     }
-    window.addEventListener("popstate", handlePopState)
-    return () => window.removeEventListener("popstate", handlePopState)
-  }, [])
+  }
 
   const showCard = !!selectedMerchantId
 
@@ -97,29 +99,26 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
       <div className="flex-1 overflow-hidden relative">
         {showCard ? (
           <div className="absolute inset-0 overflow-y-auto">
-            <CardDetail merchantId={selectedMerchantId} onBack={handleCloseCard} />
+            <CardDetail merchantId={selectedMerchantId} onBack={() => navigate("/home")} />
           </div>
         ) : (
           <div className="absolute inset-0 overflow-y-auto">
             {tab === "home" && (
               <WalletHome
                 onSelectCard={(id) => handleOpenMerchant(id)}
-                onExploreClick={() => setTab("explore")}
-                onLogout={onBack}
+                onExploreClick={() => handleTabChange("explore")}
+                onLogout={handleLogout}
               />
             )}
-            {tab === "explore" && <ExplorePage onSelectMerchant={(id) => { handleOpenMerchant(id); setTab("home") }} />}
+            {tab === "explore" && <ExplorePage onSelectMerchant={(id) => handleOpenMerchant(id)} />}
             {tab === "scan" && (
               <ScanFlow
-                onNavigateToCard={(merchantId) => {
-                  handleOpenMerchant(merchantId)
-                  setTab("home")
-                }}
-                onNavigateHome={() => setTab("home")}
+                onNavigateToCard={(merchantId) => handleOpenMerchant(merchantId)}
+                onNavigateHome={() => handleTabChange("home")}
               />
             )}
             {tab === "rewards" && <RewardsPage />}
-            {tab === "profile" && <ProfilePage onBack={onBack} />}
+            {tab === "profile" && <ProfilePage onBack={handleLogout} />}
           </div>
         )}
       </div>
@@ -127,12 +126,12 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
       {!showCard && (
         <nav className="flex-shrink-0 bg-white border-t border-[#E9E5DC] px-2 pb-safe safe-area-inset-bottom" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           <div className="flex items-center justify-around">
-            <NavBtn icon={<HomeIcon size={22} />} label="হোম" active={tab === "home"} onClick={() => setTab("home")} />
-            <NavBtn icon={<CompassIcon size={22} />} label="খুঁজুন" active={tab === "explore"} onClick={() => setTab("explore")} />
+            <NavBtn icon={<HomeIcon size={22} />} label="হোম" active={tab === "home"} onClick={() => handleTabChange("home")} />
+            <NavBtn icon={<CompassIcon size={22} />} label="খুঁজুন" active={tab === "explore"} onClick={() => handleTabChange("explore")} />
 
             <button
-              onClick={() => setTab("scan")}
-              className="flex flex-col items-center -mt-5 relative"
+              onClick={() => handleTabChange("scan")}
+              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform"
             >
               <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all ${tab === "scan" ? "bg-[#F59E0B]" : "bg-[#1B4332]"}`}>
                 <ScanIcon size={24} className="text-white" />
@@ -140,8 +139,8 @@ export default function CustomerApp({ onBack, initialMerchantId }: CustomerAppPr
               <span className={`text-[10px] mt-1 font-medium ${tab === "scan" ? "text-[#F59E0B]" : "text-[#6B6158]"}`}>স্ক্যান</span>
             </button>
 
-            <NavBtn icon={<GiftIcon size={22} />} label="পুরস্কার" active={tab === "rewards"} onClick={() => setTab("rewards")} badge={readyRewardsCount > 0 ? readyRewardsCount : undefined} />
-            <NavBtn icon={<UserIcon size={22} />} label="প্রোফাইল" active={tab === "profile"} onClick={() => setTab("profile")} />
+            <NavBtn icon={<GiftIcon size={22} />} label="পুরস্কার" active={tab === "rewards"} onClick={() => handleTabChange("rewards")} badge={readyRewardsCount > 0 ? readyRewardsCount : undefined} />
+            <NavBtn icon={<UserIcon size={22} />} label="প্রোফাইল" active={tab === "profile"} onClick={() => handleTabChange("profile")} />
           </div>
         </nav>
       )}

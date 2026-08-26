@@ -1,13 +1,20 @@
-import React, { Component, useState, useEffect, type ErrorInfo, type ReactNode } from "react"
+import React, { Component, type ErrorInfo, type ReactNode } from "react"
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useParams,
+} from "react-router-dom"
 import Landing from "./views/Landing"
 import CustomerApp from "./views/customer/CustomerApp"
+import CardDetail from "./views/customer/CardDetail"
 import MerchantApp from "./views/merchant/MerchantApp"
 import OnboardingWizard from "./views/merchant/OnboardingWizard"
 import OpsConsole from "./views/ops/OpsConsole"
 import { AuthProvider, useAuth } from "./context/AuthContext"
 import { LanguageProvider } from "./context/LanguageContext"
-
-type AppView = "landing" | "customer" | "merchant" | "merchant-onboarding" | "ops"
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -68,103 +75,145 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-function getScannedMerchant() {
-  if (typeof window === "undefined") return null
-  const params = new URLSearchParams(window.location.search)
-  const mParam = params.get("m") || params.get("merchantId")
-  if (mParam) return mParam.trim()
+// Wrapper for Dynamic Merchant Slugs (e.g. /cafeb, /crimson-cup)
+function DynamicMerchantSlugRoute() {
+  const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
+  const { profile } = useAuth()
 
-  const path = window.location.pathname.replace(/^\/+|\/+$/g, "").trim()
-  if (!path) return null
-  const firstSegment = path.split("/")[0].toLowerCase().trim()
-  const reserved = ["api", "ops", "landing", "login", "register", "admin", "null", "undefined", "favicon.ico"]
-  if (!reserved.includes(firstSegment)) {
-    return firstSegment
+  const reserved = [
+    "api",
+    "ops",
+    "landing",
+    "login",
+    "register",
+    "admin",
+    "home",
+    "explore",
+    "scan",
+    "rewards",
+    "profile",
+    "merchant",
+    "favicon.ico",
+  ]
+
+  if (!slug || reserved.includes(slug.toLowerCase())) {
+    return <Navigate to="/" replace />
   }
-  return null
+
+  return (
+    <div className="flex flex-col h-full bg-[#F7F5F0] max-w-md mx-auto relative overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
+        <div className="absolute inset-0 overflow-y-auto">
+          <CardDetail
+            merchantId={slug}
+            onBack={() => {
+              if (profile?.role === "customer") {
+                navigate("/home")
+              } else {
+                navigate("/")
+              }
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  )
 }
 
-function MainContent() {
-  const { profile, updateSessionProfile, logout } = useAuth()
-  const [scannedMerchant, setScannedMerchant] = useState<string | null>(getScannedMerchant)
+function LandingRoute() {
+  const { profile } = useAuth()
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    function handlePop() {
-      setScannedMerchant(getScannedMerchant())
+  if (profile) {
+    if (profile.role === "customer") {
+      return <Navigate to="/home" replace />
     }
-    window.addEventListener("popstate", handlePop)
-    return () => window.removeEventListener("popstate", handlePop)
-  }, [])
-
-  const [view, setView] = useState<AppView>(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      if (params.get("view") === "ops" || window.location.pathname.toLowerCase().includes("/ops")) {
-        return "ops"
-      }
+    if (profile.role === "merchant") {
+      return (
+        <Navigate
+          to={profile.onboarded ? "/merchant/dashboard" : "/merchant/onboarding"}
+          replace
+        />
+      )
     }
-    const saved = typeof window !== "undefined" ? localStorage.getItem("silsila_profile") : null
-    if (saved) {
-      try {
-        const p = JSON.parse(saved)
-        if (p?.role === "merchant") return p.onboarded ? "merchant" : "merchant-onboarding"
-        if (p?.role === "customer") return "customer"
-      } catch {}
+    if (profile.role === "ops") {
+      return <Navigate to="/ops" replace />
     }
-    return "landing"
-  })
-
-  // Sync view when auth profile is modified
-  useEffect(() => {
-    if (!profile) {
-      if (view !== "ops") setView("landing")
-    } else {
-      if (profile.role === "customer") {
-        setView("customer")
-      } else if (profile.role === "merchant") {
-        setView(profile.onboarded ? "merchant" : "merchant-onboarding")
-      }
-    }
-  }, [profile])
-
-  const handleLogoutAndReturn = async () => {
-    await logout()
-    setView("landing")
-  }
-
-  if (view === "customer") {
-    return <CustomerApp onBack={handleLogoutAndReturn} initialMerchantId={scannedMerchant} />
-  }
-
-  if (view === "merchant-onboarding") {
-    return (
-      <OnboardingWizard
-        onBack={handleLogoutAndReturn}
-        onComplete={(merchantId) => {
-          updateSessionProfile({ merchantId, onboarded: true })
-          setView("merchant")
-        }}
-      />
-    )
-  }
-
-  if (view === "merchant") {
-    return <MerchantApp onBack={handleLogoutAndReturn} />
-  }
-
-  if (view === "ops") {
-    return <OpsConsole onBack={handleLogoutAndReturn} />
   }
 
   return (
     <Landing
-      initialMerchantSlug={scannedMerchant}
       onEnter={(role, opts) => {
-        if (role === "customer") setView("customer")
-        else if (role === "merchant") setView(opts?.needsOnboarding ? "merchant-onboarding" : "merchant")
-        else if (role === "ops") setView("ops")
+        if (role === "customer") navigate("/home")
+        else if (role === "merchant")
+          navigate(opts?.needsOnboarding ? "/merchant/onboarding" : "/merchant/dashboard")
+        else if (role === "ops") navigate("/ops")
       }}
     />
+  )
+}
+
+function OnboardingRoute() {
+  const { updateSessionProfile, logout } = useAuth()
+  const navigate = useNavigate()
+
+  return (
+    <OnboardingWizard
+      onBack={async () => {
+        await logout()
+        navigate("/")
+      }}
+      onComplete={(merchantId) => {
+        updateSessionProfile({ merchantId, onboarded: true })
+        navigate("/merchant/dashboard")
+      }}
+    />
+  )
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Root Landing */}
+      <Route path="/" element={<LandingRoute />} />
+
+      {/* Customer Routes */}
+      <Route path="/home" element={<CustomerApp initialTab="home" />} />
+      <Route path="/explore" element={<CustomerApp initialTab="explore" />} />
+      <Route path="/scan" element={<CustomerApp initialTab="scan" />} />
+      <Route path="/rewards" element={<CustomerApp initialTab="rewards" />} />
+      <Route path="/profile" element={<CustomerApp initialTab="profile" />} />
+
+      {/* Merchant Routes */}
+      <Route path="/merchant/onboarding" element={<OnboardingRoute />} />
+      <Route path="/merchant" element={<Navigate to="/merchant/dashboard" replace />} />
+      <Route path="/merchant/dashboard" element={<MerchantApp initialTab="home" />} />
+      <Route path="/merchant/customers" element={<MerchantApp initialTab="customers" />} />
+      <Route path="/merchant/rewards" element={<MerchantApp initialTab="rewards" />} />
+      <Route path="/merchant/marketing" element={<MerchantApp initialTab="marketing" />} />
+      <Route path="/merchant/settings" element={<MerchantApp initialTab="settings" />} />
+      <Route path="/merchant/analytics" element={<MerchantApp initialTab="analytics" />} />
+      <Route path="/merchant/staff" element={<MerchantApp initialTab="staff" />} />
+
+      {/* Ops Route */}
+      <Route
+        path="/ops"
+        element={
+          <OpsConsole
+            onBack={() => {
+              window.location.href = "/"
+            }}
+          />
+        }
+      />
+
+      {/* Dynamic Merchant Slugs (e.g. /cafeb, /north-end, etc.) */}
+      <Route path="/:slug" element={<DynamicMerchantSlugRoute />} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
@@ -173,7 +222,9 @@ export default function App() {
     <ErrorBoundary>
       <LanguageProvider>
         <AuthProvider>
-          <MainContent />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
         </AuthProvider>
       </LanguageProvider>
     </ErrorBoundary>

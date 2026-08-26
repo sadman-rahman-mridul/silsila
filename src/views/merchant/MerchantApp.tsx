@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import MerchantDashboard from "./MerchantDashboard"
 import CustomersPage from "./CustomersPage"
 import RewardsManager from "./RewardsManager"
@@ -14,14 +15,29 @@ import { useAuth } from "../../context/AuthContext"
 type MerchantTab = "home" | "customers" | "rewards" | "marketing" | "settings"
 
 interface MerchantAppProps {
-  onBack: () => void
+  onBack?: () => void
+  initialTab?: "home" | "customers" | "rewards" | "marketing" | "settings" | "analytics" | "staff"
 }
 
-export default function MerchantApp({ onBack }: MerchantAppProps) {
-  const { profile } = useAuth()
-  const [tab, setTab] = useState<MerchantTab>("home")
-  const [showAnalytics, setShowAnalytics] = useState(false)
-  const [showStaffMode, setShowStaffMode] = useState(false)
+export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
+  const { profile, logout } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  function getTabStateFromPath() {
+    const path = location.pathname.replace(/^\/+|\/+$/g, "").toLowerCase()
+    if (path === "merchant/staff") return { tab: "home" as MerchantTab, staff: true, analytics: false }
+    if (path === "merchant/analytics") return { tab: "home" as MerchantTab, staff: false, analytics: true }
+    if (path === "merchant/customers") return { tab: "customers" as MerchantTab, staff: false, analytics: false }
+    if (path === "merchant/rewards") return { tab: "rewards" as MerchantTab, staff: false, analytics: false }
+    if (path === "merchant/marketing") return { tab: "marketing" as MerchantTab, staff: false, analytics: false }
+    if (path === "merchant/settings") return { tab: "settings" as MerchantTab, staff: false, analytics: false }
+    return { tab: "home" as MerchantTab, staff: false, analytics: false }
+  }
+
+  const [tab, setTab] = useState<MerchantTab>(() => initialTab && initialTab !== "staff" && initialTab !== "analytics" ? initialTab : getTabStateFromPath().tab)
+  const [showAnalytics, setShowAnalytics] = useState(() => initialTab === "analytics" || getTabStateFromPath().analytics)
+  const [showStaffMode, setShowStaffMode] = useState(() => initialTab === "staff" || getTabStateFromPath().staff)
 
   // Use profile to determine merchantId
   const [merchantId, setMerchantId] = useState<string>(
@@ -29,6 +45,13 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
   )
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState<number>(0)
   const [activeMerchant, setActiveMerchant] = useState<Merchant | null>(null)
+
+  useEffect(() => {
+    const state = getTabStateFromPath()
+    setTab(state.tab)
+    setShowStaffMode(state.staff)
+    setShowAnalytics(state.analytics)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!merchantId) return
@@ -61,21 +84,34 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
     setTab(nextTab)
     setShowAnalytics(false)
     setShowStaffMode(false)
+    navigate(`/merchant/${nextTab === "home" ? "dashboard" : nextTab}`)
   }
 
   function handleOpenStaff() {
     setShowStaffMode(true)
     setShowAnalytics(false)
+    navigate("/merchant/staff")
   }
 
   function handleOpenAnalytics() {
     setShowAnalytics(true)
     setShowStaffMode(false)
+    navigate("/merchant/analytics")
   }
 
   function handleExitSpecialMode() {
     setShowStaffMode(false)
     setShowAnalytics(false)
+    navigate("/merchant/dashboard")
+  }
+
+  async function handleLogout() {
+    if (onBack) {
+      onBack()
+    } else {
+      await logout()
+      navigate("/")
+    }
   }
 
   if (showStaffMode) {
@@ -142,7 +178,7 @@ export default function MerchantApp({ onBack }: MerchantAppProps) {
             👷 স্টাফ
           </button>
           <button
-            onClick={onBack}
+            onClick={handleLogout}
             title="লগ আউট করুন"
             className="p-1 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all cursor-pointer text-xs"
           >
