@@ -212,39 +212,46 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
     try {
       // 1. Fetch live merchant document from Firestore
       const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId).catch(() => null)
-      const expectedPin =
-        fbMerchant?.password ||
-        fbMerchant?.pin ||
-        (profile as any)?.password ||
-        (profile as any)?.pin ||
-        ""
+      
+      const candidatePins = [
+        fbMerchant?.pin,
+        fbMerchant?.password,
+        (profile as any)?.pin,
+        (profile as any)?.password,
+      ].filter(Boolean).map(String)
 
-      if (expectedPin && expectedPin === code) {
+      // Check direct candidate match
+      let isMatch = candidatePins.some((p) => p === code || p === code.slice(0, 5))
+
+      if (!isMatch) {
+        // Fallback: check phone account in Firestore
+        const ownerPhone = profile?.phone || fbMerchant?.ownerPhone || fbMerchant?.phone || ""
+        if (ownerPhone) {
+          const account = await firebaseService.findAccountByPhone(ownerPhone, "merchant").catch(() => null)
+          if (account && (account.password === code || account.pin === code || account.password === code.slice(0, 5))) {
+            isMatch = true
+          }
+        }
+      }
+
+      if (isMatch) {
+        // Auto-upgrade legacy short passwords in Firestore if needed
+        if (merchantId) {
+          firebaseService.updateMerchantInFirestore(merchantId, {
+            password: code,
+            pin: code,
+          }).catch(console.warn)
+        }
         setShowOwnerUnlockModal(false)
         onExit()
         return
-      } else if (expectedPin && expectedPin !== code) {
-        setOwnerPinError(
-          isBn
-            ? "ভুল মালিক পিন! শুধুমাত্র স্টোরের মালিক প্রবেশ করতে পারবেন।"
-            : "Incorrect Owner PIN! Only the store owner can access Admin view."
-        )
-        return
-      } else {
-        // Fallback: check phone account in Firestore
-        const ownerPhone = profile?.phone || fbMerchant?.ownerPhone || ""
-        const account = await firebaseService.findAccountByPhone(ownerPhone, "merchant").catch(() => null)
-        if (account && (account.password === code || account.pin === code)) {
-          setShowOwnerUnlockModal(false)
-          onExit()
-          return
-        }
-        setOwnerPinError(
-          isBn
-            ? "ভুল মালিক পিন! শুধুমাত্র স্টোরের মালিক প্রবেশ করতে পারবেন।"
-            : "Incorrect Owner PIN! Only the store owner can access Admin view."
-        )
       }
+
+      setOwnerPinError(
+        isBn
+          ? "ভুল মালিক পিন! শুধুমাত্র স্টোরের মালিক প্রবেশ করতে পারবেন।"
+          : "Incorrect Owner PIN! Only the store owner can access Admin view."
+      )
     } catch (err: any) {
       setOwnerPinError(err?.message || (isBn ? "যাচাই করা যায়নি" : "Verification failed"))
     } finally {
