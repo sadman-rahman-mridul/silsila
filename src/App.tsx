@@ -14,7 +14,14 @@ import MerchantApp from "./views/merchant/MerchantApp"
 import OnboardingWizard from "./views/merchant/OnboardingWizard"
 import OpsConsole from "./views/ops/OpsConsole"
 import { AuthProvider, useAuth } from "./context/AuthContext"
-import { LanguageProvider } from "./context/LanguageContext"
+import { LanguageProvider, useLanguage } from "./context/LanguageContext"
+import {
+  HomeIcon,
+  CompassIcon,
+  ScanIcon,
+  GiftIcon,
+  UserIcon,
+} from "./components/Icons"
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -42,32 +49,23 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0] p-6 text-center">
-          <div className="w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-3xl mb-4 shadow-inner">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-[#071D13] text-white p-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-3xl mb-4 shadow-xl">
             ⚠️
           </div>
-          <h2 className="font-display font-bold text-[#1A1916] text-lg mb-1">
-            কিছু সমস্যা হয়েছে (An error occurred)
-          </h2>
-          <p className="text-[#6B6158] text-xs mb-6 max-w-xs leading-relaxed">
-            {this.state.error?.message || "পেজটি লোড করতে সমস্যা হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।"}
+          <h2 className="text-xl font-bold mb-2">কিছু সমস্যা হয়েছে (An error occurred)</h2>
+          <p className="text-white/60 text-sm max-w-sm mb-6">
+            {this.state.error?.message || "অ্যাপটি লোড করার সময় একটি অপ্রত্যাশিত ত্রুটি হয়েছে।"}
           </p>
-          <div className="flex gap-3 w-full max-w-xs">
-            <button
-              onClick={() => {
-                window.location.href = "/"
-              }}
-              className="flex-1 py-3 bg-[#1B4332] text-white font-bold text-xs rounded-xl hover:bg-[#2D6A4F] transition-all cursor-pointer shadow-md"
-            >
-              হোমে ফিরে যান
-            </button>
-            <button
-              onClick={() => window.location.reload()}
-              className="flex-1 py-3 bg-[#E9E5DC] text-[#1A1916] font-bold text-xs rounded-xl hover:bg-[#DCD7CD] transition-all cursor-pointer"
-            >
-              🔄 রিলোড
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false, error: null })
+              window.location.href = "/"
+            }}
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-white font-bold text-sm shadow-lg glow-emerald cursor-pointer active:scale-95 transition-all"
+          >
+            হোমে ফিরে যান (Reload Home)
+          </button>
         </div>
       )
     }
@@ -75,11 +73,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-// Wrapper for Dynamic Merchant Slugs (e.g. /cafeb, /crimson-cup)
-function DynamicMerchantSlugRoute() {
+function PublicMerchantRoute() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { profile } = useAuth()
+  const { isBn } = useLanguage()
 
   const reserved = [
     "api",
@@ -102,7 +100,7 @@ function DynamicMerchantSlugRoute() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0] max-w-md mx-auto relative overflow-hidden">
+    <div className="flex flex-col h-full bg-[#071D13] bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] text-white max-w-md mx-auto relative overflow-hidden">
       <div className="flex-1 overflow-hidden relative">
         <div className="absolute inset-0 overflow-y-auto">
           <CardDetail
@@ -117,6 +115,88 @@ function DynamicMerchantSlugRoute() {
           />
         </div>
       </div>
+
+      {/* Static Bottom Navigation (Facebook style) */}
+      {profile?.role === "customer" ? (
+        <nav
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
+          <div className="flex items-center justify-around">
+            <button
+              onClick={() => navigate("/home")}
+              className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
+            >
+              <HomeIcon size={22} />
+              <span className="text-[10px] mt-1 font-medium">{isBn ? "হোম" : "Home"}</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/explore")}
+              className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
+            >
+              <CompassIcon size={22} />
+              <span className="text-[10px] mt-1 font-medium">{isBn ? "খুঁজুন" : "Explore"}</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/scan")}
+              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
+            >
+              <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20">
+                <ScanIcon size={24} className="text-[#071D13]" />
+              </div>
+              <span className="text-[10px] mt-1 font-bold text-[#52B788]">{isBn ? "স্ক্যান" : "Scan"}</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/rewards")}
+              className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
+            >
+              <GiftIcon size={22} />
+              <span className="text-[10px] mt-1 font-medium">{isBn ? "পুরস্কার" : "Rewards"}</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/profile")}
+              className="flex flex-col items-center py-2 px-3 text-[#52B788] hover:text-white transition-colors cursor-pointer active:scale-95"
+            >
+              {profile?.avatarUrl || profile?.photoURL ? (
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-white/40">
+                  <img
+                    src={profile?.avatarUrl || profile?.photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <UserIcon size={22} />
+              )}
+              <span className="text-[10px] mt-1 font-medium">{isBn ? "প্রোফাইল" : "Profile"}</span>
+            </button>
+          </div>
+        </nav>
+      ) : (
+        <div
+          className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 pb-safe safe-area-inset-bottom shadow-2xl z-20 flex items-center justify-between gap-3"
+          style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-black text-xs text-[#0A2318]">
+              🔖
+            </div>
+            <p className="text-white text-xs font-bold leading-tight">
+              {isBn ? "সিল সংগ্রহ করতে লগইন করুন" : "Sign in to earn stamps"}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="px-4 py-2 rounded-xl bg-[#F59E0B] text-[#0A2318] font-display font-black text-xs shadow-lg glow-amber cursor-pointer active:scale-95 transition-all"
+          >
+            {isBn ? "লগইন / যুক্ত হন" : "Sign In / Join"}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

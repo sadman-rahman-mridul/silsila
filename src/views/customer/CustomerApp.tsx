@@ -125,55 +125,54 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
         )}
       </div>
 
-      {!showCard && (
-        <nav className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-          <div className="flex items-center justify-around">
-            <NavBtn icon={<HomeIcon size={22} />} label={isBn ? "হোম" : "Home"} active={tab === "home"} onClick={() => handleTabChange("home")} />
-            <NavBtn icon={<CompassIcon size={22} />} label={isBn ? "খুঁজুন" : "Explore"} active={tab === "explore"} onClick={() => handleTabChange("explore")} />
+      {/* Static Bottom Navigation (Facebook style) */}
+      <nav className="flex-shrink-0 bg-[#092015]/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+        <div className="flex items-center justify-around">
+          <NavBtn icon={<HomeIcon size={22} />} label={isBn ? "হোম" : "Home"} active={!showCard && tab === "home"} onClick={() => handleTabChange("home")} />
+          <NavBtn icon={<CompassIcon size={22} />} label={isBn ? "খুঁজুন" : "Explore"} active={!showCard && tab === "explore"} onClick={() => handleTabChange("explore")} />
 
-            <button
-              onClick={() => handleTabChange("scan")}
-              className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
-            >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all ${tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
-                <ScanIcon size={24} className="text-[#071D13]" />
-              </div>
-              <span className={`text-[10px] mt-1 font-bold ${tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>{isBn ? "স্ক্যান" : "Scan"}</span>
-            </button>
+          <button
+            onClick={() => handleTabChange("scan")}
+            className="flex flex-col items-center -mt-5 relative cursor-pointer active:scale-95 transition-transform group"
+          >
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all ${!showCard && tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
+              <ScanIcon size={24} className="text-[#071D13]" />
+            </div>
+            <span className={`text-[10px] mt-1 font-bold ${!showCard && tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>{isBn ? "স্ক্যান" : "Scan"}</span>
+          </button>
 
-            <NavBtn
-              icon={<GiftIcon size={22} />}
-              label={isBn ? "পুরস্কার" : "Rewards"}
-              active={tab === "rewards"}
-              onClick={() => handleTabChange("rewards")}
-              badge={readyRewardsCount > 0 ? readyRewardsCount : undefined}
-            />
+          <NavBtn
+            icon={<GiftIcon size={22} />}
+            label={isBn ? "পুরস্কার" : "Rewards"}
+            active={!showCard && tab === "rewards"}
+            onClick={() => handleTabChange("rewards")}
+            badge={readyRewardsCount > 0 ? readyRewardsCount : undefined}
+          />
 
-            <NavBtn
-              icon={
-                (profile?.avatarUrl || profile?.photoURL) ? (
-                  <div
-                    className={`w-6 h-6 rounded-full overflow-hidden border transition-all ${
-                      tab === "profile" ? "border-[#34D399] ring-2 ring-[#34D399]/40 shadow-sm" : "border-white/40 opacity-70 group-hover:opacity-100"
-                    }`}
-                  >
-                    <img
-                      src={profile?.avatarUrl || profile?.photoURL}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <UserIcon size={22} />
-                )
-              }
-              label={isBn ? "প্রোফাইল" : "Profile"}
-              active={tab === "profile"}
-              onClick={() => handleTabChange("profile")}
-            />
-          </div>
-        </nav>
-      )}
+          <NavBtn
+            icon={
+              (profile?.avatarUrl || profile?.photoURL) ? (
+                <div
+                  className={`w-6 h-6 rounded-full overflow-hidden border transition-all ${
+                    !showCard && tab === "profile" ? "border-[#34D399] ring-2 ring-[#34D399]/40 shadow-sm" : "border-white/40 opacity-70 group-hover:opacity-100"
+                  }`}
+                >
+                  <img
+                    src={profile?.avatarUrl || profile?.photoURL}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <UserIcon size={22} />
+              )
+            }
+            label={isBn ? "প্রোফাইল" : "Profile"}
+            active={!showCard && tab === "profile"}
+            onClick={() => handleTabChange("profile")}
+          />
+        </div>
+      </nav>
     </div>
   )
 }

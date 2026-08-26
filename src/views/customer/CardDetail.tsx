@@ -334,14 +334,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0]">
-        <div className="w-12 h-12 rounded-2xl bg-[#1B4332]/10 flex items-center justify-center text-2xl animate-spin mb-3">
+      <div className="flex flex-col h-full items-center justify-center bg-[#071D13] text-white">
+        <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl animate-spin mb-3 shadow-xl backdrop-blur-md">
           ⏳
         </div>
-        <p className="text-[#1B4332] font-display font-bold text-sm">
+        <p className="text-white font-display font-bold text-sm">
           {isBn ? "কার্ডের তথ্য লোড হচ্ছে..." : "Loading card details..."}
         </p>
-        <p className="text-[#6B6158] text-xs mt-1">
+        <p className="text-white/60 text-xs mt-1">
           {isBn ? "অনুগ্রহ করে একটু অপেক্ষা করুন" : "Please wait a moment"}
         </p>
       </div>
@@ -350,14 +350,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
   if (!data) {
     return (
-      <div className="flex flex-col h-full items-center justify-center bg-[#F7F5F0] p-6 text-center">
-        <div className="w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-3xl mb-4 shadow-inner">
+      <div className="flex flex-col h-full items-center justify-center bg-[#071D13] p-6 text-center text-white">
+        <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-3xl mb-4 shadow-xl">
           ⚠️
         </div>
-        <h2 className="font-display font-bold text-[#1A1916] text-lg mb-1">
+        <h2 className="font-display font-bold text-white text-lg mb-1">
           {error || (isBn ? "দোকানের তথ্য পাওয়া যায়নি" : "Store information not found")}
         </h2>
-        <p className="text-[#6B6158] text-xs mb-6 max-w-xs leading-relaxed">
+        <p className="text-white/60 text-xs mb-6 max-w-xs leading-relaxed">
           {isBn
             ? "দোকানটির কিউআর কোড সঠিক নাও হতে পারে অথবা নেটওয়ার্ক সমস্যা হতে পারে।"
             : "The QR code may be invalid or there is a network issue."}
@@ -365,13 +365,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
         <div className="flex gap-3 w-full max-w-xs">
           <button
             onClick={onBack}
-            className="flex-1 py-3 bg-[#E9E5DC] text-[#1A1916] font-bold text-xs rounded-xl hover:bg-[#DCD7CD] transition-all cursor-pointer"
+            className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-white/15"
           >
             {isBn ? "← ফিরে যান" : "← Go Back"}
           </button>
           <button
             onClick={loadCardDetail}
-            className="flex-1 py-3 bg-[#1B4332] text-white font-bold text-xs rounded-xl hover:bg-[#2D6A4F] transition-all cursor-pointer shadow-md"
+            className="flex-1 py-3 bg-[#F59E0B] text-[#0A2318] font-bold text-xs rounded-xl hover:brightness-105 transition-all cursor-pointer shadow-lg glow-amber"
           >
             {isBn ? "🔄 পুনরায় চেষ্টা" : "🔄 Retry"}
           </button>
@@ -391,28 +391,42 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
     <div className="flex flex-col h-full bg-transparent overflow-y-auto" {...swipeHandlers}>
       {/* UNIFIED SCROLLING CONTAINER */}
       <div>
-        {/* Top Gradient Header */}
-        <div
-          className="relative overflow-hidden"
-          style={{ background: `linear-gradient(145deg, #155E3E 0%, #071D13 100%)` }}
-        >
-          <div className="absolute inset-0 opacity-10">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute text-white text-4xl opacity-20 select-none pointer-events-none"
-                style={{ top: `${(i * 37) % 100}%`, left: `${(i * 53) % 100}%`, transform: "rotate(-15deg)" }}
-              >
-                {isBn ? "সিল" : "Stamp"}
+        {/* Top Header with Merchant Cover Photo */}
+        <div className="relative overflow-hidden min-h-[190px]">
+          {/* Cover Photo Background or Stylized Fallback */}
+          {merchant.coverUrl ? (
+            <div className="absolute inset-0 z-0">
+              <img
+                src={merchant.coverUrl}
+                alt={merchant.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#071D13]/50 via-[#071D13]/80 to-[#071D13]" />
+            </div>
+          ) : (
+            <div
+              className="absolute inset-0 z-0"
+              style={{ background: `linear-gradient(145deg, #155E3E 0%, #071D13 100%)` }}
+            >
+              <div className="absolute inset-0 opacity-10">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute text-white text-4xl opacity-20 select-none pointer-events-none"
+                    style={{ top: `${(i * 37) % 100}%`, left: `${(i * 53) % 100}%`, transform: "rotate(-15deg)" }}
+                  >
+                    {isBn ? "সিল" : "Stamp"}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
-          <div className="relative px-5 pt-10 pb-6">
+          <div className="relative z-10 px-5 pt-10 pb-6">
             <div className="flex items-center justify-between mb-5">
               <button
                 onClick={onBack}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10 active:scale-95 shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/20 active:scale-95 shadow-md"
               >
                 <ChevronLeftIcon size={16} />
                 <span>{isBn ? "হোম" : "Home"}</span>
@@ -420,13 +434,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
               <button
                 onClick={onBack}
-                className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95"
+                className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95 bg-white/10 px-3 py-1 rounded-xl backdrop-blur-md border border-white/15"
                 title={isBn ? "হোমে ফিরুন" : "Back to Home"}
               >
-                <div className="w-6 h-6 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs">
+                <div className="w-5 h-5 rounded-md bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-[10px]">
                   {isBn ? "স" : "S"}
                 </div>
-                <span className="font-display font-black text-white text-sm">
+                <span className="font-display font-black text-white text-xs">
                   {isBn ? "সিলসিলা" : "Silsila"}
                 </span>
               </button>
@@ -434,7 +448,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
             <div className="flex items-center gap-4 mb-5">
               <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/20 overflow-hidden flex-shrink-0 bg-[#0A2318]"
+                className="w-18 h-18 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/30 overflow-hidden flex-shrink-0 bg-[#0A2318] glow-emerald"
                 style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
               >
                 {merchant.logoUrl ? (
@@ -445,21 +459,23 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-sm">
+                  <h1 className="font-display font-black text-white text-2xl truncate drop-shadow-md">
                     {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                   </h1>
                   {merchant.verified && (
                     <ShieldCheckIcon size={18} className="text-[#34D399] flex-shrink-0" />
                   )}
                 </div>
-                <p className="text-white/70 text-xs mt-0.5">
+                <p className="text-white/80 text-xs mt-0.5 drop-shadow-xs font-medium">
                   {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
                 </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <FireIcon size={13} className="text-[#F59E0B]" />
-                  <span className="text-white/80 text-xs font-medium">
-                    {isBn ? `${card.streakCount || 1} সপ্তাহের সিলসিলা` : `${card.streakCount || 1} week streak`}
-                  </span>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <div className="px-2 py-0.5 rounded-md bg-[#F59E0B]/20 border border-[#F59E0B]/30 flex items-center gap-1">
+                    <FireIcon size={12} className="text-[#F59E0B]" />
+                    <span className="text-[#F59E0B] text-[11px] font-bold">
+                      {isBn ? `${card.streakCount || 1} সপ্তাহের সিলসিলা` : `${card.streakCount || 1} week streak`}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -769,13 +785,13 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
       {/* Real-Time Approval Modal */}
       {approvalStatus !== "idle" && (!minimizedWaiting || approvalStatus !== "waiting") && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full card-shadow-md animate-slide-up text-center border border-[#E9E5DC] relative">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in text-white">
+          <div className="bg-[#0A2318] border border-emerald-500/30 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-scale-up text-center relative">
             {approvalStatus === "waiting" && (
               <button
                 onClick={() => setMinimizedWaiting(true)}
                 title={isBn ? "মিনিমাইজ করুন" : "Minimize"}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[#F7F5F0] hover:bg-[#E9E5DC] text-[#6B6158] flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/70 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
               >
                 ✕
               </button>
@@ -786,33 +802,33 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
               <div>
                 <div className="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-[#F59E0B]/20 animate-ping" />
-                  <div className="w-16 h-16 rounded-full bg-[#FEF3C7] border-2 border-[#F59E0B] flex items-center justify-center text-[#F59E0B] shadow-inner">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#D97706] border-2 border-white/20 flex items-center justify-center text-[#0A2318] shadow-lg glow-amber">
                     <MapPinIcon size={28} />
                   </div>
                 </div>
 
-                <h3 className="font-display font-black text-2xl text-[#1A1916] mb-1.5">
+                <h3 className="font-display font-black text-2xl text-white mb-1.5 drop-shadow-sm">
                   {isBn ? "অনুমোদনের অপেক্ষা..." : "Waiting for Approval..."}
                 </h3>
                 <p className="text-xs font-bold text-[#F59E0B] uppercase tracking-wider mb-3">
                   {isBn ? "মার্চেন্ট অনুমোদনের অপেক্ষায়" : "Awaiting merchant approval"}
                 </p>
 
-                <p className="text-xs text-[#6B6158] leading-relaxed mb-5 bg-[#F7F5F0] p-3.5 rounded-2xl border border-[#E9E5DC]">
+                <p className="text-xs text-white/70 leading-relaxed mb-5 bg-[#071D13] p-3.5 rounded-2xl border border-emerald-500/20">
                   {isBn
                     ? "কাউন্টারে আপনার সিল অনুরোধ পাঠানো হয়েছে। মার্চেন্ট অনুমোদন করলেই আপনার কার্ডে নতুন সিল যুক্ত হবে।"
                     : "Stamp request sent to counter. Your stamp will appear as soon as staff approves."}
                 </p>
 
-                <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#1B4332] mb-5">
-                  <span className="w-2 h-2 rounded-full bg-[#52B788] animate-ping" />
+                <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#34D399] mb-5">
+                  <span className="w-2 h-2 rounded-full bg-[#34D399] animate-ping" />
                   <span>{isBn ? "কাউন্টার কানেক্টেড..." : "Connected to counter..."}</span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <button
                     onClick={() => setMinimizedWaiting(true)}
-                    className="w-full py-3 rounded-xl bg-[#1B4332] hover:bg-[#143427] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs shadow-lg glow-emerald transition-all cursor-pointer active:scale-95"
                   >
                     {isBn ? "লুকান ও ব্রাউজ চালিয়ে যান" : "Minimize & Continue"}
                   </button>
@@ -826,7 +842,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                         await firebaseService.resolveApprovalInFirestore(idToCancel, "rejected")
                       }
                     }}
-                    className="w-full py-2.5 rounded-xl border border-[#E9E5DC] text-[#6B6158] hover:bg-[#F7F5F0] font-medium text-xs transition-colors cursor-pointer"
+                    className="w-full py-2.5 rounded-xl border border-white/15 text-white/60 hover:bg-white/10 font-medium text-xs transition-colors cursor-pointer"
                   >
                     {isBn ? "অনুরোধ বাতিল করুন" : "Cancel Request"}
                   </button>
@@ -837,24 +853,24 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             {/* STATE 2: APPROVED */}
             {approvalStatus === "approved" && (
               <div>
-                <div className="w-20 h-20 rounded-full bg-[#D8EDDF] border-2 border-[#52B788] flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg text-[#1B4332] animate-bounce">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#10B981] to-[#047857] border-2 border-white/30 flex items-center justify-center text-3xl mx-auto mb-4 shadow-xl text-white animate-bounce glow-emerald">
                   ✓
                 </div>
 
-                <h3 className="font-display font-black text-2xl text-[#1B4332] mb-1">
+                <h3 className="font-display font-black text-2xl text-white mb-1 drop-shadow-sm">
                   {isBn ? "সিল অনুমোদিত!" : "Seal Approved!"}
                 </h3>
-                <p className="text-sm font-bold text-[#52B788] mb-3">
+                <p className="text-sm font-bold text-[#34D399] mb-3">
                   {isBn ? "সিল সফলভাবে যোগ হয়েছে ✓" : "Stamp added successfully ✓"}
                 </p>
 
-                <p className="text-xs text-[#6B6158] mb-6 bg-[#F0F7F2] p-3.5 rounded-2xl border border-[#52B788]/30">
+                <p className="text-xs text-white/70 mb-6 bg-[#071D13] p-3.5 rounded-2xl border border-emerald-500/25">
                   {approvalMessage || (isBn ? "+১টি নতুন সিল আপনার কার্ডে সফলভাবে যুক্ত হয়েছে!" : "+1 new stamp has been added to your card!")}
                 </p>
 
                 <button
                   onClick={() => setApprovalStatus("idle")}
-                  className="w-full py-3.5 bg-[#1B4332] hover:bg-[#143427] text-white font-display font-black text-sm rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] font-display font-black text-sm rounded-xl shadow-xl glow-amber transition-all active:scale-[0.98] cursor-pointer"
                 >
                   {isBn ? "চমৎকার! কার্ড দেখুন ✓" : "Awesome! View Card ✓"}
                 </button>
@@ -864,20 +880,20 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
             {/* STATE 3: REJECTED */}
             {approvalStatus === "rejected" && (
               <div>
-                <div className="w-16 h-16 rounded-full bg-red-50 border-2 border-red-300 flex items-center justify-center text-2xl text-red-500 mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-red-500/20 border-2 border-red-400/40 flex items-center justify-center text-2xl text-red-300 mx-auto mb-4 shadow-md">
                   ✕
                 </div>
 
-                <h3 className="font-display font-black text-xl text-[#1A1916] mb-1">
+                <h3 className="font-display font-black text-xl text-white mb-1">
                   {isBn ? "অনুরোধ প্রত্যাখ্যাত" : "Request Rejected"}
                 </h3>
-                <p className="text-xs text-[#6B6158] mb-6">
+                <p className="text-xs text-white/60 mb-6 bg-[#071D13] p-3 rounded-2xl border border-red-500/20">
                   {approvalMessage || (isBn ? "কাউন্টার থেকে অনুরোধটি অনুমোদন করা যায়নি।" : "The request could not be approved by staff.")}
                 </p>
 
                 <button
                   onClick={() => setApprovalStatus("idle")}
-                  className="w-full py-3 bg-[#6B6158] text-white font-bold text-xs rounded-xl cursor-pointer"
+                  className="w-full py-3 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl cursor-pointer transition-colors"
                 >
                   {isBn ? "বন্ধ করুন" : "Close"}
                 </button>
@@ -889,34 +905,34 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
       {/* Voucher Display Modal */}
       {showVoucherModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full card-shadow-md animate-slide-up text-center">
-            <div className="w-16 h-16 rounded-full bg-[#FEF3C7] flex items-center justify-center mx-auto mb-3 text-3xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in text-white">
+          <div className="bg-[#0A2318] border border-amber-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-scale-up text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center mx-auto mb-3 text-3xl shadow-lg glow-amber text-[#0A2318]">
               🎁
             </div>
-            <h3 className="font-display font-black text-2xl text-[#1A1916] mb-1">
+            <h3 className="font-display font-black text-2xl text-white mb-1 drop-shadow-sm">
               {isBn ? "অভিনন্দন!" : "Congratulations!"}
             </h3>
-            <p className="text-sm text-[#6B6158] mb-4">
+            <p className="text-xs text-white/70 mb-4">
               {isBn
                 ? `আপনি ${merchant.name}-এ `
                 : `You've completed `}
-              <strong>{target} {isBn ? "টি সিল" : "stamps"}</strong> {isBn ? "সম্পন্ন করেছেন" : `at ${merchant.name}`}
+              <strong className="text-[#34D399]">{target} {isBn ? "টি সিল" : "stamps"}</strong> {isBn ? "সম্পন্ন করেছেন" : `at ${merchant.name}`}
             </p>
 
-            <div className="bg-[#1B4332] text-white p-5 rounded-2xl mb-4">
-              <p className="text-xs text-[#52B788] uppercase tracking-widest font-bold mb-1">
+            <div className="bg-[#071D13] border border-emerald-500/25 text-white p-5 rounded-2xl mb-4 shadow-inner">
+              <p className="text-xs text-[#34D399] uppercase tracking-widest font-bold mb-1">
                 {isBn ? "ভাউচার কোড" : "Voucher Code"}
               </p>
               <p className="font-mono font-black text-2xl tracking-widest text-[#F59E0B]">
                 {card.voucherCode || "SL-M1-5X9K"}
               </p>
-              <p className="text-xs text-white/70 mt-2">
+              <p className="text-xs text-white/80 mt-2 font-medium">
                 {isBn ? "পুরস্কার: " : "Reward: "}{card.rewardText || program?.rewardText}
               </p>
             </div>
 
-            <p className="text-xs text-[#6B6158] mb-6">
+            <p className="text-xs text-white/60 mb-6">
               {isBn
                 ? "দোকানের কাউন্টারে এই কোডটি দেখান। স্টাফ তাদের পিন দিয়ে এটি রিডিম করবেন।"
                 : "Show this code at counter. Staff will redeem using their PIN."}
@@ -924,7 +940,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
             <button
               onClick={() => setShowVoucherModal(false)}
-              className="w-full py-3 bg-[#1B4332] text-white font-bold rounded-xl text-sm cursor-pointer"
+              className="w-full py-3.5 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] font-display font-black rounded-xl text-sm shadow-xl glow-amber cursor-pointer active:scale-95 transition-all"
             >
               {isBn ? "বন্ধ করুন" : "Close"}
             </button>

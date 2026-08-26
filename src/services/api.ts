@@ -6,6 +6,7 @@ export interface Merchant {
   area: string
   clusterId?: string
   logoUrl?: string
+  coverUrl?: string
   logoInitials: string
   logoBg: string
   logoColor: string
