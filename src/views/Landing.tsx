@@ -5,7 +5,7 @@ import { useLanguage } from "../context/LanguageContext"
 import { firebaseService } from "../services/firebaseService"
 import { GlobeIcon } from "../components/Icons"
 
-type LandingStep = "choose" | "phone" | "login_password" | "register_password" | "otp"
+type LandingStep = "choose" | "phone" | "login_pin" | "register_pin" | "otp"
 type Role = "customer" | "merchant"
 
 interface LandingProps {
@@ -19,8 +19,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   const [step, setStep] = useState<LandingStep>(() => (initialMerchantSlug ? "phone" : "choose"))
   const [role, setRole] = useState<Role>("customer")
   const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const [pin, setPin] = useState("")
+  const [showPin, setShowPin] = useState(false)
   const [consentGiven, setConsentGiven] = useState(true)
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [loading, setLoading] = useState(false)
@@ -41,7 +41,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     setError(null)
     setInfoMsg(null)
     setPhone("")
-    setPassword("")
+    setPin("")
     setIsExistingAccount(false)
     setExistingUserName(null)
     setCachedAccount(null)
@@ -80,36 +80,37 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       setExistingUserName(name)
 
       if (exists) {
-        // Phone matches an existing user in Firestore -> ask for Password (with OTP option below)
-        setStep("login_password")
+        // Phone matches an existing user in Firestore -> ask for 6-Digit PIN
+        setStep("login_pin")
         if (name) {
           setInfoMsg(
             isBn
-              ? `স্বাগতম ${name}! আপনার অ্যাকাউন্টের পাসওয়ার্ড লিখুন।`
-              : `Welcome back, ${name}! Please enter your password.`
+              ? `স্বাগতম ${name}! আপনার ৬ সংখ্যার পিন লিখুন।`
+              : `Welcome back, ${name}! Please enter your 6-digit PIN.`
           )
         }
       } else {
-        // Phone doesn't match any Firestore account -> ask to start Registration by writing password
-        setStep("register_password")
+        // Phone doesn't match any Firestore account -> ask to set a 6-digit PIN
+        setStep("register_pin")
         setInfoMsg(
           isBn
-            ? "এই নম্বরে কোনো অ্যাকাউন্ট নেই। অনুগ্রহ করে রেজিস্ট্রেশন করতে একটি পাসওয়ার্ড তৈরি করুন।"
-            : "No account found for this number. Please set a password to register."
+            ? "এই নম্বরে কোনো অ্যাকাউন্ট নেই। নিবন্ধন করতে আপনার ৬ সংখ্যার গোপন পিন সেট করুন।"
+            : "No account found for this number. Please set a 6-digit secret PIN to register."
         )
       }
     } catch (err: any) {
       console.error("Lookup error:", err)
-      setStep("register_password")
+      setStep("register_pin")
     } finally {
       setLoading(false)
     }
   }
 
-  // STEP 3A: Existing User Login with Password
-  async function handleExistingPasswordLogin() {
-    if (!password.trim()) {
-      setError(isBn ? "অনুগ্রহ করে আপনার পাসওয়ার্ড লিখুন" : "Please enter your password")
+  // STEP 3A: Existing User Login with 6-Digit PIN
+  async function handleExistingPinLogin(overridePin?: string) {
+    const pinToVerify = (overridePin || pin).trim()
+    if (pinToVerify.length !== 6 || !/^\d{6}$/.test(pinToVerify)) {
+      setError(isBn ? "অনুগ্রহ করে ৬ সংখ্যার সঠিক পিন দিন" : "Please enter a valid 6-digit numeric PIN")
       return
     }
 
@@ -120,7 +121,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     try {
       // Firestore-only authentication (single source of truth, role-aware)
       if (cachedAccount) {
-        if (cachedAccount.password && cachedAccount.password === password.trim()) {
+        const storedPin = cachedAccount.password || cachedAccount.pin || ""
+        if (storedPin && storedPin === pinToVerify) {
           const storedName =
             role === "merchant" ? cachedAccount.ownerName || cachedAccount.name : cachedAccount.name
           const resObj = {
@@ -133,11 +135,11 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           }
           await finalizeLogin(resObj, storedName || (isBn ? "ব্যবহারকারী" : "User"))
           return
-        } else if (cachedAccount.password && cachedAccount.password !== password.trim()) {
+        } else if (storedPin && storedPin !== pinToVerify) {
           setError(
             isBn
-              ? "ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
-              : "Incorrect password! Please try again or log in with OTP below."
+              ? "ভুল পিন! সঠিক ৬ সংখ্যার পিন দিন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+              : "Incorrect PIN! Please enter your 6-digit PIN or log in with OTP below."
           )
           return
         }
@@ -145,15 +147,15 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
       setError(
         isBn
-          ? "পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
-          : "Incorrect password. Please try again or log in with OTP below."
+          ? "পিন মেলেনি। সঠিক ৬ সংখ্যার পিন লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+          : "Incorrect PIN. Please enter your 6-digit PIN or log in with OTP below."
       )
     } catch (err: any) {
-      console.error("Password login error:", err)
+      console.error("PIN login error:", err)
       setError(
         isBn
-          ? "পাসওয়ার্ড ভুল হয়েছে। সঠিক পাসওয়ার্ড লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
-          : "Incorrect password. Please try again or log in with OTP below."
+          ? "পিন মেলেনি। সঠিক ৬ সংখ্যার পিন লিখুন অথবা নিচে 'OTP কোড দিয়ে লগইন করুন' চাপুন।"
+          : "Incorrect PIN. Please enter your 6-digit PIN or log in with OTP below."
       )
     } finally {
       setLoading(false)
@@ -161,9 +163,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   }
 
   // STEP 3B: New User Registration -> Send OTP verification first
-  async function handleNewUserRegisterSubmit() {
-    if (password.trim().length < 4) {
-      setError(isBn ? "পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে" : "Password must be at least 4 characters")
+  async function handleNewUserRegisterSubmit(overridePin?: string) {
+    const pinToSet = (overridePin || pin).trim()
+    if (pinToSet.length !== 6 || !/^\d{6}$/.test(pinToSet)) {
+      setError(isBn ? "পিন অবশ্যই ৬ সংখ্যার হতে হবে" : "PIN must be exactly 6 numeric digits")
       return
     }
 
@@ -244,7 +247,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         role,
         undefined,
         consentGiven,
-        password.trim() || undefined
+        pin.trim() || undefined
       )
 
       const storedName =
@@ -291,7 +294,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           id: accountId,
           name: finalName,
           phone: cleanPhone,
-          password: password.trim(),
+          password: pin.trim(),
         })
         // Set session and navigate
         const profile: UserProfile = {
@@ -312,7 +315,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           ownerPhone: cleanPhone,
           ownerName: finalName,
           name: "",
-          password: password.trim(),
+          password: pin.trim(),
           onboarded: false,
         })
         const profile: UserProfile = {
@@ -331,7 +334,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       }
 
       // Non-blocking backend sync
-      api.registerWithPassword(cleanPhone, password.trim(), finalName, role).catch(() => {})
+      api.registerWithPassword(cleanPhone, pin.trim(), finalName, role).catch(() => {})
     } catch (err: any) {
       console.error("Failed to save new profile:", err)
       setError(
@@ -370,7 +373,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         ownerPhone: phone,
         ownerName: finalName,
         name: merchant.name || "",
-        password: password.trim() || merchant.password || undefined,
+        password: pin.trim() || merchant.password || undefined,
         onboarded: hasCompletedOnboarding,
         createdAt: merchant.createdAt,
       })
@@ -395,7 +398,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       id: profile.id,
       phone,
       name: finalName,
-      password: password.trim() || customer?.password || undefined,
+      password: pin.trim() || customer?.password || undefined,
     })
 
     setSessionProfile(profile, res.token)
@@ -426,7 +429,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   return (
     <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] flex flex-col relative overflow-hidden">
       {/* Top Bar Quick Language Toggle */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-3 right-3 z-20">
         <button
           onClick={toggleLanguage}
           className="px-3 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer backdrop-blur-md border border-white/15 flex items-center gap-1.5 active:scale-95 shadow-md"
@@ -439,50 +442,52 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
       </div>
 
       {/* Ambient background glow orb */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-80 h-80 bg-[#52B788]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-72 h-72 bg-[#52B788]/15 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-16 pb-8 relative z-10">
-        <div className="text-center mb-8 animate-slide-up">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 mb-5 backdrop-blur-md border border-white/20 shadow-2xl glow-emerald">
-            <span className="text-4xl">🔖</span>
+      {/* Main Container - Lifted to Upper Side */}
+      <div className="flex-1 flex flex-col items-center justify-start pt-6 sm:pt-10 pb-6 px-4 relative z-10 w-full max-w-sm mx-auto">
+        {/* Compact Hero Branding */}
+        <div className="text-center mb-5 animate-slide-up">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/10 mb-2 backdrop-blur-md border border-white/20 shadow-xl glow-emerald">
+            <span className="text-3xl">🔖</span>
           </div>
-          <h1 className="font-display text-5xl font-black text-white tracking-tight leading-none mb-2 drop-shadow-md">
+          <h1 className="font-display text-3xl font-black text-white tracking-tight leading-none drop-shadow-md">
             {isBn ? "সিলসিলা" : "Silsila"}
           </h1>
-          <p className="text-[#34D399] text-base font-semibold tracking-wide mt-1 drop-shadow-sm">
+          <p className="text-[#34D399] text-xs font-semibold tracking-wide mt-1 drop-shadow-sm">
             {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your Brand's Digital Loyalty Card!"}
           </p>
         </div>
 
         {error && (
-          <div className="w-full max-w-sm mb-4 bg-red-500/20 border border-red-400/40 text-red-200 px-4 py-3 rounded-2xl text-sm animate-fade-in backdrop-blur-md shadow-lg">
+          <div className="w-full mb-3 bg-red-500/20 border border-red-400/40 text-red-200 px-3.5 py-2.5 rounded-2xl text-xs animate-fade-in backdrop-blur-md shadow-lg">
             ⚠️ {error}
           </div>
         )}
 
         {infoMsg && (
-          <div className="w-full max-w-sm mb-4 bg-[#52B788]/20 border border-[#52B788]/40 text-[#D8EDDF] px-4 py-3 rounded-2xl text-xs font-medium animate-fade-in backdrop-blur-md shadow-lg">
+          <div className="w-full mb-3 bg-[#52B788]/20 border border-[#52B788]/40 text-[#D8EDDF] px-3.5 py-2.5 rounded-2xl text-xs font-medium animate-fade-in backdrop-blur-md shadow-lg">
             ✓ {infoMsg}
           </div>
         )}
 
         {/* STEP 1: ROLE SELECTION (Customer and Merchant with icon above) */}
         {step === "choose" && (
-          <div className="w-full max-w-sm animate-slide-up grid grid-cols-2 gap-3.5">
+          <div className="w-full animate-slide-up grid grid-cols-2 gap-3">
             {/* Customer Button */}
             <button
               onClick={() => handleRoleSelect("customer")}
-              className="bg-white/95 rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-white text-center cursor-pointer shadow-2xl border border-white/40 group backdrop-blur-md"
+              className="bg-white/95 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 transition-all active:scale-[0.96] hover:bg-white text-center cursor-pointer shadow-2xl border border-white/40 group backdrop-blur-md"
             >
-              <div className="w-16 h-16 rounded-2xl bg-[#D8EDDF] text-[#1B4332] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-14 h-14 rounded-2xl bg-[#D8EDDF] text-[#1B4332] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 00-3-3.87" />
                   <path d="M16 3.13a4 4 0 010 7.75" />
                 </svg>
               </div>
-              <span className="text-[#1B4332] font-display font-black text-lg tracking-tight">
+              <span className="text-[#1B4332] font-display font-black text-base tracking-tight">
                 {isBn ? "কাস্টমার" : "Customer"}
               </span>
             </button>
@@ -490,17 +495,17 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             {/* Merchant Button */}
             <button
               onClick={() => handleRoleSelect("merchant")}
-              className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-6 flex flex-col items-center justify-center gap-3.5 transition-all active:scale-[0.96] hover:bg-[#123324] text-center cursor-pointer shadow-2xl border border-emerald-500/20 hover:border-emerald-500/40 group"
+              className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 flex flex-col items-center justify-center gap-3 transition-all active:scale-[0.96] hover:bg-[#123324] text-center cursor-pointer shadow-2xl border border-emerald-500/20 hover:border-emerald-500/40 group"
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-[#1B4332] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] text-[#1B4332] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 9l1.5-6h15L21 9" />
                   <path d="M3 9a3 3 0 006 0 3 3 0 006 0 3 3 0 006 0" />
                   <path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                   <line x1="10" y1="16" x2="14" y2="16" />
                 </svg>
               </div>
-              <span className="text-white font-display font-black text-lg tracking-tight">
+              <span className="text-white font-display font-black text-base tracking-tight">
                 {isBn ? "মার্চেন্ট" : "Merchant"}
               </span>
             </button>
@@ -509,24 +514,24 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
 
         {/* STEP 2: PHONE NUMBER ONLY */}
         {step === "phone" && (
-          <div className="w-full max-w-sm animate-slide-up">
+          <div className="w-full animate-slide-up">
             <button
               onClick={() => setStep("choose")}
-              className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+              className="text-white/70 text-xs mb-3 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
               {isBn ? "← ফিরে যান" : "← Back"}
             </button>
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-white font-display font-bold text-2xl">
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-white font-display font-bold text-xl">
                   {role === "customer"
-                    ? isBn ? "কাস্টমার" : "Customer"
-                    : isBn ? "মার্চেন্ট" : "Merchant"}
+                    ? isBn ? "কাস্টমার লগইন" : "Customer Login"
+                    : isBn ? "মার্চেন্ট লগইন" : "Merchant Login"}
                 </h2>
-                <span className="px-3 py-1 bg-white/15 rounded-full text-xs font-semibold text-white/80">
+                <span className="px-2.5 py-0.5 bg-white/15 rounded-full text-[11px] font-semibold text-white/80">
                   {role === "customer"
-                    ? isBn ? "কাস্টমার" : "Customer"
-                    : isBn ? "মার্চেন্ট" : "Merchant"}
+                    ? isBn ? "গ্রাহক" : "Customer"
+                    : isBn ? "দোকান/মালিক" : "Merchant"}
                 </span>
               </div>
 
@@ -535,16 +540,18 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               </p>
 
               {/* Phone Number Field */}
-              <div className="mb-5">
+              <div className="mb-4">
                 <label className="block text-white/80 text-xs font-semibold mb-1.5">
                   {isBn ? "মোবাইল নম্বর (+৮৮০)" : "Mobile Number (+880)"}
                 </label>
                 <div className="flex gap-2">
-                  <div className="bg-white/10 border border-white/20 rounded-xl px-3.5 py-3 text-white font-medium text-sm flex items-center">
+                  <div className="bg-white/10 border border-white/20 rounded-xl px-3 py-3 text-white font-medium text-sm flex items-center">
                     +880
                   </div>
                   <input
                     type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     autoFocus
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
@@ -554,23 +561,23 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                       }
                     }}
                     placeholder="01711234567"
-                    className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base"
+                    className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base font-mono"
                   />
                 </div>
               </div>
 
               {/* PDPA Consent Checkbox */}
-              <label className="flex items-start gap-2 mb-6 cursor-pointer text-xs text-white/70">
+              <label className="flex items-start gap-2 mb-5 cursor-pointer text-xs text-white/70">
                 <input
                   type="checkbox"
                   checked={consentGiven}
                   onChange={(e) => setConsentGiven(e.target.checked)}
                   className="mt-0.5 rounded text-[#1B4332] focus:ring-0 cursor-pointer"
                 />
-                <span>
+                <span className="text-[11px] leading-tight">
                   {isBn
                     ? "বাংলাদেশ ব্যক্তিগত ডেটা সুরক্ষা আইন ২০২৬ অনুযায়ী আমার লয়্যালটি স্ট্যাম্প সংরক্ষণে সম্মতি প্রদান করছি।"
-                    : "I consent to the collection and storage of my loyalty stamp information under Bangladesh Data Privacy Regulations (PDPA 2026)."}
+                    : "I consent to the collection and storage of my loyalty stamps under PDPA 2026."}
                 </span>
               </label>
 
@@ -592,24 +599,24 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
           </div>
         )}
 
-        {/* STEP 3A: EXISTING USER -> ENTER PASSWORD (WITH OTP OPTION BELOW) */}
-        {step === "login_password" && (
-          <div className="w-full max-w-sm animate-slide-up">
+        {/* STEP 3A: EXISTING USER -> ENTER 6-DIGIT PIN (bKash Style) */}
+        {step === "login_pin" && (
+          <div className="w-full animate-slide-up">
             <button
-              onClick={() => { setStep("phone"); setError(null); }}
-              className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+              onClick={() => { setStep("phone"); setError(null); setPin(""); }}
+              className="text-white/70 text-xs mb-3 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
               {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-white font-display font-bold text-2xl">
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-white font-display font-bold text-xl">
                   {existingUserName
                     ? (isBn ? `স্বাগতম, ${existingUserName}!` : `Welcome, ${existingUserName}!`)
-                    : (isBn ? "লগইন করুন" : "Log In")}
+                    : (isBn ? "পিন দিন" : "Enter PIN")}
                 </h2>
-                <span className="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-[11px] font-bold">
-                  {isBn ? "বিদ্যমান অ্যাকাউন্ট" : "Existing Account"}
+                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-[10px] font-bold">
+                  {isBn ? "বিদ্যমান একাউন্ট" : "Existing User"}
                 </span>
               </div>
 
@@ -617,123 +624,199 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                 📱 +880 {phone}
               </p>
 
-              {/* Password Field */}
+              {/* 6-Digit PIN Field (bKash Style) */}
               <div className="mb-5">
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-2">
                   <label className="block text-white/80 text-xs font-semibold">
-                    {isBn ? "আপনার পাসওয়ার্ড" : "Your Password"}
+                    {isBn ? "আপনার ৬ সংখ্যার পিন" : "Your 6-Digit PIN"}
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer"
+                    onClick={() => setShowPin(!showPin)}
+                    className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer font-bold"
                   >
-                    {showPassword ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
+                    {showPin ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
                   </button>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  autoFocus
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && password.trim() && !loading) {
-                      handleExistingPasswordLogin()
-                    }
-                  }}
-                  placeholder={isBn ? "পাসওয়ার্ড লিখুন" : "Enter password"}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base"
-                />
+
+                {/* 6 PIN Digit Box Slots */}
+                <div className="relative">
+                  <div className="flex justify-between gap-1.5 mb-2">
+                    {Array.from({ length: 6 }).map((_, idx) => {
+                      const digit = pin[idx]
+                      const isFocused = pin.length === idx
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex-1 h-13 rounded-2xl border-2 flex items-center justify-center font-display font-black text-xl transition-all ${
+                            digit
+                              ? "border-[#34D399] bg-[#34D399]/20 text-white shadow-md glow-emerald"
+                              : isFocused
+                              ? "border-[#F59E0B] bg-white/15 ring-2 ring-[#F59E0B]/30"
+                              : "border-white/20 bg-white/5 text-white/30"
+                          }`}
+                        >
+                          {digit ? (showPin ? digit : "●") : ""}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Native Hidden/Overlay Numeric Input */}
+                  <input
+                    type={showPin ? "text" : "password"}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoFocus
+                    maxLength={6}
+                    value={pin}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 6)
+                      setPin(val)
+                      if (val.length === 6 && !loading) {
+                        handleExistingPinLogin(val)
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && pin.length === 6 && !loading) {
+                        handleExistingPinLogin()
+                      }
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full text-transparent bg-transparent"
+                  />
+                </div>
+
+                <p className="text-[11px] text-white/50 text-center mt-1">
+                  {isBn ? "শুধুমাত্র ৬টি সংখ্যা (0-9) লিখুন" : "Enter exactly 6 numeric digits"}
+                </p>
               </div>
 
               {/* Primary Button: Login */}
               <button
-                onClick={handleExistingPasswordLogin}
-                disabled={loading || !password.trim()}
+                onClick={() => handleExistingPinLogin()}
+                disabled={loading || pin.length !== 6}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
                 {loading
-                  ? isBn ? "লগইন হচ্ছে..." : "Logging In..."
+                  ? isBn ? "যাচাই হচ্ছে..." : "Verifying..."
                   : isBn ? "লগইন করুন ✓" : "Log In ✓"}
               </button>
 
               {/* Secondary Option: Request OTP */}
-              <div className="mt-4 pt-4 border-t border-white/15 text-center">
+              <div className="mt-3 pt-3 border-t border-white/15 text-center">
                 <button
                   type="button"
                   onClick={() => handleSendOtp()}
                   disabled={loading}
                   className="text-xs font-semibold text-white/80 hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
                 >
-                  {isBn ? "📲 অথবা OTP কোড দিয়ে লগইন করুন" : "📲 Or log in with OTP code"}
+                  {isBn ? "📲 পিন ভুলে গেছেন? OTP দিয়ে লগইন করুন" : "📲 Forgot PIN? Log in with OTP"}
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* STEP 3B: NEW USER -> ENTER PASSWORD TO REGISTER */}
-        {step === "register_password" && (
-          <div className="w-full max-w-sm animate-slide-up">
+        {/* STEP 3B: NEW USER -> ENTER 6-DIGIT PIN TO REGISTER (bKash Style) */}
+        {step === "register_pin" && (
+          <div className="w-full animate-slide-up">
             <button
-              onClick={() => { setStep("phone"); setError(null); }}
-              className="text-white/70 text-sm mb-4 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
+              onClick={() => { setStep("phone"); setError(null); setPin(""); }}
+              className="text-white/70 text-xs mb-3 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
               {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-white font-display font-bold text-2xl">
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-white font-display font-bold text-xl">
                   {isBn ? "নতুন রেজিস্ট্রেশন" : "New Registration"}
                 </h2>
-                <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-[11px] font-bold">
-                  {isBn ? "নতুন অ্যাকাউন্ট" : "New Account"}
+                <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full text-[10px] font-bold">
+                  {isBn ? "নতুন একাউন্ট" : "New User"}
                 </span>
               </div>
 
-              <p className="text-white/70 text-xs mb-4">
+              <p className="text-white/70 text-xs mb-3">
                 📱 +880 {phone}
               </p>
 
-              <div className="p-3 bg-white/5 border border-white/10 rounded-2xl mb-4 text-xs text-white/80 leading-relaxed">
+              <div className="p-2.5 bg-white/5 border border-white/10 rounded-2xl mb-3 text-xs text-white/80 leading-relaxed">
                 {isBn
-                  ? "এই নম্বরে কোনো অ্যাকাউন্ট নেই। নতুন অ্যাকাউন্ট তৈরি করতে আপনার পছন্দের একটি পাসওয়ার্ড সেট করুন।"
-                  : "No account found with this number. Please choose a password to create your account."}
+                  ? "নতুন অ্যাকাউন্ট তৈরি করতে আপনার পছন্দের একটি ৬ সংখ্যার গোপন পিন সেট করুন।"
+                  : "Please set a 6-digit secret numeric PIN for your new account."}
               </div>
 
-              {/* Password Field */}
-              <div className="mb-5">
-                <div className="flex items-center justify-between mb-1.5">
+              {/* 6-Digit PIN Field (bKash Style) */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <label className="block text-white/80 text-xs font-semibold">
-                    {isBn ? "নতুন পাসওয়ার্ড তৈরি করুন" : "Create New Password"}
+                    {isBn ? "৬ সংখ্যার পিন সেট করুন" : "Set 6-Digit Secret PIN"}
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer"
+                    onClick={() => setShowPin(!showPin)}
+                    className="text-xs text-[#52B788] hover:text-white transition-colors cursor-pointer font-bold"
                   >
-                    {showPassword ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
+                    {showPin ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
                   </button>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  autoFocus
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && password.trim().length >= 4 && !loading) {
-                      handleNewUserRegisterSubmit()
-                    }
-                  }}
-                  placeholder={isBn ? "পাসওয়ার্ড লিখুন (কমপক্ষে ৪ অক্ষর)" : "Enter password (at least 4 chars)"}
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 font-medium outline-none focus:border-[#52B788] transition-colors text-base"
-                />
+
+                {/* 6 PIN Digit Box Slots */}
+                <div className="relative">
+                  <div className="flex justify-between gap-1.5 mb-2">
+                    {Array.from({ length: 6 }).map((_, idx) => {
+                      const digit = pin[idx]
+                      const isFocused = pin.length === idx
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex-1 h-13 rounded-2xl border-2 flex items-center justify-center font-display font-black text-xl transition-all ${
+                            digit
+                              ? "border-[#F59E0B] bg-[#F59E0B]/20 text-[#F59E0B] shadow-md glow-amber"
+                              : isFocused
+                              ? "border-[#34D399] bg-white/15 ring-2 ring-[#34D399]/30"
+                              : "border-white/20 bg-white/5 text-white/30"
+                          }`}
+                        >
+                          {digit ? (showPin ? digit : "●") : ""}
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* Native Hidden/Overlay Numeric Input */}
+                  <input
+                    type={showPin ? "text" : "password"}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoFocus
+                    maxLength={6}
+                    value={pin}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "").slice(0, 6)
+                      setPin(val)
+                      if (val.length === 6 && !loading) {
+                        handleNewUserRegisterSubmit(val)
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && pin.length === 6 && !loading) {
+                        handleNewUserRegisterSubmit()
+                      }
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full text-transparent bg-transparent"
+                  />
+                </div>
+
+                <p className="text-[11px] text-white/50 text-center mt-1">
+                  {isBn ? "শুধুমাত্র ৬টি সংখ্যা (0-9) লিখুন" : "Enter exactly 6 numeric digits"}
+                </p>
               </div>
 
-              {/* Button: Set Password & Send OTP */}
+              {/* Button: Set PIN & Send OTP */}
               <button
-                onClick={handleNewUserRegisterSubmit}
-                disabled={loading || password.trim().length < 4}
+                onClick={() => handleNewUserRegisterSubmit()}
+                disabled={loading || pin.length !== 6}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
                 {loading

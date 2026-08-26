@@ -14,6 +14,7 @@ import {
 } from "../../components/Icons"
 import { firebaseService } from "../../services/firebaseService"
 import { useLanguage } from "../../context/LanguageContext"
+import { useAuth } from "../../context/AuthContext"
 
 interface StaffModeProps {
   onExit: () => void
@@ -26,6 +27,7 @@ type StaffStep = "pin" | "approvals"
 
 export default function StaffMode({ onExit, merchantId: propId, activeMerchantId, merchantName }: StaffModeProps) {
   const { isBn } = useLanguage()
+  const { profile } = useAuth()
   const merchantId = propId || activeMerchantId || ""
   const [step, setStep] = useState<StaffStep>("pin")
   const [activeTab, setActiveTab] = useState<"approvals" | "redeem">("approvals")
@@ -34,6 +36,13 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
   const [checking, setChecking] = useState(false)
   const [approvals, setApprovals] = useState<PendingApproval[]>([])
   const [resolved, setResolved] = useState<{ id: string; result: "approved" | "rejected" }[]>([])
+
+  // Owner Exit Verification states
+  const [showOwnerUnlockModal, setShowOwnerUnlockModal] = useState(false)
+  const [ownerPinInput, setOwnerPinInput] = useState("")
+  const [ownerPinError, setOwnerPinError] = useState<string | null>(null)
+  const [ownerVerifying, setOwnerVerifying] = useState(false)
+  const [showOwnerPin, setShowOwnerPin] = useState(false)
 
   // Voucher Redemption states
   const [voucherCodeInput, setVoucherCodeInput] = useState("")
@@ -184,6 +193,65 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
     }
   }
 
+  async function handleRequestOwnerExit() {
+    setShowOwnerUnlockModal(true)
+    setOwnerPinInput("")
+    setOwnerPinError(null)
+  }
+
+  async function handleVerifyOwnerExit(overridePin?: string) {
+    const code = (overridePin || ownerPinInput).trim()
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      setOwnerPinError(isBn ? "৬ সংখ্যার মালিকের পিন লিখুন" : "Enter 6-digit Owner PIN")
+      return
+    }
+
+    setOwnerVerifying(true)
+    setOwnerPinError(null)
+
+    try {
+      // 1. Fetch live merchant document from Firestore
+      const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId).catch(() => null)
+      const expectedPin =
+        fbMerchant?.password ||
+        fbMerchant?.pin ||
+        (profile as any)?.password ||
+        (profile as any)?.pin ||
+        ""
+
+      if (expectedPin && expectedPin === code) {
+        setShowOwnerUnlockModal(false)
+        onExit()
+        return
+      } else if (expectedPin && expectedPin !== code) {
+        setOwnerPinError(
+          isBn
+            ? "ভুল মালিক পিন! শুধুমাত্র স্টোরের মালিক প্রবেশ করতে পারবেন।"
+            : "Incorrect Owner PIN! Only the store owner can access Admin view."
+        )
+        return
+      } else {
+        // Fallback: check phone account in Firestore
+        const ownerPhone = profile?.phone || fbMerchant?.ownerPhone || ""
+        const account = await firebaseService.findAccountByPhone(ownerPhone, "merchant").catch(() => null)
+        if (account && (account.password === code || account.pin === code)) {
+          setShowOwnerUnlockModal(false)
+          onExit()
+          return
+        }
+        setOwnerPinError(
+          isBn
+            ? "ভুল মালিক পিন! শুধুমাত্র স্টোরের মালিক প্রবেশ করতে পারবেন।"
+            : "Incorrect Owner PIN! Only the store owner can access Admin view."
+        )
+      }
+    } catch (err: any) {
+      setOwnerPinError(err?.message || (isBn ? "যাচাই করা যায়নি" : "Verification failed"))
+    } finally {
+      setOwnerVerifying(false)
+    }
+  }
+
   const pinDigits = isBn
     ? ["১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯", "", "০", "⌫"]
     : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"]
@@ -254,12 +322,27 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
           </div>
 
           <button
-            onClick={onExit}
+            onClick={handleRequestOwnerExit}
             className="w-full mt-5 py-2.5 rounded-xl text-white/50 text-xs font-bold hover:text-white transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
           >
-            <span>{isBn ? "← মালিকের ভিউতে ফিরুন" : "← Back to Owner View"}</span>
+            <span>{isBn ? "🔒 মালিকের ভিউতে ফিরুন (Owner PIN)" : "🔒 Back to Owner View (Owner PIN)"}</span>
           </button>
         </div>
+
+        {/* Owner Unlock Modal on Pin Screen */}
+        {showOwnerUnlockModal && (
+          <OwnerUnlockModal
+            isBn={isBn}
+            ownerPinInput={ownerPinInput}
+            setOwnerPinInput={setOwnerPinInput}
+            ownerPinError={ownerPinError}
+            ownerVerifying={ownerVerifying}
+            showOwnerPin={showOwnerPin}
+            setShowOwnerPin={setShowOwnerPin}
+            onClose={() => setShowOwnerUnlockModal(false)}
+            onVerify={handleVerifyOwnerExit}
+          />
+        )}
       </div>
     )
   }
@@ -277,13 +360,23 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
               {isBn ? "কাউন্টার কন্ট্রোল" : "Counter Control"}
             </h1>
           </div>
-          <button
-            onClick={() => setStep("pin")}
-            className="px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <LockIcon size={12} />
-            <span>{isBn ? "লক করুন" : "Lock"}</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setStep("pin")}
+              className="px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1"
+            >
+              <LockIcon size={12} />
+              <span>{isBn ? "লক" : "Lock"}</span>
+            </button>
+            <button
+              onClick={handleRequestOwnerExit}
+              className="px-2.5 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+              title={isBn ? "মালিকের ড্যাশবোর্ডে ফিরুন" : "Exit to Owner Dashboard"}
+            >
+              <KeyIcon size={12} />
+              <span>{isBn ? "অ্যাডমিন ভিউ" : "Admin Exit"}</span>
+            </button>
+          </div>
         </div>
 
         {/* Sub-tab Switcher: সিল অনুমোদন | ভাউচার রিডিম */}
@@ -565,6 +658,164 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             )}
           </div>
         )}
+      </div>
+
+      {/* Owner Unlock Modal for Active Counter Mode */}
+      {showOwnerUnlockModal && (
+        <OwnerUnlockModal
+          isBn={isBn}
+          ownerPinInput={ownerPinInput}
+          setOwnerPinInput={setOwnerPinInput}
+          ownerPinError={ownerPinError}
+          ownerVerifying={ownerVerifying}
+          showOwnerPin={showOwnerPin}
+          setShowOwnerPin={setShowOwnerPin}
+          onClose={() => setShowOwnerUnlockModal(false)}
+          onVerify={handleVerifyOwnerExit}
+        />
+      )}
+    </div>
+  )
+}
+
+function OwnerUnlockModal({
+  isBn,
+  ownerPinInput,
+  setOwnerPinInput,
+  ownerPinError,
+  ownerVerifying,
+  showOwnerPin,
+  setShowOwnerPin,
+  onClose,
+  onVerify,
+}: {
+  isBn: boolean
+  ownerPinInput: string
+  setOwnerPinInput: (val: string) => void
+  ownerPinError: string | null
+  ownerVerifying: boolean
+  showOwnerPin: boolean
+  setShowOwnerPin: (val: boolean) => void
+  onClose: () => void
+  onVerify: (pin?: string) => void
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-[#0A2318] border border-amber-500/30 rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-scale-up text-white">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center text-[#0A2318] shadow-md glow-amber">
+              <KeyIcon size={18} />
+            </div>
+            <div>
+              <h3 className="font-display font-black text-base text-white">
+                {isBn ? "মালিকের পিন যাচাই" : "Owner Verification"}
+              </h3>
+              <p className="text-[11px] text-white/50">
+                {isBn ? "অ্যাডমিন ড্যাশবোর্ড আনলক" : "Unlock Admin Dashboard"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 cursor-pointer"
+          >
+            <XIcon size={14} />
+          </button>
+        </div>
+
+        <p className="text-white/70 text-xs mb-4 text-center leading-relaxed">
+          {isBn
+            ? "স্টাফ মোড থেকে মালিকের ড্যাশবোর্ডে প্রবেশ করতে আপনার ৬ সংখ্যার গোপন পিন দিন।"
+            : "Enter your 6-digit Owner PIN to return to the full Merchant Dashboard."}
+        </p>
+
+        {/* 6 Digit Box Slots */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] text-white/60 font-semibold">
+              {isBn ? "মালিকের ৬ সংখ্যার পিন" : "6-Digit Owner PIN"}
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowOwnerPin(!showOwnerPin)}
+              className="text-[11px] text-[#34D399] hover:text-white font-bold cursor-pointer"
+            >
+              {showOwnerPin ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
+            </button>
+          </div>
+
+          <div className="relative">
+            <div className="flex justify-between gap-1 mb-1">
+              {Array.from({ length: 6 }).map((_, idx) => {
+                const digit = ownerPinInput[idx]
+                const isFocused = ownerPinInput.length === idx
+                return (
+                  <div
+                    key={idx}
+                    className={`flex-1 h-12 rounded-xl border-2 flex items-center justify-center font-display font-black text-lg transition-all ${
+                      ownerPinError
+                        ? "border-red-400 bg-red-500/20 text-red-300"
+                        : digit
+                        ? "border-[#F59E0B] bg-[#F59E0B]/20 text-[#F59E0B] shadow-md glow-amber"
+                        : isFocused
+                        ? "border-[#34D399] bg-white/15 ring-2 ring-[#34D399]/30"
+                        : "border-white/20 bg-white/5 text-white/30"
+                    }`}
+                  >
+                    {digit ? (showOwnerPin ? digit : "●") : ""}
+                  </div>
+                )
+              })}
+            </div>
+
+            <input
+              type={showOwnerPin ? "text" : "password"}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoFocus
+              maxLength={6}
+              value={ownerPinInput}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 6)
+                setOwnerPinInput(val)
+                if (val.length === 6 && !ownerVerifying) {
+                  onVerify(val)
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && ownerPinInput.length === 6 && !ownerVerifying) {
+                  onVerify()
+                }
+              }}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full text-transparent bg-transparent"
+            />
+          </div>
+
+          {ownerPinError && (
+            <p className="text-red-300 text-center text-xs mt-2 font-bold animate-fade-in">
+              ⚠️ {ownerPinError}
+            </p>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all cursor-pointer"
+          >
+            {isBn ? "বাতিল" : "Cancel"}
+          </button>
+          <button
+            onClick={() => onVerify()}
+            disabled={ownerVerifying || ownerPinInput.length !== 6}
+            className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] text-xs font-black transition-all shadow-lg glow-amber cursor-pointer disabled:opacity-40"
+          >
+            {ownerVerifying
+              ? (isBn ? "যাচাই হচ্ছে..." : "Verifying...")
+              : (isBn ? "আনলক করুন ✓" : "Unlock ✓")}
+          </button>
+        </div>
       </div>
     </div>
   )
