@@ -91,7 +91,7 @@ export default function MerchantSettings({
   const [pinSuccess, setPinSuccess] = useState("")
 
   // Language preference
-  const { language, setLanguage } = useLanguage()
+  const { language, isBn, setLanguage } = useLanguage()
   const currentLang = language === "en" ? "English" : "বাংলা"
 
   function handleSetLanguage(l: "বাংলা" | "English") {
@@ -406,8 +406,12 @@ export default function MerchantSettings({
       <div className="px-5 pt-4 pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">সেটিংস</h1>
-            <p className="text-[#34D399] text-xs font-semibold mt-0.5">লোগো, ব্র্যান্ডিং ও দোকান কনফিগারেশন</p>
+            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">
+              {isBn ? "সেটিংস" : "Settings"}
+            </h1>
+            <p className="text-[#34D399] text-xs font-semibold mt-0.5">
+              {isBn ? "লোগো, ব্র্যান্ডিং ও দোকান কনফিগারেশন" : "Logo, branding & store configuration"}
+            </p>
           </div>
 
           <button
@@ -418,15 +422,15 @@ export default function MerchantSettings({
             {saving ? (
               <>
                 <RefreshIcon size={14} className="animate-spin" />
-                <span>Saving...</span>
+                <span>{isBn ? "সংরক্ষণ হচ্ছে..." : "Saving..."}</span>
               </>
             ) : saved ? (
               <>
                 <CheckIcon size={14} />
-                <span>Saved ✓</span>
+                <span>{isBn ? "সংরক্ষিত ✓" : "Saved ✓"}</span>
               </>
             ) : (
-              <span>Save</span>
+              <span>{isBn ? "সংরক্ষণ করুন" : "Save Changes"}</span>
             )}
           </button>
         </div>
@@ -436,13 +440,16 @@ export default function MerchantSettings({
         {saved && (
           <div className="bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 animate-fade-in shadow-md backdrop-blur-md">
             <CheckIcon size={16} className="text-[#34D399]" />
-            <span>সেটিংস ডাটাবেজে সফলভাবে আপডেট হয়েছে!</span>
+            <span>{isBn ? "সেটিংস ডাটাবেজে সফলভাবে আপডেট হয়েছে!" : "Settings successfully updated in database!"}</span>
           </div>
         )}
 
         {loading && (
           <div className="text-center py-8 text-white/70 text-sm">
-            <span className="inline-block animate-spin mr-1"><RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" /></span> লোড হচ্ছে...
+            <span className="inline-block animate-spin mr-1">
+              <RefreshIcon size="14" className="animate-spin inline-block mr-1.5 text-[#34D399]" />
+            </span>{" "}
+            {isBn ? "লোড হচ্ছে..." : "Loading..."}
           </div>
         )}
 
@@ -453,8 +460,12 @@ export default function MerchantSettings({
               <SparklesIcon size={16} />
             </div>
             <div>
-              <h2 className="font-display font-bold text-white text-base">লোগো কাস্টমাইজার</h2>
-              <p className="text-xs text-white/60">লোগো পরিবর্তন করুন ও লাইভ প্রিভিউ দেখুন</p>
+              <h2 className="font-display font-bold text-white text-base">
+                {isBn ? "লোগো কাস্টমাইজার" : "Logo Customizer"}
+              </h2>
+              <p className="text-xs text-white/60">
+                {isBn ? "লোগো পরিবর্তন করুন ও লাইভ প্রিভিউ দেখুন" : "Change logo and preview in real-time"}
+              </p>
             </div>
           </div>
 
@@ -473,7 +484,7 @@ export default function MerchantSettings({
                   {logoUrl ? (
                     <img src={logoUrl} alt="Merchant Logo" className="w-full h-full object-cover" />
                   ) : (
-                    logoInitials || "সি"
+                    logoInitials || (isBn ? "সি" : "S")
                   )}
                 </div>
                 {logoUrl && (
@@ -487,12 +498,18 @@ export default function MerchantSettings({
               </div>
 
               <div className="flex-1 space-y-2 text-center sm:text-left">
-                <p className="font-bold text-white text-sm">দোকানের লোগো নির্বাচন করুন</p>
+                <p className="font-bold text-white text-sm">
+                  {isBn ? "দোকানের লোগো নির্বাচন করুন" : "Select Store Logo"}
+                </p>
                 <p className="text-xs text-white/60">
-                  ব্র্যান্ড লোগো ফাইল আপলোড করুন অথবা সংক্ষেপ অক্ষর ব্যবহার করুন।
+                  {isBn
+                    ? "ব্র্যান্ড লোগো ফাইল আপলোড করুন অথবা সংক্ষেপ অক্ষর ব্যবহার করুন।"
+                    : "Upload a brand logo file or use short initials."}
                 </p>
                 <div className="p-2.5 bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl text-[11px] text-amber-200 font-medium">
-                  নোট: লোগো ফাইলের আকার ৫০০ KB এর নিচে হতে হবে (PNG, JPG, WebP)
+                  {isBn
+                    ? "নোট: লোগো ফাইলের আকার ৫০০ KB এর নিচে হতে হবে (PNG, JPG, WebP)"
+                    : "Note: Logo file size must be under 500 KB (PNG, JPG, WebP)"}
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
                   <input
@@ -507,14 +524,14 @@ export default function MerchantSettings({
                     htmlFor="logo-file-input"
                     className="px-4 py-2 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center gap-1.5 transition-all active:scale-95"
                   >
-                    নতুন লোগো আপলোড
+                    {isBn ? "নতুন লোগো আপলোড" : "Upload New Logo"}
                   </label>
                   {logoUrl && (
                     <button
                       onClick={handleRemoveLogoImage}
                       className="px-3 py-2 border border-red-400/40 text-red-300 hover:bg-red-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
                     >
-                      ছবি বাদ দিন
+                      {isBn ? "ছবি বাদ দিন" : "Remove Image"}
                     </button>
                   )}
                 </div>
@@ -525,14 +542,14 @@ export default function MerchantSettings({
           {/* Initials only */}
           <div className="mb-2">
             <label className="text-white/70 text-xs font-semibold block mb-1">
-              লোগো অক্ষর (১-৩ অক্ষর)
+              {isBn ? "লোগো অক্ষর (১-৩ অক্ষর)" : "Logo Initials (1-3 chars)"}
             </label>
             <input
               type="text"
               maxLength={4}
               value={logoInitials}
               onChange={(e) => setLogoInitials(e.target.value)}
-              placeholder="যেমন: কহ"
+              placeholder={isBn ? "যেমন: কহ" : "e.g. CB"}
               className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white outline-none focus:border-[#34D399]"
             />
           </div>
@@ -545,8 +562,12 @@ export default function MerchantSettings({
               <ImageIcon size={18} className="text-[#F59E0B]" />
             </div>
             <div>
-              <h2 className="font-display font-bold text-white text-base">কভার ফটো ও ব্যানার</h2>
-              <p className="text-xs text-white/60">খুঁজুন পেজ ও স্টোর পেজে প্রদর্শিত ব্যানার ছবি</p>
+              <h2 className="font-display font-bold text-white text-base">
+                {isBn ? "কভার ফটো ও ব্যানার" : "Cover Photo & Banner"}
+              </h2>
+              <p className="text-xs text-white/60">
+                {isBn ? "খুঁজুন পেজ ও স্টোর পেজে প্রদর্শিত ব্যানার ছবি" : "Banner image displayed on explore and store pages"}
+              </p>
             </div>
           </div>
 
@@ -558,8 +579,12 @@ export default function MerchantSettings({
               ) : (
                 <div className="text-center p-4">
                   <ImageIcon size={36} className="text-white/30 mb-2 mx-auto" />
-                  <p className="text-white/80 text-xs font-semibold">কোনো কভার ছবি আপলোড করা হয়নি</p>
-                  <p className="text-white/40 text-[11px]">খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে</p>
+                  <p className="text-white/80 text-xs font-semibold">
+                    {isBn ? "কোনো কভার ছবি আপলোড করা হয়নি" : "No cover photo uploaded"}
+                  </p>
+                  <p className="text-white/40 text-[11px]">
+                    {isBn ? "খুঁজুন পেজে আপনার দোকানের কভার ছবি দেখাবে" : "Your cover image will appear on explore page"}
+                  </p>
                 </div>
               )}
 
@@ -576,7 +601,10 @@ export default function MerchantSettings({
             <div className="p-3 bg-[#071D13] rounded-xl border border-white/10 flex items-start gap-2">
               <ShieldIcon size={16} className="text-[#34D399] flex-shrink-0 mt-0.5" />
               <p className="text-xs text-[#34D399]">
-                <strong>নিয়মাবলী:</strong> কভার ছবির সাইজ অবশ্যই ১ MB এর নিচে হতে হবে। আপলোডের আগে ক্রপ ও পজিশন ঠিক করে নিন।
+                <strong>{isBn ? "নিয়মাবলী:" : "Rules:"}</strong>{" "}
+                {isBn
+                  ? "কভার ছবির সাইজ অবশ্যই ১ MB এর নিচে হতে হবে। আপলোডের আগে ক্রপ ও পজিশন ঠিক করে নিন।"
+                  : "Cover photo size must be under 1 MB. Adjust crop and position before uploading."}
               </p>
             </div>
 
@@ -593,7 +621,7 @@ export default function MerchantSettings({
                 htmlFor="cover-file-input"
                 className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-md glow-emerald cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-95 text-center"
               >
-                নতুন কভার ফটো নির্বাচন ও ক্রপ
+                {isBn ? "নতুন কভার ফটো নির্বাচন ও ক্রপ" : "Choose & Crop Cover Photo"}
               </label>
 
               {coverUrl && (
@@ -601,7 +629,7 @@ export default function MerchantSettings({
                   onClick={handleRemoveCoverImage}
                   className="px-4 py-3 border border-red-400/40 text-red-300 hover:bg-red-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
                 >
-                  ছবি মুছুন
+                  {isBn ? "ছবি মুছুন" : "Remove Photo"}
                 </button>
               )}
             </div>
@@ -610,26 +638,28 @@ export default function MerchantSettings({
 
         {/* 3. Business Details */}
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
-          <h2 className="font-display font-bold text-white text-base mb-3">ব্যবসার বিবরণ</h2>
+          <h2 className="font-display font-bold text-white text-base mb-3">
+            {isBn ? "ব্যবসার বিবরণ" : "Business Details"}
+          </h2>
 
           <div className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
-                  ব্যবসার নাম (বাংলা) *
+                  {isBn ? "ব্যবসার নাম (বাংলা) *" : "Business Name (Bangla) *"}
                 </label>
                 <input
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="আপনার দোকানের নাম"
+                  placeholder={isBn ? "আপনার দোকানের নাম" : "Your store name"}
                   className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-sm text-white font-bold outline-none focus:border-[#34D399]"
                 />
               </div>
 
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
-                  English Name (QR Slug URL) *
+                  {isBn ? "English Name (QR Slug URL) *" : "English Name (QR Slug URL) *"}
                 </label>
                 <input
                   type="text"
@@ -643,7 +673,9 @@ export default function MerchantSettings({
 
             {/* Category */}
             <div>
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">ক্যাটাগরি</label>
+              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+                {isBn ? "ক্যাটাগরি" : "Category"}
+              </label>
               <div className="flex flex-wrap gap-1.5">
                 {categories.map((cat) => (
                   <button
@@ -664,8 +696,12 @@ export default function MerchantSettings({
             {/* Open/Closed toggle */}
             <div className="flex items-center justify-between py-2 border-t border-b border-white/10">
               <div>
-                <p className="text-white text-sm font-bold">এখন খোলা আছে?</p>
-                <p className="text-white/50 text-xs">কাস্টমাররা লাইভ স্ট্যাটাস দেখতে পাবেন</p>
+                <p className="text-white text-sm font-bold">
+                  {isBn ? "এখন খোলা আছে?" : "Open Right Now?"}
+                </p>
+                <p className="text-white/50 text-xs">
+                  {isBn ? "কাস্টমাররা লাইভ স্ট্যাটাস দেখতে পাবেন" : "Customers can see live store status"}
+                </p>
               </div>
               <button
                 onClick={() => setIsOpen((v) => !v)}
@@ -684,7 +720,7 @@ export default function MerchantSettings({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
-                  যোগাযোগ ফোন নম্বর
+                  {isBn ? "যোগাযোগ ফোন নম্বর" : "Contact Phone Number"}
                 </label>
                 <input
                   type="text"
@@ -698,13 +734,13 @@ export default function MerchantSettings({
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
                   <ClockIcon size={12} className="inline mr-1" />
-                  খোলার সময়সূচি
+                  {isBn ? "খোলার সময়সূচি" : "Opening Hours"}
                 </label>
                 <input
                   type="text"
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
-                  placeholder="যেমন: সকাল ৯টা – রাত ১০টা"
+                  placeholder={isBn ? "যেমন: সকাল ৯টা – রাত ১০টা" : "e.g. 9:00 AM – 10:00 PM"}
                   className="w-full bg-[#071D13] border border-emerald-500/20 rounded-xl px-3.5 py-2.5 text-xs text-white font-medium outline-none focus:border-[#34D399]"
                 />
               </div>
@@ -716,7 +752,7 @@ export default function MerchantSettings({
         <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl text-white">
           <h2 className="font-display font-bold text-white text-base mb-3 flex items-center gap-2">
             <MapPinIcon size={16} className="text-[#34D399]" />
-            ঠিকানা ও জিওফেন্স সুরক্ষা
+            {isBn ? "ঠিকানা ও জিওফেন্স সুরক্ষা" : "Address & Geofence Security"}
           </h2>
 
           <div className="p-3.5 bg-[#071D13] rounded-2xl mb-3 border border-white/10">
@@ -724,12 +760,12 @@ export default function MerchantSettings({
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="বাড়ি নম্বর, রোড, এলাকা, শহর"
+              placeholder={isBn ? "বাড়ি নম্বর, রোড, এলাকা, শহর" : "House, Road, Area, City"}
               className="w-full bg-transparent text-white text-xs font-medium outline-none mb-1.5 placeholder-white/30"
             />
             {lat !== null && lng !== null && (
               <p className="text-[#34D399] text-[11px] font-mono">
-                অক্ষাংশ: {lat}°, দ্রাঘিমাংশ: {lng}°
+                {isBn ? `অক্ষাংশ: ${lat}°, দ্রাঘিমাংশ: ${lng}°` : `Lat: ${lat}°, Lng: ${lng}°`}
               </p>
             )}
           </div>
@@ -739,15 +775,17 @@ export default function MerchantSettings({
             className="w-full py-2.5 rounded-xl border border-[#34D399] text-[#34D399] bg-[#34D399]/10 text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#34D399]/20 transition-colors cursor-pointer"
           >
             <MapPinIcon size={14} />
-            বর্তমান GPS অবস্থান সিঙ্ক করুন
+            {isBn ? "বর্তমান GPS অবস্থান সিঙ্ক করুন" : "Sync Current GPS Location"}
           </button>
 
           <div className="mt-3 p-3 bg-[#071D13] rounded-xl border border-white/10">
             <p className="text-[#34D399] text-xs font-bold">
-              জিওফেন্স ব্যাসার্ধ: {geofenceM} মিটার
+              {isBn ? `জিওফেন্স ব্যাসার্ধ: ${geofenceM} মিটার` : `Geofence Radius: ${geofenceM} meters`}
             </p>
             <p className="text-white/60 text-[11px] mt-0.5">
-              দোকানের {geofenceM} মিটারের বাইরের স্ক্যান স্বয়ংক্রিয়ভাবে চিহ্নিত হবে।
+              {isBn
+                ? `দোকানের ${geofenceM} মিটারের বাইরের স্ক্যান স্বয়ংক্রিয়ভাবে চিহ্নিত হবে।`
+                : `Scans beyond ${geofenceM} meters from the store will be flagged.`}
             </p>
           </div>
         </div>
@@ -760,8 +798,12 @@ export default function MerchantSettings({
                 <GlobeIcon size={20} className="text-[#34D399]" />
               </div>
               <div>
-                <h2 className="font-display font-bold text-white text-base">ভাষা / Language</h2>
-                <p className="text-xs text-white/60">অ্যাপের ভাষা নির্বাচন করুন</p>
+                <h2 className="font-display font-bold text-white text-base">
+                  {isBn ? "ভাষা / Language" : "Language Preference"}
+                </h2>
+                <p className="text-xs text-white/60">
+                  {isBn ? "অ্যাপের ভাষা নির্বাচন করুন" : "Select application language"}
+                </p>
               </div>
             </div>
             <div className="flex bg-[#071D13] p-1 rounded-xl border border-white/10">
@@ -798,11 +840,17 @@ export default function MerchantSettings({
               <LockIcon size={18} className="text-[#F59E0B]" />
             </div>
             <div>
-              <h2 className="font-display font-bold text-white text-base">স্টাফ মোড পিন</h2>
+              <h2 className="font-display font-bold text-white text-base">
+                {isBn ? "স্টাফ মোড পিন" : "Staff Mode PIN"}
+              </h2>
               <p className="text-xs text-white/60">
                 {pinStatus?.hasPin
-                  ? "৪-সংখ্যার পিন সক্রিয় আছে (••••)"
-                  : "এখনো পিন সেট করা হয়নি (ডিফল্ট: 1234)"}
+                  ? isBn
+                    ? "৪-সংখ্যার পিন সক্রিয় আছে (••••)"
+                    : "4-digit PIN is active (••••)"
+                  : isBn
+                  ? "এখনো পিন সেট করা হয়নি (ডিফল্ট: 1234)"
+                  : "No custom PIN set yet (default: 1234)"}
               </p>
             </div>
           </div>
@@ -829,18 +877,26 @@ export default function MerchantSettings({
               }}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
             >
-              {pinStatus?.hasPin ? "পিন পরিবর্তন করুন" : "পিন সেট করুন"}
+              {pinStatus?.hasPin
+                ? isBn
+                  ? "পিন পরিবর্তন করুন"
+                  : "Change PIN"
+                : isBn
+                ? "পিন সেট করুন"
+                : "Set PIN"}
             </button>
           )}
 
           {pinStep === "enter_pin" && (
             <div className="space-y-3">
               <div className="bg-[#FEF3C7]/15 border border-[#F59E0B]/30 rounded-xl px-3 py-2.5 text-xs text-amber-200">
-                কাউন্টার স্টাফদের সিল অনুমোদন এবং ভাউচার রিডিম করার জন্য ৪-সংখ্যার পিন নির্ধারণ করুন
+                {isBn
+                  ? "কাউন্টার স্টাফদের সিল অনুমোদন এবং ভাউচার রিডিম করার জন্য ৪-সংখ্যার পিন নির্ধারণ করুন"
+                  : "Set a 4-digit security PIN for counter staff to approve stamps and redeem vouchers"}
               </div>
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
-                  নতুন ৪-সংখ্যার পিন
+                  {isBn ? "নতুন ৪-সংখ্যার পিন" : "New 4-Digit PIN"}
                 </label>
                 <input
                   type="password"
@@ -854,7 +910,7 @@ export default function MerchantSettings({
               </div>
               <div>
                 <label className="text-white/70 text-xs font-semibold block mb-1">
-                  পিন নিশ্চিত করুন (Confirm PIN)
+                  {isBn ? "পিন নিশ্চিত করুন (Confirm PIN)" : "Confirm PIN"}
                 </label>
                 <input
                   type="password"
@@ -876,14 +932,14 @@ export default function MerchantSettings({
                   }}
                   className="flex-1 py-2.5 rounded-xl border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition-all cursor-pointer"
                 >
-                  বাতিল
+                  {isBn ? "বাতিল" : "Cancel"}
                 </button>
                 <button
                   onClick={handleSavePin}
                   className="flex-[2] py-2.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] text-sm font-black flex items-center justify-center gap-2 shadow-md glow-emerald transition-all cursor-pointer active:scale-95"
                 >
                   <CheckIcon size={16} />
-                  <span>পিন সংরক্ষণ করুন</span>
+                  <span>{isBn ? "পিন সংরক্ষণ করুন" : "Save PIN"}</span>
                 </button>
               </div>
             </div>
@@ -892,7 +948,7 @@ export default function MerchantSettings({
           {pinStep === "saving" && (
             <div className="text-center py-3 text-white/70 text-sm flex items-center justify-center gap-2">
               <RefreshIcon size={16} className="animate-spin text-[#34D399]" />
-              <span>পিন সংরক্ষণ করা হচ্ছে...</span>
+              <span>{isBn ? "পিন সংরক্ষণ করা হচ্ছে..." : "Saving PIN..."}</span>
             </div>
           )}
         </div>
@@ -906,12 +962,12 @@ export default function MerchantSettings({
           {saving ? (
             <>
               <RefreshIcon size={18} className="animate-spin" />
-              <span>Saving...</span>
+              <span>{isBn ? "সংরক্ষণ হচ্ছে..." : "Saving..."}</span>
             </>
           ) : (
             <>
               <CheckIcon size={18} />
-              <span>Save Changes</span>
+              <span>{isBn ? "পরিবর্তনগুলো সংরক্ষণ করুন" : "Save Changes"}</span>
             </>
           )}
         </button>
@@ -922,7 +978,7 @@ export default function MerchantSettings({
           className="w-full py-3.5 rounded-2xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 shadow-sm backdrop-blur-md"
         >
           <LogOutIcon size={16} />
-          <span>লগ আউট</span>
+          <span>{isBn ? "লগ আউট" : "Log Out"}</span>
         </button>
       </div>
 
@@ -932,8 +988,12 @@ export default function MerchantSettings({
           <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-slide-up text-white">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-display font-black text-lg text-white">কভার ছবি ক্রপ করুন</h3>
-                <p className="text-xs text-white/60">ব্যানার ফ্রেমের সাথে ছবি মিলিয়ে নিন</p>
+                <h3 className="font-display font-black text-lg text-white">
+                  {isBn ? "কভার ছবি ক্রপ করুন" : "Crop Cover Photo"}
+                </h3>
+                <p className="text-xs text-white/60">
+                  {isBn ? "ব্যানার ফ্রেমের সাথে ছবি মিলিয়ে নিন" : "Adjust your photo to fit the banner frame"}
+                </p>
               </div>
               <button
                 onClick={() => setRawCoverImage(null)}
@@ -961,13 +1021,20 @@ export default function MerchantSettings({
             {/* Zoom Slider */}
             <div className="space-y-2 mb-4 bg-[#071D13] p-3.5 rounded-2xl border border-white/10">
               <div className="flex items-center justify-between text-xs text-white font-bold">
-                <span>🔍 জুম (Zoom): {coverScale.toFixed(1)}x</span>
+                <span>
+                  {isBn
+                    ? `🔍 জুম (Zoom): ${coverScale.toFixed(1)}x`
+                    : `🔍 Zoom: ${coverScale.toFixed(1)}x`}
+                </span>
                 <button
                   type="button"
-                  onClick={() => { setCoverScale(1); setCoverOffsetY(0) }}
+                  onClick={() => {
+                    setCoverScale(1)
+                    setCoverOffsetY(0)
+                  }}
                   className="text-[#34D399] text-[11px] underline cursor-pointer"
                 >
-                  রিসেট
+                  {isBn ? "রিসেট" : "Reset"}
                 </button>
               </div>
               <input
@@ -981,21 +1048,21 @@ export default function MerchantSettings({
               />
 
               <div className="flex items-center justify-between text-xs text-white font-bold pt-2 border-t border-white/10">
-                <span>↕️ উচ্চতা পজিশন:</span>
+                <span>{isBn ? "↕️ উচ্চতা পজিশন:" : "↕️ Vertical Position:"}</span>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setCoverOffsetY((y) => y - 15)}
                     className="px-3 py-1 bg-[#0E281C] border border-white/15 rounded-lg text-xs font-bold text-[#34D399] cursor-pointer"
                   >
-                    ▲ উপরে
+                    {isBn ? "▲ উপরে" : "▲ Up"}
                   </button>
                   <button
                     type="button"
                     onClick={() => setCoverOffsetY((y) => y + 15)}
                     className="px-3 py-1 bg-[#0E281C] border border-white/15 rounded-lg text-xs font-bold text-[#34D399] cursor-pointer"
                   >
-                    ▼ নিচে
+                    {isBn ? "▼ নিচে" : "▼ Down"}
                   </button>
                 </div>
               </div>
@@ -1006,13 +1073,13 @@ export default function MerchantSettings({
                 onClick={() => setRawCoverImage(null)}
                 className="flex-1 py-3 bg-white/10 text-white rounded-2xl text-xs font-bold hover:bg-white/15 cursor-pointer"
               >
-                বাতিল
+                {isBn ? "বাতিল" : "Cancel"}
               </button>
               <button
                 onClick={handleApplyCrop}
                 className="flex-[2] py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] rounded-2xl text-xs font-black hover:brightness-105 cursor-pointer shadow-lg glow-emerald"
               >
-                ✓ ক্রপ ও ব্যানার নিশ্চিত করুন
+                {isBn ? "✓ ক্রপ ও ব্যানার নিশ্চিত করুন" : "✓ Apply & Confirm Banner"}
               </button>
             </div>
           </div>

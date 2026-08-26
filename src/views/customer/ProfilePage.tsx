@@ -21,14 +21,10 @@ interface ProfilePageProps {
 }
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
-  const { user, profile, logout, updateSessionProfile } = useAuth()
-  const { language, setLanguage, toggleLanguage, t } = useLanguage()
+  const { language, isBn, toggleLanguage, setLanguage } = useLanguage()
   const swipeHandlers = useSwipeBack(onBack)
-  const lang = language === "en" ? "English" : "বাংলা"
+  const lang = isBn ? "বাংলা" : "English"
 
-  function handleToggleLang() {
-    toggleLanguage()
-  }
   const [notifications, setNotifications] = useState(true)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
@@ -54,20 +50,25 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   }, [profile?.avatarUrl, profile?.photoURL])
 
   const customer = {
-    name: profile?.name || user?.displayName || "সম্মানিত গ্রাহক",
+    name: profile?.name || user?.displayName || (isBn ? "সম্মানিত গ্রাহক" : "Valued Customer"),
     phone: profile?.phone || user?.phoneNumber || "",
     joinedDate: profile?.createdAt
-      ? new Date(profile.createdAt).toLocaleDateString("bn-BD", { year: "numeric", month: "long" })
-      : "আগস্ট ২০২৬",
+      ? new Date(profile.createdAt).toLocaleDateString(isBn ? "bn-BD" : "en-US", {
+          year: "numeric",
+          month: "long",
+        })
+      : isBn
+      ? "আগস্ট ২০২৬"
+      : "August 2026",
   }
 
-  const initialLetter = customer.name.trim().slice(0, 1) || "গ্র"
+  const initialLetter = customer.name.trim().slice(0, 1) || (isBn ? "গ্র" : "C")
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith("image/")) {
-      alert("অনুগ্রহ করে একটি ছবি (PNG, JPG, WebP) নির্বাচন করুন")
+      alert(isBn ? "অনুগ্রহ করে একটি ছবি (PNG, JPG, WebP) নির্বাচন করুন" : "Please select an image file (PNG, JPG, WebP)")
       return
     }
 
@@ -124,7 +125,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         setAvatarUrl(compressedDataUrl)
         setRawImage(null)
         setSavingPhoto(false)
-        setPhotoToast("Profile photo updated successfully ✓")
+        setPhotoToast(isBn ? "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে ✓" : "Profile photo updated successfully ✓")
         setTimeout(() => setPhotoToast(null), 3000)
       }
       img.src = rawImage
@@ -143,7 +144,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
       photoURL: "",
     }).catch(console.warn)
     updateSessionProfile({ avatarUrl: "", photoURL: "" })
-    setPhotoToast("Profile photo removed")
+    setPhotoToast(isBn ? "প্রোফাইল ছবি মুছে ফেলা হয়েছে" : "Profile photo removed")
     setTimeout(() => setPhotoToast(null), 3000)
   }
 
@@ -188,13 +189,13 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <button
             onClick={onBack}
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
-            title="হোমে ফিরুন"
+            title={isBn ? "হোমে ফিরুন" : "Back to Home"}
           >
             <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs shadow-sm">
-              স
+              {isBn ? "স" : "S"}
             </div>
             <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#34D399] transition-colors">
-              সিলসিলা
+              {isBn ? "সিলসিলা" : "Silsila"}
             </span>
           </button>
 
@@ -203,7 +204,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10"
           >
             <ChevronLeftIcon size={14} />
-            <span>হোমে ফিরুন</span>
+            <span>{isBn ? "হোমে ফিরুন" : "Home"}</span>
           </button>
         </div>
 
@@ -220,7 +221,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              title="Change photo"
+              title={isBn ? "ছবি পরিবর্তন করুন" : "Change photo"}
               className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
             >
               <CameraIcon size={14} />
@@ -231,13 +232,15 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <h1 className="font-display font-black text-white text-xl truncate drop-shadow-sm">{customer.name}</h1>
             <p className="text-[#34D399] text-xs font-bold mt-0.5 font-mono">{customer.phone}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-white/50 text-[11px]">সদস্য হয়েছেন {customer.joinedDate} থেকে</span>
+              <span className="text-white/50 text-[11px]">
+                {isBn ? `সদস্য হয়েছেন ${customer.joinedDate} থেকে` : `Member since ${customer.joinedDate}`}
+              </span>
               {avatarUrl && (
                 <button
                   onClick={handleRemovePhoto}
                   className="text-[10px] text-red-400/80 hover:text-red-300 underline cursor-pointer"
                 >
-                  Remove photo
+                  {isBn ? "ছবি সরান" : "Remove photo"}
                 </button>
               )}
             </div>
@@ -258,9 +261,13 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         <div className="bg-[#0E281C]/80 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-xl">
           <ShieldCheckIcon size={22} className="text-[#34D399] flex-shrink-0" />
           <div>
-            <p className="text-[#34D399] font-bold text-xs">বাংলাদেশ PDPA ২০২৬ সুরক্ষিত</p>
+            <p className="text-[#34D399] font-bold text-xs">
+              {isBn ? "বাংলাদেশ PDPA ২০২৬ সুরক্ষিত" : "Bangladesh PDPA 2026 Protected"}
+            </p>
             <p className="text-white/60 text-[11px] mt-0.5 leading-relaxed">
-              আপনার ডেটা সম্পূর্ণ এনক্রিপ্ট করা ও আইনানুযায়ী যেকোনো সময় সম্পূর্ণ মুছে ফেলার অধিকার সংরক্ষিত।
+              {isBn
+                ? "আপনার ডেটা সম্পূর্ণ এনক্রিপ্ট করা ও আইনানুযায়ী যেকোনো সময় সম্পূর্ণ মুছে ফেলার অধিকার সংরক্ষিত।"
+                : "Your data is fully encrypted with guaranteed right to erasure under Bangladesh data law."}
             </p>
           </div>
         </div>
@@ -271,8 +278,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🌐</span>
-            <p className="flex-1 text-left font-semibold text-sm text-white">ভাষা (Language)</p>
-            <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-3 py-1 rounded-full font-bold">{lang}</span>
+            <p className="flex-1 text-left font-semibold text-sm text-white">
+              {isBn ? "ভাষা (Language)" : "Language (ভাষা)"}
+            </p>
+            <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-3 py-1 rounded-full font-bold">
+              {lang}
+            </span>
             <ChevronRightIcon size={16} className="text-white/40" />
           </button>
 
@@ -281,9 +292,17 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
           >
             <BellIcon size={18} className="text-[#34D399] flex-shrink-0" />
-            <p className="flex-1 text-left font-semibold text-sm text-white">নোটিফিকেশন ও অ্যালার্ট</p>
-            <span className={`text-xs px-3 py-1 rounded-full font-bold ${notifications ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30" : "bg-white/10 text-white/50"}`}>
-              {notifications ? "চালু" : "বন্ধ"}
+            <p className="flex-1 text-left font-semibold text-sm text-white">
+              {isBn ? "নোটিফিকেশন ও অ্যালার্ট" : "Notifications & Alerts"}
+            </p>
+            <span
+              className={`text-xs px-3 py-1 rounded-full font-bold ${
+                notifications
+                  ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30"
+                  : "bg-white/10 text-white/50"
+              }`}
+            >
+              {notifications ? (isBn ? "চালু" : "ON") : isBn ? "বন্ধ" : "OFF"}
             </span>
             <ChevronRightIcon size={16} className="text-white/40" />
           </button>
@@ -294,8 +313,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           >
             <LogOutIcon size={18} className="text-red-400 flex-shrink-0" />
             <div className="flex-1 text-left">
-              <p className="font-bold text-sm text-red-300">আমার ডেটা ও সিল মুছে ফেলুন</p>
-              <p className="text-[10px] text-red-400/70">Right to erasure (PDPA ২০২৬ ধারা ৬৩)</p>
+              <p className="font-bold text-sm text-red-300">
+                {isBn ? "আমার ডেটা ও সিল মুছে ফেলুন" : "Delete My Data & Stamps"}
+              </p>
+              <p className="text-[10px] text-red-400/70">
+                {isBn ? "Right to erasure (PDPA ২০২৬ ধারা ৬৩)" : "Right to erasure (PDPA 2026 Section 63)"}
+              </p>
             </div>
             <ChevronRightIcon size={16} className="text-red-400/50" />
           </button>
@@ -306,10 +329,10 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-bold text-sm transition-all cursor-pointer backdrop-blur-md active:scale-95"
         >
           <LogOutIcon size={16} />
-          লগ আউট
+          {isBn ? "লগ আউট" : "Log Out"}
         </button>
 
-        <p className="text-center text-white/30 text-xs mt-6">সিলসিলা v1.0.0</p>
+        <p className="text-center text-white/30 text-xs mt-6">{isBn ? "সিলসিলা v1.0.0" : "Silsila v1.0.0"}</p>
       </div>
 
       {/* PDPA Erasure Modal */}
@@ -320,20 +343,26 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               ⚠️
             </div>
             <h3 className="font-display font-black text-xl text-[#1A1916] text-center mb-1">
-              সমস্ত ডেটা মুছে ফেলবেন?
+              {isBn ? "সমস্ত ডেটা মুছে ফেলবেন?" : "Delete All Your Data?"}
             </h3>
             <p className="text-xs text-[#6B6158] text-center mb-4 leading-relaxed">
-              বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ অনুসারে আপনার সব স্ট্যাম্প, রিডিম ইতিহাস ও প্রোফাইল অবিলম্বে মুছে ফেলা হবে। এটি ফেরানো সম্ভব নয়।
+              {isBn
+                ? "বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ অনুসারে আপনার সব স্ট্যাম্প, রিডিম ইতিহাস ও প্রোফাইল অবিলম্বে মুছে ফেলা হবে। এটি ফেরানো সম্ভব নয়।"
+                : "Under Bangladesh Data Protection Act 2026, all your stamps, history, and profile will be permanently deleted. This cannot be undone."}
             </p>
 
             {deleteSuccess ? (
               <div className="bg-green-50 text-green-700 p-3 rounded-xl text-center text-xs font-bold mb-4">
-                ✓ আপনার ডেটা সফলভাবে মুছে ফেলা হয়েছে। লগ আউট হচ্ছে...
+                {isBn
+                  ? "✓ আপনার ডেটা সফলভাবে মুছে ফেলা হয়েছে। লগ আউট হচ্ছে..."
+                  : "✓ Your data has been deleted. Logging out..."}
               </div>
             ) : (
               <>
                 <p className="text-xs text-[#1A1916] font-semibold mb-2">
-                  নিশ্চিত করতে নিচে <span className="font-mono text-red-600">DELETE</span> লিখুন:
+                  {isBn ? "নিশ্চিত করতে নিচে " : "Type "}
+                  <span className="font-mono text-red-600">DELETE</span>
+                  {isBn ? " লিখুন:" : " below to confirm:"}
                 </p>
                 <input
                   type="text"
@@ -348,14 +377,20 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                     onClick={() => setShowDeleteModal(false)}
                     className="flex-1 py-3 bg-[#F0EDE6] text-[#6B6158] rounded-xl text-xs font-bold"
                   >
-                    বাতিল
+                    {isBn ? "বাতিল" : "Cancel"}
                   </button>
                   <button
                     onClick={handleDeleteData}
                     disabled={deleteConfirmation !== "DELETE" || loading}
                     className="flex-1 py-3 bg-red-600 text-white rounded-xl text-xs font-bold disabled:opacity-40"
                   >
-                    {loading ? "মুছছে..." : "স্থায়ীভাবে মুছুন"}
+                    {loading
+                      ? isBn
+                        ? "মুছছে..."
+                        : "Deleting..."
+                      : isBn
+                      ? "স্থায়ীভাবে মুছুন"
+                      : "Permanently Delete"}
                   </button>
                 </div>
               </>

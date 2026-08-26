@@ -7,6 +7,7 @@ import ExplorePage from "./ExplorePage"
 import RewardsPage from "./RewardsPage"
 import ProfilePage from "./ProfilePage"
 import { useAuth } from "../../context/AuthContext"
+import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import { HomeIcon, CompassIcon, ScanIcon, GiftIcon, UserIcon } from "../../components/Icons"
 
@@ -20,6 +21,7 @@ interface CustomerAppProps {
 
 export default function CustomerApp({ onBack, initialMerchantId, initialTab }: CustomerAppProps) {
   const { user, profile, logout } = useAuth()
+  const { isBn } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -126,8 +128,8 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
       {!showCard && (
         <nav className="flex-shrink-0 bg-[#092015]/90 backdrop-blur-xl border-t border-white/10 px-2 pb-safe safe-area-inset-bottom shadow-2xl z-20" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
           <div className="flex items-center justify-around">
-            <NavBtn icon={<HomeIcon size={22} />} label="হোম" active={tab === "home"} onClick={() => handleTabChange("home")} />
-            <NavBtn icon={<CompassIcon size={22} />} label="খুঁজুন" active={tab === "explore"} onClick={() => handleTabChange("explore")} />
+            <NavBtn icon={<HomeIcon size={22} />} label={isBn ? "হোম" : "Home"} active={tab === "home"} onClick={() => handleTabChange("home")} />
+            <NavBtn icon={<CompassIcon size={22} />} label={isBn ? "খুঁজুন" : "Explore"} active={tab === "explore"} onClick={() => handleTabChange("explore")} />
 
             <button
               onClick={() => handleTabChange("scan")}
@@ -136,12 +138,12 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
               <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all ${tab === "scan" ? "bg-[#F59E0B] glow-amber" : "bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20"}`}>
                 <ScanIcon size={24} className="text-[#071D13]" />
               </div>
-              <span className={`text-[10px] mt-1 font-bold ${tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>স্ক্যান</span>
+              <span className={`text-[10px] mt-1 font-bold ${tab === "scan" ? "text-[#F59E0B]" : "text-[#52B788]"}`}>{isBn ? "স্ক্যান" : "Scan"}</span>
             </button>
 
             <NavBtn
               icon={<GiftIcon size={22} />}
-              label="পুরস্কার"
+              label={isBn ? "পুরস্কার" : "Rewards"}
               active={tab === "rewards"}
               onClick={() => handleTabChange("rewards")}
               badge={readyRewardsCount > 0 ? readyRewardsCount : undefined}
@@ -165,7 +167,7 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
                   <UserIcon size={22} />
                 )
               }
-              label="প্রোফাইল"
+              label={isBn ? "প্রোফাইল" : "Profile"}
               active={tab === "profile"}
               onClick={() => handleTabChange("profile")}
             />
