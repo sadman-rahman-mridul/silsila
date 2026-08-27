@@ -246,6 +246,7 @@ export const api = {
       existingName: string | null
       message: string
       expiresIn: number
+      otpToken?: string
       smsSkipped?: boolean
     }>(`${API_BASE}/auth/otp/send`, {
       method: "POST",
@@ -278,7 +279,8 @@ export const api = {
     role: "customer" | "merchant",
     name?: string,
     consentGiven?: boolean,
-    password?: string
+    password?: string,
+    otpToken?: string
   ) {
     return fetchJson<{
       success: boolean
@@ -291,7 +293,7 @@ export const api = {
     }>(`${API_BASE}/auth/otp/verify`, {
       method: "POST",
       headers: JSON_HEADERS,
-      body: JSON.stringify({ phone, otp, role, name, consentGiven, password }),
+      body: JSON.stringify({ phone, otp, role, name, consentGiven, password, otpToken }),
     })
   },
 

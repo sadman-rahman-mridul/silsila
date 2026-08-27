@@ -21,6 +21,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   const [phone, setPhone] = useState("")
   const [pin, setPin] = useState("")
   const [otpCode, setOtpCode] = useState("")
+  const [otpToken, setOtpToken] = useState<string | null>(null)
   const [showPin, setShowPin] = useState(false)
   const [consentGiven, setConsentGiven] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -217,7 +218,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     setOtpCode("")
 
     try {
-      await api.sendOtp(clean, role)
+      const res = await api.sendOtp(clean, role)
+      if (res.otpToken) {
+        setOtpToken(res.otpToken)
+      }
       setInfoMsg(
         customSuccessMsg ||
           (isBn
@@ -255,7 +259,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         role,
         undefined,
         consentGiven,
-        pin.trim() || undefined
+        pin.trim() || undefined,
+        otpToken || undefined
       )
 
       // Authoritative Firestore lookup

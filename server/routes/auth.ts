@@ -83,6 +83,7 @@ router.post("/otp/send", async (req, res) => {
     existingName: existingName || null,
     message: `OTP পাঠানো হয়েছে: +880${cleanPhone.slice(-10)}`,
     expiresIn: result.expiresIn,
+    otpToken: result.otpToken,
     smsSkipped: result.smsSkipped,
   })
 })
@@ -176,7 +177,7 @@ router.post("/login-password", async (req, res) => {
 })
 
 router.post("/otp/verify", (req, res) => {
-  const { phone, otp, role, name, consentGiven, password } = req.body
+  const { phone, otp, role, name, consentGiven, password, otpToken } = req.body
 
   if (!phone || !otp) {
     res.status(400).json({ error: "ফোন নম্বর এবং OTP প্রয়োজন" })
@@ -184,7 +185,7 @@ router.post("/otp/verify", (req, res) => {
   }
 
   const cleanPhone = phone.replace(/\D/g, "")
-  const check = verifyOtp(cleanPhone, "login", String(otp))
+  const check = verifyOtp(cleanPhone, "login", String(otp), otpToken)
   if (!check.valid) {
     res.status(400).json({ error: check.error })
     return
