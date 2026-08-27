@@ -578,14 +578,8 @@ export default function MerchantDashboard({
               {activeMerchant?.logoUrl ? (
                 <img src={activeMerchant.logoUrl} alt="Logo" className="w-9 h-9 rounded-xl object-cover border border-white/20 shadow-md" />
               ) : (
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shadow-md border border-white/15"
-                  style={{
-                    backgroundColor: activeMerchant?.logoBg || "#0D3824",
-                    color: activeMerchant?.logoColor || "#34D399",
-                  }}
-                >
-                  {merchantInitials || (isBn ? "সি" : "S")}
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md border border-white/15 p-1.5 bg-[#092015]">
+                  <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
                 </div>
               )}
               <div>
@@ -617,10 +611,14 @@ export default function MerchantDashboard({
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="mt-3 pt-2.5 border-t border-gray-200 w-full text-center">
-                <p className="font-display font-black text-[#0A2318] text-base">
+              <div className="mt-3 pt-2.5 border-t border-gray-200 w-full flex items-center justify-between px-1">
+                <p className="font-display font-black text-[#0A2318] text-sm truncate max-w-[170px]">
                   {merchantName}
                 </p>
+                <div className="flex items-center gap-1.5 opacity-80">
+                  <span className="text-[10px] font-bold text-gray-500 tracking-wider">Powered by</span>
+                  <img src="/sealsela-logo-light.svg" alt="Sealsela" className="h-4 w-auto object-contain" />
+                </div>
               </div>
             </div>
           </div>

@@ -11,13 +11,13 @@
   "categories": ["lifestyle", "shopping", "business"],
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/sealsela-logo-dark.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/favicon.svg",
+      "src": "/sealsela-logo-dark.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable"

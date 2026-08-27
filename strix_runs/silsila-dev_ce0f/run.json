@@ -1,0 +1,201 @@
+{
+  "run_id": "silsila-dev_ce0f",
+  "run_name": "silsila-dev_ce0f",
+  "start_time": "2026-08-26T16:55:46.708733+00:00",
+  "end_time": null,
+  "status": "running",
+  "auth_mode": "api_key",
+  "targets_info": [
+    {
+      "type": "local_code",
+      "details": {
+        "target_path": "/Users/macbookair/Desktop/Silsila/silsila-dev",
+        "workspace_subdir": "silsila-dev"
+      },
+      "original": "/Users/macbookair/Desktop/Silsila/silsila-dev"
+    }
+  ],
+  "llm_usage": {
+    "requests": 5,
+    "input_tokens": 10250,
+    "input_tokens_details": [
+      {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      }
+    ],
+    "output_tokens": 164,
+    "output_tokens_details": [
+      {
+        "reasoning_tokens": 0
+      }
+    ],
+    "total_tokens": 10414,
+    "request_usage_entries": [
+      {
+        "input_tokens": 2050,
+        "output_tokens": 43,
+        "total_tokens": 2093,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      {
+        "input_tokens": 2050,
+        "output_tokens": 49,
+        "total_tokens": 2099,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      {
+        "input_tokens": 2050,
+        "output_tokens": 27,
+        "total_tokens": 2077,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      {
+        "input_tokens": 2050,
+        "output_tokens": 30,
+        "total_tokens": 2080,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      {
+        "input_tokens": 2050,
+        "output_tokens": 15,
+        "total_tokens": 2065,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    ],
+    "cost": 0.0,
+    "agents": [
+      {
+        "requests": 5,
+        "input_tokens": 10250,
+        "input_tokens_details": [
+          {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          }
+        ],
+        "output_tokens": 164,
+        "output_tokens_details": [
+          {
+            "reasoning_tokens": 0
+          }
+        ],
+        "total_tokens": 10414,
+        "request_usage_entries": [
+          {
+            "input_tokens": 2050,
+            "output_tokens": 43,
+            "total_tokens": 2093,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          {
+            "input_tokens": 2050,
+            "output_tokens": 49,
+            "total_tokens": 2099,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          {
+            "input_tokens": 2050,
+            "output_tokens": 27,
+            "total_tokens": 2077,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          {
+            "input_tokens": 2050,
+            "output_tokens": 30,
+            "total_tokens": 2080,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          {
+            "input_tokens": 2050,
+            "output_tokens": 15,
+            "total_tokens": 2065,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          }
+        ],
+        "agent_id": "9cb2ee9a",
+        "agent_name": "Root Agent",
+        "model": "ollama/llama3.1:8b",
+        "cost": 0.0
+      }
+    ]
+  },
+  "scan_mode": "deep",
+  "instruction": "",
+  "user_instruction": null,
+  "non_interactive": false,
+  "local_sources": [
+    {
+      "source_path": "/Users/macbookair/Desktop/Silsila/silsila-dev",
+      "workspace_subdir": "silsila-dev",
+      "protect_metadata": true
+    }
+  ],
+  "workspace_mount": null,
+  "diff_scope": {
+    "active": false,
+    "mode": "auto"
+  },
+  "scope_mode": "auto",
+  "diff_base": null
+}

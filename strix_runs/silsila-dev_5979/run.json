@@ -1,0 +1,129 @@
+{
+  "run_id": "silsila-dev_5979",
+  "run_name": "silsila-dev_5979",
+  "start_time": "2026-08-26T16:44:22.871014+00:00",
+  "end_time": null,
+  "status": "running",
+  "auth_mode": "api_key",
+  "targets_info": [
+    {
+      "type": "local_code",
+      "details": {
+        "target_path": "/Users/macbookair/Desktop/Silsila/silsila-dev",
+        "workspace_subdir": "silsila-dev"
+      },
+      "original": "/Users/macbookair/Desktop/Silsila/silsila-dev"
+    }
+  ],
+  "llm_usage": {
+    "requests": 2,
+    "input_tokens": 4100,
+    "input_tokens_details": [
+      {
+        "cache_write_tokens": 0,
+        "cached_tokens": 0
+      }
+    ],
+    "output_tokens": 170,
+    "output_tokens_details": [
+      {
+        "reasoning_tokens": 0
+      }
+    ],
+    "total_tokens": 4270,
+    "request_usage_entries": [
+      {
+        "input_tokens": 2050,
+        "output_tokens": 154,
+        "total_tokens": 2204,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      {
+        "input_tokens": 2050,
+        "output_tokens": 16,
+        "total_tokens": 2066,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      }
+    ],
+    "cost": 0.0,
+    "agents": [
+      {
+        "requests": 2,
+        "input_tokens": 4100,
+        "input_tokens_details": [
+          {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          }
+        ],
+        "output_tokens": 170,
+        "output_tokens_details": [
+          {
+            "reasoning_tokens": 0
+          }
+        ],
+        "total_tokens": 4270,
+        "request_usage_entries": [
+          {
+            "input_tokens": 2050,
+            "output_tokens": 154,
+            "total_tokens": 2204,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          },
+          {
+            "input_tokens": 2050,
+            "output_tokens": 16,
+            "total_tokens": 2066,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            }
+          }
+        ],
+        "agent_id": "8d7e5837",
+        "agent_name": "Root Agent",
+        "model": "ollama/llama3.1:8b",
+        "cost": 0.0
+      }
+    ]
+  },
+  "scan_mode": "deep",
+  "instruction": "",
+  "user_instruction": null,
+  "non_interactive": false,
+  "local_sources": [
+    {
+      "source_path": "/Users/macbookair/Desktop/Silsila/silsila-dev",
+      "workspace_subdir": "silsila-dev",
+      "protect_metadata": true
+    }
+  ],
+  "workspace_mount": null,
+  "diff_scope": {
+    "active": false,
+    "mode": "auto"
+  },
+  "scope_mode": "auto",
+  "diff_base": null
+}

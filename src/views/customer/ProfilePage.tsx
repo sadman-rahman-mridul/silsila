@@ -192,8 +192,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title={isBn ? "হোমে ফিরুন" : "Back to Home"}
           >
-            <div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center font-display font-black text-[#0A2318] text-xs shadow-sm">
-              {isBn ? "স" : "S"}
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 p-1 flex items-center justify-center shadow-sm border border-emerald-500/30 flex-shrink-0">
+              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
             </div>
             <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#34D399] transition-colors">
               {isBn ? "সিলসিলা" : "Sealsela"}
