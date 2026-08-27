@@ -20,6 +20,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
   const [role, setRole] = useState<Role>("customer")
   const [phone, setPhone] = useState("")
   const [pin, setPin] = useState("")
+  const [otpCode, setOtpCode] = useState("")
   const [showPin, setShowPin] = useState(false)
   const [consentGiven, setConsentGiven] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -213,7 +214,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     setLoading(true)
     setError(null)
     setInfoMsg(null)
-    setOtp(["", "", "", "", "", ""])
+    setOtpCode("")
 
     try {
       await api.sendOtp(clean, role)
@@ -224,7 +225,6 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             : `A 6-digit OTP code has been sent to (+880 ${clean}).`)
       )
       setStep("otp")
-      setTimeout(() => document.getElementById("otp-0")?.focus(), 150)
     } catch (err: any) {
       console.error("OTP send error:", err)
       setError(
@@ -239,24 +239,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     }
   }
 
-  function handlePasteOtp(e: React.ClipboardEvent) {
-    e.preventDefault()
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6)
-    if (pasted.length === 0) return
-
-    const digits = pasted.split("")
-    while (digits.length < 6) digits.push("")
-    setOtp(digits)
-
-    if (pasted.length === 6) {
-      handleVerifyOtp(pasted)
-    } else {
-      document.getElementById(`otp-${Math.min(pasted.length, 5)}`)?.focus()
-    }
-  }
-
   async function handleVerifyOtp(overrideOtp?: string) {
-    const fullOtp = overrideOtp || otp.join("")
+    const fullOtp = (overrideOtp || otpCode).trim()
     if (fullOtp.length < 6) {
       setError(isBn ? "৬ ডিজিটের OTP কোড লিখুন" : "Please enter the 6-digit OTP code")
       return
@@ -274,15 +258,29 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         pin.trim() || undefined
       )
 
+      // Authoritative Firestore lookup
+      const cleanPhone = phone.replace(/\D/g, "")
+      const firestoreAccount =
+        cachedAccount || (await firebaseService.findAccountByPhone(cleanPhone, role).catch(() => null))
+
       const storedName =
-        role === "merchant" ? res.merchant?.ownerName : res.customer?.name
+        existingUserName ||
+        (role === "merchant"
+          ? firestoreAccount?.ownerName || firestoreAccount?.name || res.merchant?.ownerName
+          : firestoreAccount?.name || res.customer?.name)
 
       if (!storedName) {
-        // Brand-new account with no name on file yet
+        // Only prompt if genuinely brand-new account with no name in Firestore or backend
         setPendingAuthResult(res)
         setShowNameModal(true)
       } else {
-        await finalizeLogin(res, storedName)
+        const fullRes = {
+          ...res,
+          customer: firestoreAccount || res.customer,
+          merchant: firestoreAccount || res.merchant,
+          merchants: firestoreAccount ? [firestoreAccount] : res.merchants,
+        }
+        await finalizeLogin(fullRes, storedName)
       }
     } catch (err: any) {
       console.error("Verification error:", err)
@@ -433,26 +431,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
     onEnter("customer")
   }
 
-  function handleOtpChange(index: number, value: string) {
-    if (!/^\d*$/.test(value)) return
-    const next = [...otp]
-    next[index] = value.slice(-1)
-    setOtp(next)
-    if (value && index < 5) {
-      const el = document.getElementById(`otp-${index + 1}`)
-      el?.focus()
-    }
-    if (next.every((d) => d !== "") && index === 5) {
-      handleVerifyOtp(next.join(""))
-    }
-  }
 
-  function handleOtpKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      const el = document.getElementById(`otp-${index - 1}`)
-      el?.focus()
-    }
-  }
 
   return (
     <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_0%,#165B3B_0%,#0D3824_45%,#061910_100%)] flex flex-col relative overflow-hidden">
@@ -859,12 +838,12 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         {step === "otp" && (
           <div className="w-full animate-slide-up">
             <button
-              onClick={() => { setStep("phone"); setError(null); }}
+              onClick={() => { setStep("phone"); setError(null); setOtpCode(""); }}
               className="text-white/70 text-xs mb-3 flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
             >
               {isBn ? "← নম্বর পরিবর্তন করুন" : "← Change Number"}
             </button>
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl" onPaste={handlePasteOtp}>
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-5 border border-white/20 shadow-2xl">
               <h2 className="text-white font-display font-bold text-xl mb-1">
                 {isBn ? "OTP কোড দিন" : "Enter OTP Code"}
               </h2>
@@ -874,33 +853,61 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
                   : `Enter the 6-digit code sent to +880 ${phone}`}
               </p>
 
-              <div className="flex justify-between gap-1.5 mb-5">
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    id={`otp-${i}`}
-                    type="tel"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(i, e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        if (otp.every((d) => d !== "")) handleVerifyOtp()
-                      } else {
-                        handleOtpKeyDown(i, e)
-                      }
-                    }}
-                    className="w-11 h-13 text-center bg-white/10 border-2 rounded-xl text-white text-xl font-bold outline-none transition-all focus:border-[#F59E0B] focus:bg-white/20"
-                    style={{ borderColor: digit ? "#52B788" : "rgba(255,255,255,0.2)" }}
-                  />
-                ))}
+              {/* 6 OTP Digit Box Slots */}
+              <div className="relative mb-5">
+                <div className="flex justify-between gap-1.5 mb-2">
+                  {Array.from({ length: 6 }).map((_, idx) => {
+                    const digit = otpCode[idx]
+                    const isFocused = otpCode.length === idx
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex-1 h-13 rounded-2xl border-2 flex items-center justify-center font-display font-black text-xl transition-all ${
+                          digit
+                            ? "border-[#34D399] bg-[#34D399]/20 text-white shadow-md glow-emerald"
+                            : isFocused
+                            ? "border-[#F59E0B] bg-white/15 ring-2 ring-[#F59E0B]/30"
+                            : "border-white/20 bg-white/5 text-white/30"
+                        }`}
+                      >
+                        {digit || ""}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Native Hidden/Overlay Numeric Input for 100% reliable mobile autofill and paste */}
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 6)
+                    setOtpCode(val)
+                    if (val.length === 6 && !loading) {
+                      handleVerifyOtp(val)
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && otpCode.length === 6 && !loading) {
+                      handleVerifyOtp(otpCode)
+                    }
+                  }}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full text-transparent bg-transparent"
+                />
               </div>
+
+              <p className="text-[11px] text-white/50 text-center mb-4">
+                {isBn ? "৬ সংখ্যার কোডটি লিখুন বা এসএমএস থেকে পেস্ট করুন" : "Type the 6 digits or paste from SMS"}
+              </p>
 
               <button
                 onClick={() => handleVerifyOtp()}
-                disabled={loading || otp.some((d) => !d)}
+                disabled={loading || otpCode.length !== 6}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer shadow-lg hover:brightness-105"
               >
                 {loading
@@ -911,7 +918,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               <button
                 onClick={() => handleSendOtp()}
                 disabled={loading}
-                className="w-full mt-3 py-2 text-white/60 text-xs hover:text-white transition-colors cursor-pointer"
+                className="w-full mt-3 py-2 text-white/70 text-xs hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
               >
                 {isBn ? "পুনরায় OTP পাঠান" : "Resend OTP"}
               </button>
@@ -939,11 +946,11 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             <input
               type="text"
               autoFocus
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
+              value={modalName}
+              onChange={(e) => setModalName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && userName.trim()) {
-                  handleCompleteRegistration()
+                if (e.key === "Enter" && modalName.trim()) {
+                  handleSaveNewUserName()
                 }
               }}
               placeholder={role === "merchant" ? (isBn ? "স্টোরের নাম" : "Store Name") : (isBn ? "আপনার নাম" : "Your Name")}
@@ -951,8 +958,8 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             />
 
             <button
-              onClick={handleCompleteRegistration}
-              disabled={loading || !userName.trim()}
+              onClick={handleSaveNewUserName}
+              disabled={loading || !modalName.trim()}
               className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] shadow-lg transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer hover:brightness-105"
             >
               {loading

@@ -18,7 +18,7 @@ interface SendSmsResult {
 export async function sendBulkSmsBd({ phone, message }: SendSmsOptions): Promise<SendSmsResult> {
   const apiKey = process.env.BULKSMS_BD_API_KEY || "CEk1QvidKiArNccVNNqq"
   const senderId = process.env.BULKSMS_BD_SENDER_ID || "8809617622724"
-  const apiUrl = process.env.BULKSMS_BD_URL || "http://bulksmsbd.net/api/smsapi"
+  const apiUrl = process.env.BULKSMS_BD_URL || "https://bulksmsbd.net/api/smsapi"
 
   if (!apiKey || !senderId) {
     console.warn("[BulkSMS BD] Credentials missing (BULKSMS_BD_API_KEY / BULKSMS_BD_SENDER_ID).")

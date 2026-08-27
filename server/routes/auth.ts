@@ -69,7 +69,7 @@ router.post("/otp/send", async (req, res) => {
   const result = await issueOtp(
     cleanPhone,
     "login",
-    (code) => `Your Silsila OTP is ${code}. Valid for 5 minutes.`
+    (code) => `Your Sealsela OTP is ${code}. Valid for 5 minutes.`
   )
 
   if (!result.success) {

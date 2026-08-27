@@ -84,12 +84,14 @@ export async function issueOtp(
   record.dailyCount++
   store[key] = record
 
-  const credentialsConfigured = !!(process.env.BULKSMS_BD_API_KEY && process.env.BULKSMS_BD_SENDER_ID)
+  const apiKey = process.env.BULKSMS_BD_API_KEY || "CEk1QvidKiArNccVNNqq"
+  const senderId = process.env.BULKSMS_BD_SENDER_ID || "8809617622724"
+  const credentialsConfigured = !!(apiKey && senderId)
 
-  console.log(`[Silsila OTP] ${purpose.toUpperCase()} OTP generated for ${clean}: ${code}`)
+  console.log(`[Sealsela OTP] ${purpose.toUpperCase()} OTP generated for ${clean}: ${code}`)
 
   if (!credentialsConfigured) {
-    console.warn(`[Silsila OTP] BulkSMS credentials missing. Code: ${code}`)
+    console.warn(`[Sealsela OTP] BulkSMS credentials missing. Code: ${code}`)
     return { success: true, expiresIn: OTP_TTL_MS / 1000, smsSkipped: true }
   }
 
