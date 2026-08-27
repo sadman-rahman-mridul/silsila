@@ -6,6 +6,7 @@ import {
   Navigate,
   useNavigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom"
 import Landing from "./views/Landing"
 import CustomerApp from "./views/customer/CustomerApp"
@@ -112,6 +113,9 @@ function PublicMerchantRoute() {
                 navigate("/")
               }
             }}
+            onRequireAuth={() => {
+              navigate(`/?redirect=/${encodeURIComponent(slug)}&role=customer`)
+            }}
           />
         </div>
       </div>
@@ -188,7 +192,7 @@ function PublicMerchantRoute() {
             </p>
           </div>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(`/?redirect=/${encodeURIComponent(slug)}&role=customer`)}
             className="px-4 py-2 rounded-xl bg-[#F59E0B] text-[#0A2318] font-display font-black text-xs shadow-lg glow-amber cursor-pointer active:scale-95 transition-all"
           >
             {isBn ? "লগইন / যুক্ত হন" : "Sign In / Join"}
@@ -202,8 +206,15 @@ function PublicMerchantRoute() {
 function LandingRoute() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const redirect = searchParams.get("redirect")
+  const roleParam = searchParams.get("role") as "customer" | "merchant" | "ops" | null
+  const initialRole = roleParam || (redirect ? "customer" : undefined)
 
   if (profile) {
+    if (redirect && redirect.startsWith("/")) {
+      return <Navigate to={redirect} replace />
+    }
     if (profile.role === "customer") {
       return <Navigate to="/home" replace />
     }
@@ -222,7 +233,13 @@ function LandingRoute() {
 
   return (
     <Landing
+      initialRole={initialRole}
+      redirectPath={redirect || undefined}
       onEnter={(role, opts) => {
+        if (redirect && redirect.startsWith("/")) {
+          navigate(redirect)
+          return
+        }
         if (role === "customer") navigate("/home")
         else if (role === "merchant")
           navigate(opts?.needsOnboarding ? "/merchant/onboarding" : "/merchant/dashboard")

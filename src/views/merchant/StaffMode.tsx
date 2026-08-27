@@ -75,16 +75,11 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
     }
   }, [step, merchantId])
 
-  async function handlePinDigit(digit: string) {
-    if (pin.length >= 4 || checking) return
-    const next = pin + digit
-    setPin(next)
-    setPinError(null)
-    if (next.length < 4) return
-
+  async function verifyEnteredPin(code: string) {
+    if (checking) return
     setChecking(true)
     try {
-      const res = await api.verifyStaffPin(merchantId, next).catch(() => ({ valid: next === "1234" || next === "0000" }))
+      const res = await api.verifyStaffPin(merchantId, code).catch(() => ({ valid: code === "1234" || code === "0000" }))
       if (res.valid) {
         setStep("approvals")
         setPin("")
@@ -99,6 +94,39 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
       setChecking(false)
     }
   }
+
+  async function handlePinDigit(digit: string) {
+    if (pin.length >= 4 || checking) return
+    const next = pin + digit
+    setPin(next)
+    setPinError(null)
+    if (next.length === 4) {
+      verifyEnteredPin(next)
+    }
+  }
+
+  // Global physical keyboard listener for Staff PIN screen
+  useEffect(() => {
+    if (step !== "pin" || showOwnerUnlockModal) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        // If typing directly into an input, let the input's onChange handle it
+        return
+      }
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault()
+        handlePinDigit(e.key)
+      } else if (e.key === "Backspace") {
+        e.preventDefault()
+        setPin((p) => p.slice(0, -1))
+        setPinError(null)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [step, pin, checking, showOwnerUnlockModal])
 
   async function handleApprove(id: string) {
     setResolved((r) => [...r, { id, result: "approved" }])
@@ -279,7 +307,25 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             </p>
           </div>
 
-          <div className="flex justify-center gap-2.5 mb-6">
+          <div className="relative flex justify-center gap-2.5 mb-6">
+            <input
+              type="password"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={4}
+              autoFocus
+              value={pin}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "").slice(0, 4)
+                setPin(val)
+                setPinError(null)
+                if (val.length === 4) {
+                  verifyEnteredPin(val)
+                }
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              aria-label="Staff PIN"
+            />
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}

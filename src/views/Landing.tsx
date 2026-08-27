@@ -11,13 +11,22 @@ type Role = "customer" | "merchant" | "ops"
 interface LandingProps {
   onEnter: (role: "customer" | "merchant" | "ops", opts?: { needsOnboarding?: boolean }) => void
   initialMerchantSlug?: string | null
+  initialRole?: "customer" | "merchant" | "ops"
+  redirectPath?: string
 }
 
-export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) {
+export default function Landing({
+  onEnter,
+  initialMerchantSlug,
+  initialRole,
+  redirectPath,
+}: LandingProps) {
   const { setSessionProfile } = useAuth()
   const { isBn, toggleLanguage } = useLanguage()
-  const [step, setStep] = useState<LandingStep>(() => (initialMerchantSlug ? "phone" : "choose"))
-  const [role, setRole] = useState<Role>("customer")
+  const [step, setStep] = useState<LandingStep>(() =>
+    initialMerchantSlug || initialRole || redirectPath ? "phone" : "choose"
+  )
+  const [role, setRole] = useState<Role>(() => initialRole || "customer")
   const [phone, setPhone] = useState("")
   const [pin, setPin] = useState("")
   const [otpCode, setOtpCode] = useState("")
@@ -464,10 +473,10 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
             <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
           <h1 className="font-display text-3xl font-black text-white tracking-tight leading-none drop-shadow-md">
-            {isBn ? "সিলসিলা" : "Sealsela"}
+            Sealsela
           </h1>
           <p className="text-[#34D399] text-xs font-semibold tracking-wide mt-1 drop-shadow-sm">
-            {isBn ? "আপনার ব্র্যান্ডের ডিজিটাল Loyalty Card!" : "Your Brand's Digital Loyalty Card!"}
+            {isBn ? "আজই আপনার ডিজিটাল লয়্যালটি কার্ড নিন!" : "Get your Digital Loyalty Card Today!"}
           </p>
         </div>
 
@@ -548,7 +557,13 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
               </div>
 
               <p className="text-white/80 text-xs mb-4 leading-relaxed">
-                {isBn ? "আপনার ১১ ডিজিটের মোবাইল নম্বর দিন" : "Enter your 11-digit mobile number"}
+                {redirectPath
+                  ? isBn
+                    ? "সিল দাবি ও সংগ্রহ করতে আপনার ১১ ডিজিটের মোবাইল নম্বর দিন"
+                    : "Enter your 11-digit mobile number to claim your stamp"
+                  : isBn
+                  ? "আপনার ১১ ডিজিটের মোবাইল নম্বর দিন"
+                  : "Enter your 11-digit mobile number"}
               </p>
 
               {/* Phone Number Field */}
@@ -980,7 +995,7 @@ export default function Landing({ onEnter, initialMerchantSlug }: LandingProps) 
         <p className="text-[11px] text-white/40">
           {isBn ? (
             <>
-              সিলসিলা প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের{" "}
+              Sealsela প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের{" "}
               <span className="underline text-white/60">গোপনীয়তা নীতি (PDPA ২০২৬)</span> মেনে নিচ্ছেন।
             </>
           ) : (

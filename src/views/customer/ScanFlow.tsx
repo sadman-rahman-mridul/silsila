@@ -395,7 +395,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
           stopCamera()
           processMerchantScan(detectedId)
         } else {
-          setErrorMsg("ছবিতে কোনো বৈধ সিলসিলা QR কোড শনাক্ত করা যায়নি। পরিষ্কার ছবি দিন।")
+          setErrorMsg("ছবিতে কোনো বৈধ Sealsela QR কোড শনাক্ত করা যায়নি। পরিষ্কার ছবি দিন।")
           setStep("error")
         }
       }

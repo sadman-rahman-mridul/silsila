@@ -584,7 +584,7 @@ export default function MerchantDashboard({
               )}
               <div>
                 <h2 className="font-display font-black text-white text-base leading-tight">
-                  {merchantName || (isBn ? "সিলসিলা স্টোর" : "Sealsela Store")}
+                  {merchantName || (isBn ? "Sealsela স্টোর" : "Sealsela Store")}
                 </h2>
                 <p className="text-[#34D399] text-[11px] font-mono font-bold">
                   {qrDisplayLink || origin}

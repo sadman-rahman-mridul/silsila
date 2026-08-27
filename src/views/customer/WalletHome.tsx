@@ -146,7 +146,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
             </div>
             <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
-              {isBn ? "সিলসিলা" : "Sealsela"}
+              Sealsela
             </span>
           </button>
 
@@ -207,7 +207,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
               <FireIcon size={18} className="text-[#F59E0B]" />
               {maxStreak}
             </p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "সপ্তাহের সিলসিলা" : "Streak"}</p>
+            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "সপ্তাহের ধারা" : "Streak"}</p>
           </div>
         </div>
       </div>
@@ -466,7 +466,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             </p>
             <p className="text-xs mt-0.5">
               {isBn
-                ? "যেকোনো সিলসিলা দোকানে একই অ্যাকাউন্টেই সিল জমবে"
+                ? "যেকোনো Sealsela দোকানে একই অ্যাকাউন্টেই সিল জমবে"
                 : "Stamps collect into this single account across all partner stores"}
             </p>
           </div>

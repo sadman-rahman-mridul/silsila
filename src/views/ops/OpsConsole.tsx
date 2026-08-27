@@ -327,7 +327,7 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
               <h3 className="font-bold text-white text-sm mb-1">নেটওয়ার্ক সারাংশ</h3>
               <p className="text-white/50 text-xs mb-4">
-                সিলসিলায় নিবন্ধিত সব মার্চেন্টের বর্তমান অবস্থা
+                Sealsela-তে নিবন্ধিত সব মার্চেন্টের বর্তমান অবস্থা
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {[

@@ -449,7 +449,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
             </h3>
             <p className="text-xs text-white/60 text-center mb-4 leading-relaxed">
               {isBn
-                ? "বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ (PDPA) ও সিলসিলা পলিসি অনুযায়ী কাস্টমারদের ফোন নম্বর ও ইতিহাস শুধুমাত্র আপনার নিজস্ব দোকানের যোগাযোগের কাজে ব্যবহারযোগ্য।"
+                ? "বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ (PDPA) ও Sealsela পলিসি অনুযায়ী কাস্টমারদের ফোন নম্বর ও ইতিহাস শুধুমাত্র আপনার নিজস্ব দোকানের যোগাযোগের কাজে ব্যবহারযোগ্য।"
                 : "Under Data Privacy regulations and Sealsela policy, customer information may only be used for your store's direct business communications."}
             </p>
 

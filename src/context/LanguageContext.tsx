@@ -32,7 +32,7 @@ const translations: Record<Language, Record<string, string>> = {
     stamps: "মোট সিল",
     visits: "মোট ভিজিট",
     cards_completed: "কার্ড সম্পন্ন",
-    streak: "সপ্তাহের সিলসিলা",
+    streak: "সপ্তাহের ধারা",
     verify: "যাচাইকৃত",
     collect_stamps: "স্ট্যাম্প সংগ্রহ করতে ক্লিক করুন",
   },

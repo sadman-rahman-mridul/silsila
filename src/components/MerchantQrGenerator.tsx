@@ -48,7 +48,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
       light: "#FFFFFF",
       name: "ব্র্যান্ড কালার",
     },
-    emerald: { dark: "#1B4332", light: "#FFFFFF", name: "সিলসিলা এমারেল্ড" },
+    emerald: { dark: "#1B4332", light: "#FFFFFF", name: "Sealsela এমারেল্ড" },
     dark: { dark: "#1A1916", light: "#FFFFFF", name: "ক্লাসিক ব্ল্যাক" },
     navy: { dark: "#0F172A", light: "#FFFFFF", name: "রয়্যাল নেভি" },
   }
@@ -205,7 +205,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
       ctx.fillStyle = "#FFFFFF"
       ctx.font = "bold 44px 'Plus Jakarta Sans', sans-serif"
       ctx.textAlign = "center"
-      ctx.fillText("সিলসিলা · ডিজিটাল লয়্যালটি স্ট্যাম্প", width / 2, 85)
+      ctx.fillText("Sealsela · ডিজিটাল লয়্যালটি স্ট্যাম্প", width / 2, 85)
 
       ctx.fillStyle = "#52B788"
       ctx.font = "bold 26px 'Plus Jakarta Sans', sans-serif"
@@ -490,7 +490,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
               {counterLabel || "মেইন কাউন্টার"} স্ট্যান্ডি
             </h3>
             <p className="text-xs text-[#6B6158] leading-relaxed max-w-sm">
-              কাস্টমাররা স্মার্টফোন ক্যামেরা অথবা সিলসিলা ক্যামেরা দিয়ে স্ক্যান করলেই সরাসরি লয়্যালটি কার্ডে সিল পাবেন।
+              কাস্টমাররা স্মার্টফোন ক্যামেরা অথবা Sealsela ক্যামেরা দিয়ে স্ক্যান করলেই সরাসরি লয়্যালটি কার্ডে সিল পাবেন।
             </p>
           </div>
 
@@ -535,7 +535,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
             </div>
 
             <p className="font-display font-bold text-[#1A1916] text-xs mt-2">{counterLabel}</p>
-            <p className="text-[#52B788] font-bold text-[10px]">সিলসিলা স্ট্যাম্প পয়েন্ট</p>
+            <p className="text-[#52B788] font-bold text-[10px]">Sealsela স্ট্যাম্প পয়েন্ট</p>
           </div>
         </div>
 
@@ -609,7 +609,7 @@ export default function MerchantQrGenerator({ merchant }: MerchantQrGeneratorPro
               className="border-2 border-dashed border-[#52B788] p-5 rounded-2xl bg-[#F7F5F0] mb-4 text-center"
             >
               <div className="bg-[#1B4332] text-white py-2 px-4 rounded-xl mb-3 inline-block">
-                <span className="font-display font-black tracking-wide text-sm">সিলসিলা · ডিজিটাল লয়্যালটি</span>
+                <span className="font-display font-black tracking-wide text-sm">Sealsela · ডিজিটাল লয়্যালটি</span>
               </div>
 
               <h4 className="font-display font-black text-[#1A1916] text-xl mb-0.5">{currentMerchant.name}</h4>

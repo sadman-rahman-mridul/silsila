@@ -23,9 +23,10 @@ import {
 interface CardDetailProps {
   merchantId: string
   onBack: () => void
+  onRequireAuth?: () => void
 }
 
-export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
+export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDetailProps) {
   const { user, profile } = useAuth()
   const { isBn } = useLanguage()
   const [data, setData] = useState<{
@@ -191,7 +192,14 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
 
   // Handle "I'm here! Seal My Card"
   async function handleRequestSeal() {
-    if (!customerId) return
+    if (!customerId) {
+      if (onRequireAuth) {
+        onRequireAuth()
+      } else {
+        window.location.href = `/?redirect=/${encodeURIComponent(merchantId)}&role=customer`
+      }
+      return
+    }
     if (hasStampToday) {
       setError("আপনি ইতিমধ্যে আজকের জন্য এই দোকানে ১টি সিল পেয়েছেন। ১ দিনে সর্বোচ্চ ১টি সিল সংগ্রহ করা যাবে। পরবর্তী সিলের জন্য অনুগ্রহ করে আগামীকাল আসুন!")
       return
@@ -441,7 +449,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-display font-black text-white text-xs">
-                  {isBn ? "সিলসিলা" : "Sealsela"}
+                  Sealsela
                 </span>
               </button>
             </div>
@@ -473,7 +481,7 @@ export default function CardDetail({ merchantId, onBack }: CardDetailProps) {
                   <div className="px-2 py-0.5 rounded-md bg-[#F59E0B]/20 border border-[#F59E0B]/30 flex items-center gap-1">
                     <FireIcon size={12} className="text-[#F59E0B]" />
                     <span className="text-[#F59E0B] text-[11px] font-bold">
-                      {isBn ? `${card.streakCount || 1} সপ্তাহের সিলসিলা` : `${card.streakCount || 1} week streak`}
+                      {isBn ? `${card.streakCount || 1} সপ্তাহের ধারা` : `${card.streakCount || 1} week streak`}
                     </span>
                   </div>
                 </div>
