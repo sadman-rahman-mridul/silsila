@@ -24,25 +24,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined") return
     const root = document.documentElement
-    if (theme === "dark") {
+    const isDarkMode = theme === "dark"
+    const bgColor = isDarkMode ? "#071D13" : "#F6F9F7"
+    const colorScheme = isDarkMode ? "dark" : "light"
+
+    if (isDarkMode) {
       root.classList.add("dark")
       root.classList.remove("light")
-      document.body.style.backgroundColor = ""
-      document.body.style.background = ""
-      document.body.style.color = ""
     } else {
       root.classList.add("light")
       root.classList.remove("dark")
-      document.body.style.backgroundColor = "#F6F9F7"
-      document.body.style.background = "#F6F9F7"
-      document.body.style.color = "#0F172A"
     }
 
-    // Update meta theme-color
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) {
-      meta.setAttribute("content", theme === "dark" ? "#071D13" : "#F6F9F7")
-    }
+    root.style.colorScheme = colorScheme
+    root.style.backgroundColor = bgColor
+    document.body.style.backgroundColor = bgColor
+    document.body.style.colorScheme = colorScheme
+
+    // Update all theme-color meta tags for mobile browsers (Safari / Chrome)
+    const metas = document.querySelectorAll('meta[name="theme-color"]')
+    metas.forEach((m) => {
+      m.setAttribute("content", bgColor)
+    })
 
     localStorage.setItem("sealsela_theme", theme)
   }, [theme])
