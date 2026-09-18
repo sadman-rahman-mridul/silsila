@@ -293,10 +293,299 @@ export default function MarketingLanding() {
             </div>
           </div>
         </div>
+
+        {/* ========================================================================= */}
+        {/* SECTION 1: WALKTHROUGH VIDEO: HOW DOES SEALSELA WORK */}
+        {/* ========================================================================= */}
+        <section className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 dark:border-white/10">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-[#10B981]/15 border border-emerald-500/20 dark:border-[#10B981]/30 text-[#059669] dark:text-[#34D399] text-xs font-mono font-bold tracking-wide">
+              <SparklesIcon size={13} className="text-[#F59E0B]" />
+              <span>{isBn ? "প্রোডাক্ট ডেমো ও গাইড" : "Live Product Walkthrough"}</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
+              {isBn ? "ভিডিও ওয়াকথ্রু: সিলসিলা কীভাবে কাজ করে!" : "Walkthrough Video: How does Sealsela work!"}
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-white/70">
+              {isBn
+                ? "দেখুন কীভাবে গ্রাহকরা কোনো অ্যাপ ডাউনলোড না করেই কাউন্টার QR স্ক্যান করে তাৎক্ষণিক ডিজিটাল স্ট্যাম্প পান এবং রিওয়ার্ড আনলক করেন।"
+                : "Watch how effortlessly customers scan counter QR codes, collect loyalty stamps, and unlock rewards directly in their mobile browser."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Embedded Responsive YouTube Video */}
+            <div className="lg:col-span-7">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-500/30 dark:border-white/15 bg-black aspect-video glow-emerald">
+                <iframe
+                  className="w-full h-full object-cover"
+                  src="https://www.youtube.com/embed/aAMlIs611vo?rel=0&modestbranding=1"
+                  title="How does Sealsela work"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+
+            {/* Retention Marketing Highlight Graphic */}
+            <div className="lg:col-span-5 flex flex-col justify-center space-y-4">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/15 group">
+                <img
+                  src="/retention-hero.png"
+                  alt="3X more Customer Retention with Sealsela"
+                  className="w-full h-auto object-cover rounded-3xl group-hover:scale-[1.02] transition-transform duration-500"
+                />
+              </div>
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#0E281C]/80 border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#10B981]/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center font-bold text-xl flex-shrink-0">
+                  📈
+                </div>
+                <div>
+                  <h4 className="font-display font-bold text-[#0F172A] dark:text-white text-xs sm:text-sm">
+                    {isBn ? "৩ গুণ বেশি কাস্টমার রিটেনশন" : "3X Higher Customer Repeat Visits"}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-white/60">
+                    {isBn ? "ব্র্যান্ডের লয়্যাল কাস্টমারদের ট্র্যাক ও রিওয়ার্ড দিন" : "Turn occasional visitors into loyal regulars with every visit."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 2: PRICING PLANS */}
+        {/* ========================================================================= */}
+        <section className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 dark:border-white/10">
+          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 dark:bg-[#F59E0B]/15 border border-amber-500/20 dark:border-[#F59E0B]/30 text-amber-700 dark:text-[#F59E0B] text-xs font-mono font-bold tracking-wide">
+              <span>{isBn ? "স্বচ্ছ ও সাশ্রয়ী মূল্য" : "Simple, Transparent Pricing"}</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
+              {isBn ? "আপনার ব্যবসার জন্য সেরা প্ল্যান বেছে নিন" : "Pick the Perfect Plan for Your Brand"}
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 dark:text-white/70">
+              {isBn
+                ? "কোনো গোপন ফি বা কমিশন নেই। সম্পূর্ণ এক্সেস, আনলিমিটেড কাস্টমার এবং রিয়েল-টাইম স্টাফ মোড।"
+                : "No hidden fees. Unlimited customers, unlimited digital stamps, and instant counter verification."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto items-stretch">
+            
+            {/* PLAN 1: 6 MONTHS */}
+            <div className="rounded-3xl p-6 sm:p-8 bg-white dark:bg-[#0E281C]/90 border border-slate-200 dark:border-white/15 shadow-xl flex flex-col justify-between relative backdrop-blur-xl">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display font-black text-xl text-[#0F172A] dark:text-white">
+                    {isBn ? "৬ মাসের প্যাকেজ" : "6 Months Plan"}
+                  </h3>
+                  <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white/80 font-mono text-xs font-bold">
+                    {isBn ? "স্টার্টার" : "Starter"}
+                  </span>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-4xl sm:text-5xl font-display font-black text-[#0F172A] dark:text-white">
+                      5,000
+                    </span>
+                    <span className="text-lg sm:text-xl font-bold text-[#059669] dark:text-[#34D399]">
+                      BDT
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-white/60 mt-1">
+                    {isBn ? "৬ মাসের পূর্ণ সেবা (মাত্র ~৮৩৩ টাকা/মাস)" : "Full access for 6 months (~833 BDT/mo)"}
+                  </p>
+                </div>
+
+                {/* Feature List */}
+                <ul className="space-y-3 mb-8 text-xs sm:text-sm text-slate-600 dark:text-white/80">
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "আনলিমিটেড কাস্টমার ও ডিজিটাল কার্ড" : "Unlimited Customers & Digital Cards"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "স্টাফ পিন মোড ও কাউন্টার কিউআর স্ক্যানার" : "PIN-Protected Counter Staff Mode"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "কাস্টম রিওয়ার্ড ও লয়্যালটি টার্গেট সেটআপ" : "Custom Reward Milestones & Rules"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "কাস্টমার হিস্ট্রি ও অ্যানালিটিক্স ড্যাশবোর্ড" : "Customer Retention History & Analytics"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "স্ট্যান্ডার্ড মার্চেন্ট সাপোর্ট" : "Standard Merchant Support"}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => goToAuth("merchant")}
+                className="w-full py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#0F172A] dark:text-white font-display font-bold text-sm transition-all cursor-pointer active:scale-95 shadow-sm border border-slate-200 dark:border-white/15"
+              >
+                {isBn ? "৬ মাসের প্ল্যান শুরু করুন" : "Get 6 Months Plan"}
+              </button>
+            </div>
+
+            {/* PLAN 2: 12 MONTHS (BEST VALUE) */}
+            <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#064E3B] to-[#0D3824] dark:bg-none dark:bg-[#092217] border-2 border-[#F59E0B] shadow-2xl flex flex-col justify-between relative backdrop-blur-xl text-white glow-amber">
+              {/* Popular Badge */}
+              <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#071D13] font-display font-black text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-lg">
+                {isBn ? "সেরা অফার • ২০০০ টাকা সাশ্রয়" : "BEST VALUE • SAVE 2,000 BDT"}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-display font-black text-xl text-white">
+                    {isBn ? "১২ মাসের প্যাকেজ" : "12 Months Plan"}
+                  </h3>
+                  <span className="px-3 py-1 rounded-full bg-amber-500/20 text-[#F59E0B] border border-amber-500/30 font-mono text-xs font-bold">
+                    {isBn ? "১ বছর" : "1 Year"}
+                  </span>
+                </div>
+
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-4xl sm:text-5xl font-display font-black text-white">
+                      8,000
+                    </span>
+                    <span className="text-lg sm:text-xl font-bold text-[#34D399]">
+                      BDT
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#34D399] mt-1 font-medium">
+                    {isBn ? "১২ মাসের পূর্ণ সেবা (মাত্র ~৬৬৬ টাকা/মাস)" : "Full access for 12 months (~666 BDT/mo)"}
+                  </p>
+                </div>
+
+                {/* Feature List */}
+                <ul className="space-y-3 mb-8 text-xs sm:text-sm text-white/90">
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/30 text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "৬ মাসের প্ল্যানের সকল সুবিধা অন্তর্ভুক্ত" : "Everything in 6 Months Plan included"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/30 text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "প্রিন্ট-রেডি স্ট্যান্ডি ও কিউআর কিট" : "Print-Ready Counter Standee & QR Assets"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/30 text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "অ্যাডভান্সড রিটেনশন অ্যানালিটিক্স ও ড্রপ-অফ চার্ট" : "Advanced Retention Analytics & Insights"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/30 text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "অগ্রাধিকার ভিত্তিক অনবোর্ডিং সাপোর্ট" : "Priority Onboarding & Dedicated Support"}</span>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <div className="w-5 h-5 rounded-full bg-emerald-500/30 text-[#34D399] flex items-center justify-center flex-shrink-0">
+                      <CheckIcon size={12} />
+                    </div>
+                    <span>{isBn ? "বিকাশ ও কার্ডে তাৎক্ষণিক অ্যাক্টিভেশন" : "Instant bKash & Card Activation"}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <button
+                onClick={() => goToAuth("merchant")}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:brightness-110 text-[#071D13] font-display font-black text-sm transition-all cursor-pointer active:scale-95 shadow-xl glow-amber flex items-center justify-center gap-2"
+              >
+                <span>{isBn ? "১২ মাসের অফার নিন (সেরা সাশ্রয়)" : "Get 12 Months Plan (Best Value)"}</span>
+                <ChevronRightIcon size={16} />
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* SECTION 3: FINAL CALL TO ACTION (ASK THEM TO JOIN SEALSELA) */}
+        {/* ========================================================================= */}
+        <section className="mt-16 sm:mt-24 mb-6">
+          <div className="relative rounded-3xl p-8 sm:p-12 bg-gradient-to-br from-[#064E3B] via-[#0E3824] to-[#042416] border-2 border-emerald-500/40 shadow-2xl text-center overflow-hidden glow-emerald">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 right-1/4 w-72 h-72 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[#34D399] text-xs font-mono font-bold tracking-wide">
+                <SparklesIcon size={13} className="text-[#F59E0B]" />
+                <span>{isBn ? "আজই যুক্ত হোন" : "Join Sealsela Today"}</span>
+              </div>
+
+              <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white leading-tight">
+                {isBn ? (
+                  <>
+                    একবারের ভিজিটরদের বানান <br />
+                    <span className="text-[#34D399]">আজীবন বিশ্বস্ত গ্রাহক!</span>
+                  </>
+                ) : (
+                  <>
+                    Turn one-time visitors <br />
+                    into <span className="text-[#34D399]">lifelong regulars!</span>
+                  </>
+                )}
+              </h2>
+
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed max-w-lg mx-auto">
+                {isBn
+                  ? "শীর্ষস্থানীয় ক্যাফে, রেস্টুরেন্ট, বেকারি ও রিটেইল ব্র্যান্ডগুলোর সাথে যুক্ত হয়ে কাস্টমারদের রিটেনশন বাড়িয়ে নিন।"
+                  : "Join top cafes, restaurants, bakeries, and customer-facing brands growing their repeat sales with Sealsela."}
+              </p>
+
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+                <button
+                  onClick={() => goToAuth("merchant")}
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#059669] hover:brightness-110 text-white font-display font-black text-sm sm:text-base shadow-2xl glow-emerald flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>{isBn ? "মার্চেন্ট হিসেবে যুক্ত হোন" : "Join Sealsela as Merchant"}</span>
+                  <ChevronRightIcon size={18} />
+                </button>
+
+                <button
+                  onClick={() => goToAuth("customer")}
+                  className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>{isBn ? "কাস্টমার ওয়ালেট দেখুন" : "Explore Customer Wallet"}</span>
+                </button>
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-white/60 font-medium">
+                <span className="flex items-center gap-1.5">✓ {isBn ? "কোনো অ্যাপ ডাউনলোড নেই" : "Zero app downloads"}</span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">✓ {isBn ? "বিকাশে ইনস্ট্যান্ট পেমেন্ট" : "Instant bKash activation"}</span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5">✓ {isBn ? "রিয়েল-টাইম ক্লাউড সিঙ্ক" : "Real-time sync"}</span>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Clean Minimalist Footer */}
-      <footer className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-white/40">
+      <footer className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-white/40">
         <div className="flex items-center gap-2">
           <span className="font-bold text-[#0F172A] dark:text-white/70">Sealsela</span>
           <span>•</span>
