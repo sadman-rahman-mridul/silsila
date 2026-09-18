@@ -70,7 +70,7 @@ export default function MarketingLanding() {
               Sealsela
             </span>
             <span className="text-[9px] font-mono uppercase tracking-widest text-[#059669] dark:text-[#34D399] font-bold mt-0.5">
-              Digital Loyalty
+              Digital Loyalty Card
             </span>
           </div>
         </div>
@@ -128,13 +128,13 @@ export default function MarketingLanding() {
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.08] text-[#0F172A] dark:text-white">
               {isBn ? (
                 <>
-                  কাস্টমারদের বানান <br />
-                  <span className="text-[#059669] dark:text-[#34D399]">নিয়মিত ও বিশ্বস্ত।</span>
+                  ভিজিটরদের বানান <br />
+                  <span className="text-[#059669] dark:text-[#34D399]">লয়্যাল কাস্টমার!</span>
                 </>
               ) : (
                 <>
-                  Turn customers <br />
-                  into <span className="text-[#059669] dark:text-[#34D399]">regulars.</span>
+                  Turn your visitors <br />
+                  into <span className="text-[#059669] dark:text-[#34D399]">loyal customer!</span>
                 </>
               )}
             </h1>
@@ -300,7 +300,7 @@ export default function MarketingLanding() {
         <div className="flex items-center gap-2">
           <span className="font-bold text-[#0F172A] dark:text-white/70">Sealsela</span>
           <span>•</span>
-          <span>Turn customers into regulars.</span>
+          <span>Turn your visitors into loyal customer!</span>
         </div>
         <div className="flex items-center gap-4">
           <button onClick={() => goToAuth("merchant")} className="hover:text-[#059669] dark:hover:text-white transition-colors cursor-pointer">
