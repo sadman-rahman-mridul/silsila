@@ -103,22 +103,24 @@ export default function CustomerApp({ onBack, initialMerchantId, initialTab }: C
           </div>
         ) : (
           <div className="absolute inset-0 overflow-y-auto">
-            {tab === "home" && (
-              <WalletHome
-                onSelectCard={(id) => handleOpenMerchant(id)}
-                onExploreClick={() => handleTabChange("explore")}
-                onLogout={handleLogout}
-              />
-            )}
-            {tab === "explore" && <ExplorePage onSelectMerchant={(id) => handleOpenMerchant(id)} />}
-            {tab === "scan" && (
-              <ScanFlow
-                onNavigateToCard={(merchantId) => handleOpenMerchant(merchantId)}
-                onNavigateHome={() => handleTabChange("home")}
-              />
-            )}
-            {tab === "rewards" && <RewardsPage />}
-            {tab === "profile" && <ProfilePage onBack={handleLogout} />}
+            <div className="w-full max-w-5xl mx-auto px-3.5 sm:px-6 lg:px-8 py-2 sm:py-4 pb-12 sm:pb-16">
+              {tab === "home" && (
+                <WalletHome
+                  onSelectCard={(id) => handleOpenMerchant(id)}
+                  onExploreClick={() => handleTabChange("explore")}
+                  onLogout={handleLogout}
+                />
+              )}
+              {tab === "explore" && <ExplorePage onSelectMerchant={(id) => handleOpenMerchant(id)} />}
+              {tab === "scan" && (
+                <ScanFlow
+                  onNavigateToCard={(merchantId) => handleOpenMerchant(merchantId)}
+                  onNavigateHome={() => handleTabChange("home")}
+                />
+              )}
+              {tab === "rewards" && <RewardsPage />}
+              {tab === "profile" && <ProfilePage onBack={handleLogout} />}
+            </div>
           </div>
         )}
       </div>

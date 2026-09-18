@@ -403,7 +403,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
   return (
     <div className="flex flex-col min-h-full bg-transparent overflow-y-auto w-full pb-20 sm:pb-12" {...swipeHandlers}>
       {/* RESPONSIVE MAX-WIDTH CONTAINER */}
-      <div className="w-full max-w-6xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="w-full max-w-5xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-6">
         
         {/* TOP GLASS NAVIGATION BAR */}
         <header className="flex items-center justify-between mb-4 sm:mb-6 bg-white/70 dark:bg-[#0A2318]/70 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-2.5 sm:px-4 shadow-sm">
