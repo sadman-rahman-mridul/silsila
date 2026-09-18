@@ -3,6 +3,7 @@ import confetti from "canvas-confetti"
 import { api, type CustomerCard, type Merchant, type RewardProgram } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
+import { useTheme } from "../../context/ThemeContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import StampGrid from "../../components/StampGrid"
@@ -18,6 +19,9 @@ import {
   GiftIcon,
   CheckIcon,
   AlertTriangleIcon,
+  SunIcon,
+  MoonIcon,
+  GlobeIcon,
 } from "../../components/Icons"
 
 interface CardDetailProps {
@@ -28,7 +32,8 @@ interface CardDetailProps {
 
 export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDetailProps) {
   const { user, profile } = useAuth()
-  const { isBn } = useLanguage()
+  const { isBn, toggleLanguage } = useLanguage()
+  const { isDark, toggleTheme } = useTheme()
   const [data, setData] = useState<{
     card: CustomerCard
     merchant: Merchant
@@ -342,14 +347,14 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
 
   if (loading) {
     return (
-      <div className="flex flex-col h-full items-center justify-center bg-[#071D13] text-white">
-        <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl animate-spin mb-3 shadow-xl backdrop-blur-md">
+      <div className="flex flex-col h-full min-h-[70vh] items-center justify-center bg-transparent text-[#0F172A] dark:text-white">
+        <div className="w-14 h-14 rounded-2xl bg-white/10 dark:bg-white/10 flex items-center justify-center text-3xl animate-spin mb-3 shadow-xl backdrop-blur-md">
           ⏳
         </div>
-        <p className="text-white font-display font-bold text-sm">
+        <p className="font-display font-bold text-sm">
           {isBn ? "কার্ডের তথ্য লোড হচ্ছে..." : "Loading card details..."}
         </p>
-        <p className="text-white/60 text-xs mt-1">
+        <p className="text-slate-500 dark:text-white/60 text-xs mt-1">
           {isBn ? "অনুগ্রহ করে একটু অপেক্ষা করুন" : "Please wait a moment"}
         </p>
       </div>
@@ -358,14 +363,14 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
 
   if (!data) {
     return (
-      <div className="flex flex-col h-full items-center justify-center bg-[#071D13] p-6 text-center text-white">
+      <div className="flex flex-col h-full min-h-[70vh] items-center justify-center p-6 text-center text-[#0F172A] dark:text-white">
         <div className="w-16 h-16 rounded-3xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-3xl mb-4 shadow-xl">
           ⚠️
         </div>
-        <h2 className="font-display font-bold text-white text-lg mb-1">
+        <h2 className="font-display font-bold text-lg mb-1">
           {error || (isBn ? "দোকানের তথ্য পাওয়া যায়নি" : "Store information not found")}
         </h2>
-        <p className="text-white/60 text-xs mb-6 max-w-xs leading-relaxed">
+        <p className="text-slate-500 dark:text-white/60 text-xs mb-6 max-w-xs leading-relaxed">
           {isBn
             ? "দোকানটির কিউআর কোড সঠিক নাও হতে পারে অথবা নেটওয়ার্ক সমস্যা হতে পারে।"
             : "The QR code may be invalid or there is a network issue."}
@@ -373,7 +378,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
         <div className="flex gap-3 w-full max-w-xs">
           <button
             onClick={onBack}
-            className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-white/15"
+            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-[#0F172A] dark:text-white font-bold text-xs rounded-xl transition-all cursor-pointer border border-slate-200 dark:border-white/15"
           >
             {isBn ? "← ফিরে যান" : "← Go Back"}
           </button>
@@ -396,143 +401,179 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
   const currentRewardText = activeProg?.rewardText || card.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")
 
   return (
-    <div className="flex flex-col h-full bg-transparent overflow-y-auto" {...swipeHandlers}>
-      {/* UNIFIED SCROLLING CONTAINER */}
-      <div className="max-w-2xl mx-auto w-full">
-        {/* Top Header with Merchant Cover Photo */}
-        <div className="relative overflow-hidden min-h-[190px]">
-          {/* Cover Photo Background or Stylized Fallback */}
-          {merchant.coverUrl ? (
-            <div className="absolute inset-0 z-0">
-              <img
-                src={merchant.coverUrl}
-                alt={merchant.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#071D13]/50 via-[#071D13]/80 to-[#071D13]" />
-            </div>
-          ) : (
-            <div
-              className="absolute inset-0 z-0"
-              style={{ background: `linear-gradient(145deg, #155E3E 0%, #071D13 100%)` }}
+    <div className="flex flex-col min-h-full bg-transparent overflow-y-auto w-full pb-20 sm:pb-12" {...swipeHandlers}>
+      {/* RESPONSIVE MAX-WIDTH CONTAINER */}
+      <div className="w-full max-w-6xl mx-auto px-3.5 sm:px-6 lg:px-8 py-3 sm:py-6">
+        
+        {/* TOP GLASS NAVIGATION BAR */}
+        <header className="flex items-center justify-between mb-4 sm:mb-6 bg-white/70 dark:bg-[#0A2318]/70 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-2.5 sm:px-4 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#0F172A] dark:text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-white/15 active:scale-95 shadow-xs"
             >
-              <div className="absolute inset-0 opacity-10">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute text-white text-4xl opacity-20 select-none pointer-events-none"
-                    style={{ top: `${(i * 37) % 100}%`, left: `${(i * 53) % 100}%`, transform: "rotate(-15deg)" }}
-                  >
-                    {isBn ? "সিল" : "Stamp"}
-                  </div>
-                ))}
+              <ChevronLeftIcon size={16} />
+              <span>{isBn ? "হোম" : "Home"}</span>
+            </button>
+
+            <button
+              onClick={onBack}
+              className="hidden sm:flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100 transition-opacity"
+              title={isBn ? "হোমে ফিরুন" : "Back to Home"}
+            >
+              <div className="w-6 h-6 rounded-lg bg-emerald-500/20 flex items-center justify-center p-1 border border-emerald-500/30">
+                <img
+                  src={isDark ? "/sealsela-logo-dark.svg" : "/sealsela-logo-light.svg"}
+                  alt="Sealsela"
+                  className="w-full h-full object-contain"
+                />
               </div>
+              <span className="font-display font-black text-[#1B4332] dark:text-white text-sm">
+                Sealsela
+              </span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Language Switcher */}
+            <button
+              onClick={toggleLanguage}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#0F172A] dark:text-white text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-white/15 flex items-center gap-1"
+            >
+              <GlobeIcon size={13} />
+              <span>{isBn ? "EN" : "বাং"}</span>
+            </button>
+
+            {/* Dark / Light Mode Switcher */}
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#0F172A] dark:text-white transition-all cursor-pointer border border-slate-200 dark:border-white/15"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <SunIcon size={15} className="text-amber-400" /> : <MoonIcon size={15} className="text-slate-700" />}
+            </button>
+          </div>
+        </header>
+
+        {error && (
+          <div className="mb-4 bg-red-500/15 border border-red-500/30 text-red-700 dark:text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center justify-between backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <AlertTriangleIcon size={14} className="text-red-500 dark:text-red-300 flex-shrink-0" />
+              <span>{error}</span>
             </div>
-          )}
+            <button onClick={() => setError(null)} className="text-red-500 dark:text-red-300 hover:text-red-700 dark:hover:text-white text-xs ml-2 cursor-pointer font-bold">✕</button>
+          </div>
+        )}
 
-          <div className="relative z-10 px-3.5 pt-6 pb-4">
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={onBack}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/20 active:scale-95 shadow-md"
-              >
-                <ChevronLeftIcon size={16} />
-                <span>{isBn ? "হোম" : "Home"}</span>
-              </button>
-
-              <button
-                onClick={onBack}
-                className="flex items-center gap-1.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity active:scale-95 bg-white/10 px-3 py-1 rounded-xl backdrop-blur-md border border-white/15"
-                title={isBn ? "হোমে ফিরুন" : "Back to Home"}
-              >
-                <div className="w-5 h-5 rounded-md bg-emerald-500/20 flex items-center justify-center p-0.5 border border-emerald-500/30">
-                  <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
-                </div>
-                <span className="font-display font-black text-white text-xs">
-                  Sealsela
-                </span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center font-display font-black text-xl shadow-2xl border-2 border-white/30 overflow-hidden flex-shrink-0 bg-[#0A2318] glow-emerald"
-                style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
-              >
-                {merchant.logoUrl ? (
-                  <img src={merchant.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+        {/* 2-COLUMN RESPONSIVE GRID FOR TABLET & DESKTOP */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
+          
+          {/* LEFT COLUMN: HERO BANNER & STAMP CARD */}
+          <div className="lg:col-span-6 space-y-4 sm:space-y-5 lg:sticky lg:top-4">
+            
+            {/* Merchant Hero Banner Card */}
+            <div className="relative rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0E281C]">
+              {/* Cover Photo / Background */}
+              <div className="relative h-36 sm:h-44 w-full overflow-hidden">
+                {merchant.coverUrl ? (
+                  <img
+                    src={merchant.coverUrl}
+                    alt={merchant.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  merchant.logoInitials || (isBn ? "সিল" : "S")
+                  <div
+                    className="w-full h-full"
+                    style={{ background: `linear-gradient(135deg, #155E3E 0%, #071D13 100%)` }}
+                  />
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="font-display font-black text-white text-xl truncate drop-shadow-md">
-                    {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
-                  </h1>
-                  {merchant.verified && (
-                    <ShieldCheckIcon size={18} className="text-[#34D399] flex-shrink-0" />
-                  )}
+
+              {/* Merchant Details Content */}
+              <div className="p-4 sm:p-5 -mt-12 relative z-10">
+                <div className="flex items-end gap-3.5 mb-3">
+                  <div
+                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-display font-black text-2xl shadow-2xl border-2 border-white dark:border-[#0E281C] overflow-hidden flex-shrink-0 bg-white dark:bg-[#0A2318]"
+                    style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
+                  >
+                    {merchant.logoUrl ? (
+                      <img src={merchant.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      merchant.logoInitials || (isBn ? "সিল" : "S")
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 pb-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h1 className="font-display font-black text-[#0F172A] dark:text-white text-xl sm:text-2xl truncate">
+                        {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
+                      </h1>
+                      {merchant.verified && (
+                        <ShieldCheckIcon size={18} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-slate-500 dark:text-white/75 text-xs font-medium mt-0.5">
+                      {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-white/80 text-xs mt-0.5 drop-shadow-xs font-medium">
-                  {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
-                </p>
-                <div className="flex items-center gap-1.5 mt-1.5">
-                  <div className="px-2 py-0.5 rounded-md bg-[#F59E0B]/20 border border-[#F59E0B]/30 flex items-center gap-1">
-                    <FireIcon size={12} className="text-[#F59E0B]" />
-                    <span className="text-[#F59E0B] text-[11px] font-bold">
+
+                <div className="flex items-center gap-2 flex-wrap pt-1">
+                  <div className="px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center gap-1.5">
+                    <FireIcon size={13} className="text-[#F59E0B]" />
+                    <span className="text-[#B45309] dark:text-[#F59E0B] text-xs font-bold">
                       {isBn ? `${card.streakCount || 1} সপ্তাহের ধারা` : `${card.streakCount || 1} week streak`}
                     </span>
                   </div>
                 </div>
+
+                {/* Reward Programs Selector Pills */}
+                {programs && programs.length > 1 && (
+                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/10">
+                    <p className="text-slate-400 dark:text-white/60 text-[11px] font-bold uppercase tracking-wider mb-2">
+                      {isBn ? "পুরস্কার অপশন (ট্যাপ করে পরিবর্তন করুন):" : "Reward Options (tap to switch):"}
+                    </p>
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                      {programs.map((p: any) => {
+                        const isSelected = activeProg?.id === p.id
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => setSelectedProgramId(p.id)}
+                            className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 border ${
+                              isSelected
+                                ? "bg-[#F59E0B] text-[#0A2318] border-[#F59E0B] shadow-md scale-[1.02] glow-amber"
+                                : "bg-slate-100 dark:bg-[#071D13] text-[#0F172A] dark:text-white hover:bg-slate-200 dark:hover:bg-[#123827] border-slate-200 dark:border-white/10"
+                            }`}
+                          >
+                            <span>🎁</span>
+                            <div className="text-left">
+                              <p className="leading-tight font-black">{p.rewardText || (isBn ? "পুরস্কার" : "Reward")}</p>
+                              <p className={`text-[10px] font-normal ${isSelected ? "text-[#0A2318]/80" : "text-slate-500 dark:text-white/60"}`}>
+                                {isBn ? `${p.target}টি সিল` : `${p.target} stamps`}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Reward Programs Switcher */}
-            {programs && programs.length > 1 && (
-              <div className="mb-4">
-                <p className="text-white/80 text-xs font-semibold uppercase tracking-wider mb-2">
-                  {isBn ? "পুরস্কার কার্ডসমূহ (ট্যাপ করে সিলেক্ট করুন):" : "Reward Programs (tap to select):"}
-                </p>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {programs.map((p: any) => {
-                    const isSelected = activeProg?.id === p.id
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedProgramId(p.id)}
-                        className={`flex-shrink-0 px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 border ${
-                          isSelected
-                            ? "bg-[#F59E0B] text-[#0A2318] border-[#F59E0B] shadow-lg scale-[1.02] glow-amber"
-                            : "bg-[#0E281C]/80 text-white hover:bg-[#123827] border-white/15 backdrop-blur-md"
-                        }`}
-                      >
-                        <span className="text-base">🎁</span>
-                        <div className="text-left">
-                          <p className="leading-tight font-black">{p.rewardText || (isBn ? "পুরস্কার" : "Reward")}</p>
-                          <p className={`text-[10px] font-normal ${isSelected ? "text-[#0A2318]/80" : "text-white/70"}`}>
-                            {isBn ? `${p.target}টি সিল প্রয়োজন` : `${p.target} stamps needed`}
-                          </p>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Stamp Card Component */}
-            <div className="bg-gradient-to-br from-[#064E3B] to-[#0D3824] dark:bg-none dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-4 border border-emerald-500/25 shadow-xl text-white">
+            {/* Loyalty Stamp Card Component */}
+            <div className="bg-gradient-to-br from-[#064E3B] to-[#0D3824] dark:from-[#08291C] dark:to-[#04170F] rounded-3xl p-4 sm:p-6 border border-emerald-500/25 shadow-xl text-white">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">
                     {isBn ? "স্ট্যাম্প অগ্রগতি" : "Stamp Progress"}
                   </p>
-                  <p className="text-white font-display font-black text-3xl leading-none drop-shadow-sm">
+                  <p className="text-white font-display font-black text-3xl sm:text-4xl leading-none drop-shadow-sm">
                     {card.stamps}
-                    <span className="text-white/40 text-lg font-medium">/{target}</span>
+                    <span className="text-white/40 text-xl font-medium">/{target}</span>
                   </p>
-                  <p className="text-white/70 text-xs mt-1.5 font-medium">
+                  <p className="text-white/70 text-xs mt-2 font-medium">
                     {card.voucherReady ? (
                       <span className="text-[#F59E0B] font-bold">
                         {isBn ? "✓ উপহার প্রস্তুত! এখনই রিডিম করুন" : "✓ Reward ready! Redeem now"}
@@ -548,26 +589,28 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                     )}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="text-white/50 text-xs font-medium">{isBn ? "চক্র" : "Cycle"}</p>
-                  <p className="text-[#34D399] font-display font-bold text-xl">#{card.cycleNo || 1}</p>
+                <div className="text-right bg-white/10 px-3 py-1.5 rounded-2xl backdrop-blur-md border border-white/15">
+                  <p className="text-white/60 text-[10px] uppercase font-bold tracking-wider">{isBn ? "চক্র" : "Cycle"}</p>
+                  <p className="text-[#34D399] font-display font-black text-lg">#{card.cycleNo || 1}</p>
                 </div>
               </div>
 
-              <div className="bg-[#071D13] p-3.5 rounded-2xl border border-emerald-500/20 mb-3">
+              {/* Coffee / Stamp Grid */}
+              <div className="bg-[#071D13] p-4 sm:p-5 rounded-2xl border border-emerald-500/20 mb-3 shadow-inner">
                 <StampGrid filled={card.stamps} total={target} size="md" variant="coffee" />
               </div>
 
-              <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+              {/* Progress Bar */}
+              <div className="mt-4 h-2.5 rounded-full bg-white/10 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#F59E0B] transition-all duration-700 shadow-sm"
                   style={{ width: `${pct}%` }}
                 />
               </div>
 
-              {/* ACTION BUTTON: "I'm here! Seal My Card" or SAME-DAY LOCK BANNER */}
+              {/* ACTION CTA BUTTON */}
               {hasStampToday ? (
-                <div className="mt-4 p-3.5 bg-[#071D13] border border-emerald-500/20 rounded-2xl text-center shadow-lg">
+                <div className="mt-5 p-4 bg-[#071D13] border border-emerald-500/20 rounded-2xl text-center shadow-lg">
                   <div className="flex items-center justify-center gap-2 text-[#34D399] font-bold text-xs">
                     <CheckIcon size={16} className="text-[#34D399]" />
                     <span>{isBn ? "আজকের সিল সংগ্রহ সম্পন্ন (১টি সিল/দিন)" : "Daily stamp collected (1 stamp/day)"}</span>
@@ -580,9 +623,9 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                 <button
                   onClick={handleRequestSeal}
                   disabled={requestingSeal || approvalStatus === "waiting"}
-                  className="mt-4 w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-sm shadow-xl glow-amber flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+                  className="mt-5 w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:brightness-105 text-[#0A2318] font-display font-black text-base shadow-xl glow-amber flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
                 >
-                  <MapPinIcon size={18} />
+                  <MapPinIcon size={20} />
                   <span>
                     {requestingSeal
                       ? isBn
@@ -596,160 +639,156 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
               )}
             </div>
           </div>
-        </div>
 
-        {error && (
-          <div className="mx-5 mt-4 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center justify-between backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <AlertTriangleIcon size={14} className="text-red-300 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-            <button onClick={() => setError(null)} className="text-red-300 hover:text-white text-xs ml-2 cursor-pointer">✕</button>
-          </div>
-        )}
-
-        {/* Card Info & Rules */}
-        <div className="px-3.5 py-3 space-y-3 pb-24">
-          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
-            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
-              {isBn ? "পরবর্তী পুরস্কার" : "Upcoming Reward"}
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
-                <GiftIcon size={24} className="text-[#0A2318]" />
-              </div>
-              <div>
-                <p className="font-display font-bold text-[#0F172A] dark:text-white text-base">
-                  {card.rewardText || program?.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
-                </p>
-                <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">
-                  {isBn
-                    ? `${target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে`
-                    : `Collect ${target} stamps to redeem your reward`}
-                </p>
-              </div>
-            </div>
-            {card.voucherReady && card.voucherCode && (
-              <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10">
-                <p className="text-slate-600 dark:text-white/70 text-xs mb-1.5 font-medium">
-                  {isBn ? "আপনার একক ভাউচার কোড" : "Your Unique Voucher Code"}
-                </p>
-                <div className="flex items-center justify-between gap-2 bg-slate-100 dark:bg-[#0A2318] border border-emerald-500/30 rounded-2xl p-3">
-                  <p className="font-display font-black text-[#059669] dark:text-[#34D399] text-lg tracking-widest">
-                    {card.voucherCode}
-                  </p>
-                  <button
-                    onClick={() => handleCopyCode(card.voucherCode!)}
-                    className="text-xs bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] px-3.5 py-1.5 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
-                  >
-                    {copied ? (isBn ? "কপি হয়েছে ✓" : "Copied ✓") : isBn ? "কপি" : "Copy"}
-                  </button>
+          {/* RIGHT COLUMN: REWARDS, HISTORY, LOCATION & SOCIALS */}
+          <div className="lg:col-span-6 space-y-4 sm:space-y-5">
+            
+            {/* Upcoming Reward & Voucher Card */}
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+                {isBn ? "পরবর্তী পুরস্কার" : "Upcoming Reward"}
+              </p>
+              <div className="flex items-center gap-3.5">
+                <div className="w-13 h-13 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
+                  <GiftIcon size={26} className="text-[#0A2318]" />
                 </div>
-                <p className="text-slate-400 dark:text-white/50 text-[11px] mt-2">
-                  {isBn
-                    ? "কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।"
-                    : "Show this code at counter. Staff will verify with their PIN."}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
-            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
-              {isBn ? "সিল অর্জনের ইতিহাস" : "Stamp History"}
-            </p>
-            <div className="space-y-3">
-              {stampsHistory && stampsHistory.length > 0 ? (
-                stampsHistory.map((visit, i) => (
-                  <div key={visit.id || i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-100 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30 font-bold text-xs">
-                      ✓
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[#0F172A] dark:text-white text-sm font-medium">
-                        {isBn ? `সিল #${stampsHistory.length - i}` : `Stamp #${stampsHistory.length - i}`}
-                      </p>
-                      <p className="text-slate-400 dark:text-white/40 text-xs">{visit.formattedDate}</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-slate-400 dark:text-white/50 py-2">
-                  {isBn ? "কোনো অতীত ভিজিট রেকর্ড নেই" : "No past visit records"}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
-            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
-              {isBn ? "দোকানের অবস্থান ও সময়সূচি" : "Location & Hours"}
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <MapPinIcon size={16} className="text-[#059669] dark:text-[#34D399] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-[#0F172A] dark:text-white text-sm leading-relaxed">
-                    {merchant.address || (isBn ? "ঢাকা, বাংলাদেশ" : "Dhaka, Bangladesh")}
+                  <p className="font-display font-bold text-[#0F172A] dark:text-white text-base sm:text-lg">
+                    {card.rewardText || program?.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
                   </p>
-                  {merchant.lat && merchant.lng && (
-                    <a
-                      href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[#059669] dark:text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
-                    >
-                      {isBn ? "গুগল ম্যাপে দেখুন" : "View on Google Maps"} <ExternalLinkIcon size={11} />
-                    </a>
-                  )}
+                  <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">
+                    {isBn
+                      ? `${target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে`
+                      : `Collect ${target} stamps to redeem your reward`}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <ClockIcon size={16} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
-                <p className="text-[#0F172A] dark:text-white text-sm">
-                  {merchant.hours || (isBn ? "সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)" : "9:00 AM – 10:00 PM (Daily)")}
-                </p>
+
+              {card.voucherReady && card.voucherCode && (
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/10">
+                  <p className="text-slate-600 dark:text-white/70 text-xs mb-1.5 font-medium">
+                    {isBn ? "আপনার একক ভাউচার কোড" : "Your Unique Voucher Code"}
+                  </p>
+                  <div className="flex items-center justify-between gap-2 bg-slate-100 dark:bg-[#0A2318] border border-emerald-500/30 rounded-2xl p-3.5">
+                    <p className="font-display font-black text-[#059669] dark:text-[#34D399] text-xl tracking-widest">
+                      {card.voucherCode}
+                    </p>
+                    <button
+                      onClick={() => handleCopyCode(card.voucherCode!)}
+                      className="text-xs bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] px-4 py-2 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
+                    >
+                      {copied ? (isBn ? "কপি হয়েছে ✓" : "Copied ✓") : isBn ? "কপি" : "Copy"}
+                    </button>
+                  </div>
+                  <p className="text-slate-400 dark:text-white/50 text-[11px] mt-2">
+                    {isBn
+                      ? "কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।"
+                      : "Show this code at counter. Staff will verify with their PIN."}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Stamp History & Ledger Card */}
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+                {isBn ? "সিল অর্জনের ইতিহাস" : "Stamp History"}
+              </p>
+              <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
+                {stampsHistory && stampsHistory.length > 0 ? (
+                  stampsHistory.map((visit, i) => (
+                    <div key={visit.id || i} className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-100 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30 font-bold text-xs">
+                        ✓
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[#0F172A] dark:text-white text-sm font-medium">
+                          {isBn ? `সিল #${stampsHistory.length - i}` : `Stamp #${stampsHistory.length - i}`}
+                        </p>
+                        <p className="text-slate-400 dark:text-white/40 text-xs">{visit.formattedDate}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 dark:text-white/50 py-2">
+                    {isBn ? "কোনো অতীত ভিজিট রেকর্ড নেই" : "No past visit records"}
+                  </p>
+                )}
               </div>
             </div>
-          </div>
 
-          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
-            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
-              {isBn ? "সোশ্যাল মিডিয়া ও রিভিউ" : "Social Media & Reviews"}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {merchant.instagram && (
-                <a
-                  href={`https://instagram.com/${merchant.instagram}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
-                >
-                  <InstagramIcon size={14} />
-                  Instagram
-                </a>
-              )}
-              {merchant.facebook && (
-                <a
-                  href={`https://facebook.com/${merchant.facebook}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
-                >
-                  <FacebookIcon size={14} />
-                  Facebook
-                </a>
-              )}
-              {merchant.reviewLink && (
-                <a
-                  href={merchant.reviewLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] text-xs font-black shadow-md glow-amber"
-                >
-                  {isBn ? "⭐ Google রিভিউ দিন" : "⭐ Leave Google Review"}
-                </a>
-              )}
+            {/* Store Location & Opening Hours Card */}
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+                {isBn ? "দোকানের অবস্থান ও সময়সূচি" : "Location & Hours"}
+              </p>
+              <div className="space-y-3.5">
+                <div className="flex items-start gap-3">
+                  <MapPinIcon size={18} className="text-[#059669] dark:text-[#34D399] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-[#0F172A] dark:text-white text-sm leading-relaxed">
+                      {merchant.address || (isBn ? "ঢাকা, বাংলাদেশ" : "Dhaka, Bangladesh")}
+                    </p>
+                    {merchant.lat && merchant.lng && (
+                      <a
+                        href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#059669] dark:text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
+                      >
+                        {isBn ? "গুগল ম্যাপে দেখুন" : "View on Google Maps"} <ExternalLinkIcon size={11} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ClockIcon size={18} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
+                  <p className="text-[#0F172A] dark:text-white text-sm">
+                    {merchant.hours || (isBn ? "সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)" : "9:00 AM – 10:00 PM (Daily)")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media & Customer Reviews Card */}
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+                {isBn ? "সোশ্যাল মিডিয়া ও রিভিউ" : "Social Media & Reviews"}
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                {merchant.instagram && (
+                  <a
+                    href={`https://instagram.com/${merchant.instagram}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
+                  >
+                    <InstagramIcon size={14} />
+                    Instagram
+                  </a>
+                )}
+                {merchant.facebook && (
+                  <a
+                    href={`https://facebook.com/${merchant.facebook}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
+                  >
+                    <FacebookIcon size={14} />
+                    Facebook
+                  </a>
+                )}
+                {merchant.reviewLink && (
+                  <a
+                    href={merchant.reviewLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] text-xs font-black shadow-md glow-amber"
+                  >
+                    {isBn ? "⭐ Google রিভিউ দিন" : "⭐ Leave Google Review"}
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

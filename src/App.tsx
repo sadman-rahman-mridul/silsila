@@ -105,7 +105,7 @@ function PublicMerchantRoute() {
   }
 
   return (
-    <div className="flex flex-col h-full min-h-[100dvh] bg-[#F6F9F7] dark:bg-[#071D13] text-[#0F172A] dark:text-white w-full max-w-lg mx-auto relative overflow-hidden transition-colors">
+    <div className="flex flex-col h-full min-h-[100dvh] bg-[#F6F9F7] dark:bg-[#071D13] text-[#0F172A] dark:text-white w-full relative overflow-hidden transition-colors">
       <div className="flex-1 overflow-hidden relative w-full">
         <div className="absolute inset-0 overflow-y-auto">
           <CardDetail
@@ -124,83 +124,83 @@ function PublicMerchantRoute() {
         </div>
       </div>
 
-      {/* Static Bottom Navigation (Facebook style) */}
+      {/* Responsive Bottom Navigation (Facebook style on mobile, elegant floating dock on desktop) */}
       {profile?.role === "customer" ? (
-        <nav
-          className="flex-shrink-0 bg-white/95 dark:bg-[#092015]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 px-1 pb-safe shadow-2xl z-20 w-full transition-colors"
-        >
-          <div className="flex items-center justify-around py-0.5">
-            <button
-              onClick={() => navigate("/home")}
-              className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
-            >
-              <HomeIcon size={21} />
-              <span className="text-[10px] mt-1 font-medium">{isBn ? "হোম" : "Home"}</span>
-            </button>
+        <div className="flex-shrink-0 w-full sm:px-4 sm:pb-3 pb-safe z-20">
+          <nav className="max-w-md mx-auto bg-white/95 dark:bg-[#092015]/95 backdrop-blur-xl border-t sm:border border-slate-200 dark:border-white/10 sm:rounded-3xl px-1 shadow-lg dark:shadow-2xl transition-colors">
+            <div className="flex items-center justify-around py-0.5">
+              <button
+                onClick={() => navigate("/home")}
+                className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
+              >
+                <HomeIcon size={21} />
+                <span className="text-[10px] mt-1 font-medium">{isBn ? "হোম" : "Home"}</span>
+              </button>
 
-            <button
-              onClick={() => navigate("/explore")}
-              className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
-            >
-              <CompassIcon size={21} />
-              <span className="text-[10px] mt-1 font-medium">{isBn ? "খুঁজুন" : "Explore"}</span>
-            </button>
+              <button
+                onClick={() => navigate("/explore")}
+                className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
+              >
+                <CompassIcon size={21} />
+                <span className="text-[10px] mt-1 font-medium">{isBn ? "খুঁজুন" : "Explore"}</span>
+              </button>
 
-            <button
-              onClick={() => navigate("/scan")}
-              className="flex flex-col items-center -mt-4 relative cursor-pointer active:scale-95 transition-transform group"
-            >
-              <div className="w-13 h-13 rounded-full flex items-center justify-center shadow-xl transition-all bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20">
-                <ScanIcon size={22} className="text-[#071D13]" />
-              </div>
-              <span className="text-[10px] mt-0.5 font-bold text-[#059669] dark:text-[#52B788]">{isBn ? "স্ক্যান" : "Scan"}</span>
-            </button>
-
-            <button
-              onClick={() => navigate("/rewards")}
-              className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
-            >
-              <GiftIcon size={21} />
-              <span className="text-[10px] mt-1 font-medium">{isBn ? "পুরস্কার" : "Rewards"}</span>
-            </button>
-
-            <button
-              onClick={() => navigate("/profile")}
-              className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
-            >
-              {profile?.avatarUrl || profile?.photoURL ? (
-                <div className="w-6 h-6 rounded-full overflow-hidden border border-slate-300 dark:border-white/40">
-                  <img
-                    src={profile?.avatarUrl || profile?.photoURL}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
+              <button
+                onClick={() => navigate("/scan")}
+                className="flex flex-col items-center -mt-4 relative cursor-pointer active:scale-95 transition-transform group"
+              >
+                <div className="w-13 h-13 rounded-full flex items-center justify-center shadow-xl transition-all bg-gradient-to-br from-[#10B981] to-[#047857] glow-emerald border border-white/20">
+                  <ScanIcon size={22} className="text-[#071D13]" />
                 </div>
-              ) : (
-                <UserIcon size={21} />
-              )}
-              <span className="text-[10px] mt-1 font-medium">{isBn ? "প্রোফাইল" : "Profile"}</span>
+                <span className="text-[10px] mt-0.5 font-bold text-[#059669] dark:text-[#52B788]">{isBn ? "স্ক্যান" : "Scan"}</span>
+              </button>
+
+              <button
+                onClick={() => navigate("/rewards")}
+                className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
+              >
+                <GiftIcon size={21} />
+                <span className="text-[10px] mt-1 font-medium">{isBn ? "পুরস্কার" : "Rewards"}</span>
+              </button>
+
+              <button
+                onClick={() => navigate("/profile")}
+                className="flex flex-col items-center py-2 px-3 text-[#059669] dark:text-[#52B788] hover:text-[#064E3B] dark:hover:text-white transition-colors cursor-pointer active:scale-95"
+              >
+                {profile?.avatarUrl || profile?.photoURL ? (
+                  <div className="w-6 h-6 rounded-full overflow-hidden border border-slate-300 dark:border-white/40">
+                    <img
+                      src={profile?.avatarUrl || profile?.photoURL}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <UserIcon size={21} />
+                )}
+                <span className="text-[10px] mt-1 font-medium">{isBn ? "প্রোফাইল" : "Profile"}</span>
+              </button>
+            </div>
+          </nav>
+        </div>
+      ) : (
+        <div className="flex-shrink-0 w-full sm:px-4 sm:pb-3 pb-safe z-20">
+          <div className="max-w-md mx-auto bg-white/95 dark:bg-[#092015]/95 backdrop-blur-xl border-t sm:border border-slate-200 dark:border-white/10 sm:rounded-3xl px-4 py-3 shadow-lg dark:shadow-2xl flex items-center justify-between gap-3 transition-colors">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-black text-xs text-[#0A2318]">
+                🔖
+              </div>
+              <p className="text-[#0F172A] dark:text-white text-xs font-bold leading-tight">
+                {isBn ? "সিল সংগ্রহ করতে লগইন করুন" : "Sign in to earn stamps"}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/login?redirect=/${encodeURIComponent(slug)}&role=customer`)}
+              className="px-4 py-2 rounded-xl bg-[#F59E0B] text-[#0A2318] font-display font-black text-xs shadow-lg glow-amber cursor-pointer active:scale-95 transition-all"
+            >
+              {isBn ? "লগইন / যুক্ত হন" : "Sign In / Join"}
             </button>
           </div>
-        </nav>
-      ) : (
-        <div
-          className="flex-shrink-0 bg-white/95 dark:bg-[#092015]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 px-4 py-3 pb-safe shadow-2xl z-20 flex items-center justify-between gap-3 w-full transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#F59E0B] flex items-center justify-center font-black text-xs text-[#0A2318]">
-              🔖
-            </div>
-            <p className="text-[#0F172A] dark:text-white text-xs font-bold leading-tight">
-              {isBn ? "সিল সংগ্রহ করতে লগইন করুন" : "Sign in to earn stamps"}
-            </p>
-          </div>
-          <button
-            onClick={() => navigate(`/login?redirect=/${encodeURIComponent(slug)}&role=customer`)}
-            className="px-4 py-2 rounded-xl bg-[#F59E0B] text-[#0A2318] font-display font-black text-xs shadow-lg glow-amber cursor-pointer active:scale-95 transition-all"
-          >
-            {isBn ? "লগইন / যুক্ত হন" : "Sign In / Join"}
-          </button>
         </div>
       )}
     </div>
