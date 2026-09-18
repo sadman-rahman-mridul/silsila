@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /ops
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://sealsela.com/sitemap.xml
