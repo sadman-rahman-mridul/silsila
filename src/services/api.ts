@@ -263,7 +263,6 @@ export const api = {
       expiresIn: number
       otpToken?: string
       smsSkipped?: boolean
-      debugCode?: string
     }>(`${API_BASE}/auth/otp/send`, {
       method: "POST",
       headers: JSON_HEADERS,

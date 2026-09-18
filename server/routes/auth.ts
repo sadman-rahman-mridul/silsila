@@ -128,7 +128,6 @@ router.post("/otp/send", async (req, res) => {
     expiresIn: result.expiresIn,
     otpToken: result.otpToken,
     smsSkipped: result.smsSkipped,
-    debugCode: result.debugCode,
   })
 })
 

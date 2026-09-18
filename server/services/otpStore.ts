@@ -67,7 +67,6 @@ export interface IssueResult {
   expiresIn?: number
   otpToken?: string
   smsSkipped?: boolean
-  debugCode?: string
 }
 
 /** Generate a 6-digit OTP, deliver it by SMS, and remember it for verification. */
@@ -124,20 +123,14 @@ export async function issueOtp(
   const senderId = process.env.BULKSMS_BD_SENDER_ID
   const credentialsConfigured = !!(apiKey && senderId)
 
-  console.log(`[Sealsela OTP] ${purpose.toUpperCase()} OTP generated for ${clean}: ${code}`)
-
   if (!credentialsConfigured) {
-    console.warn(`[Sealsela OTP] BulkSMS credentials missing in environment. Code logged to server console: ${code}`)
-    return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true, debugCode: code }
+    console.warn(`[Sealsela OTP] BulkSMS credentials missing in environment (BULKSMS_BD_API_KEY / BULKSMS_BD_SENDER_ID).`)
+    return { success: false, error: "এসএমএস গেটওয়ে সেটআপ করা হয়নি। অনুগ্রহ করে Vercel-এ BULKSMS_BD_API_KEY ও BULKSMS_BD_SENDER_ID যোগ করুন।" }
   }
 
   const smsResult = await sendBulkSmsBd({ phone: clean, message: messageTemplate(code) })
   if (!smsResult.success) {
-    console.warn(`[Silsila OTP] SMS delivery failed: ${smsResult.error} (Code: ${code})`)
-    if (process.env.NODE_ENV !== "production") {
-      // In local development, permit proceeding without blocking
-      return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true }
-    }
+    console.warn(`[Sealsela OTP] SMS delivery failed: ${smsResult.error}`)
     return { success: false, error: smsResult.error || "এসএমএস গেটওয়ে সংযোগে ত্রুটি হয়েছে। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।" }
   }
 
