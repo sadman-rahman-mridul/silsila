@@ -358,37 +358,3 @@ export function MoonIcon({ size = 24, ...p }: IconProps) {
     </svg>
   )
 }
-
-export function PhoneIcon({ size = 24, ...p }: IconProps) {
-  return (
-    <svg {...base(size)} {...p}>
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  )
-}
-
-export function TrendingDownIcon({ size = 24, ...p }: IconProps) {
-  return (
-    <svg {...base(size)} {...p}>
-      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-      <polyline points="17 18 23 18 23 12" />
-    </svg>
-  )
-}
-
-export function MessageSquareIcon({ size = 24, ...p }: IconProps) {
-  return (
-    <svg {...base(size)} {...p}>
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  )
-}
-
-export function ArrowRightIcon({ size = 24, ...p }: IconProps) {
-  return (
-    <svg {...base(size)} {...p}>
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  )
-}
