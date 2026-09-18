@@ -336,12 +336,21 @@ export default function Landing({
       if (res.otpToken) {
         setOtpToken(res.otpToken)
       }
-      setInfoMsg(
-        customSuccessMsg ||
-          (isBn
-            ? `আপনার মোবাইল নম্বরে ৬ সংখ্যার OTP কোড পাঠানো হয়েছে (+৮৮০ ${clean})।`
-            : `A 6-digit OTP code has been sent to (+880 ${clean}).`)
-      )
+      if (res.debugCode) {
+        setOtpCode(res.debugCode)
+        setInfoMsg(
+          isBn
+            ? `আপনার ওটিপি কোড: ${res.debugCode}`
+            : `Your OTP Verification Code: ${res.debugCode}`
+        )
+      } else {
+        setInfoMsg(
+          customSuccessMsg ||
+            (isBn
+              ? `আপনার মোবাইল নম্বরে ৬ সংখ্যার OTP কোড পাঠানো হয়েছে (+৮৮০ ${clean})।`
+              : `A 6-digit OTP code has been sent to (+880 ${clean}).`)
+        )
+      }
       setStep("otp")
     } catch (err: any) {
       console.error("OTP send error:", err)

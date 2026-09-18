@@ -67,6 +67,7 @@ export interface IssueResult {
   expiresIn?: number
   otpToken?: string
   smsSkipped?: boolean
+  debugCode?: string
 }
 
 /** Generate a 6-digit OTP, deliver it by SMS, and remember it for verification. */
@@ -127,7 +128,7 @@ export async function issueOtp(
 
   if (!credentialsConfigured) {
     console.warn(`[Sealsela OTP] BulkSMS credentials missing in environment. Code logged to server console: ${code}`)
-    return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true }
+    return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true, debugCode: code }
   }
 
   const smsResult = await sendBulkSmsBd({ phone: clean, message: messageTemplate(code) })
