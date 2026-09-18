@@ -491,10 +491,10 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
               </div>
 
               {/* Merchant Details Content */}
-              <div className="p-4 sm:p-5 -mt-12 relative z-10">
+              <div className="p-4 sm:p-5 pt-0 relative z-10">
                 <div className="flex items-end gap-3.5 mb-3">
                   <div
-                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-display font-black text-2xl shadow-2xl border-2 border-white dark:border-[#0E281C] overflow-hidden flex-shrink-0 bg-white dark:bg-[#0A2318]"
+                    className="-mt-10 sm:-mt-12 w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-display font-black text-2xl shadow-2xl ring-4 ring-white dark:ring-[#0E281C] overflow-hidden flex-shrink-0 bg-white dark:bg-[#0A2318] z-10 relative"
                     style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
                   >
                     {merchant.logoUrl ? (
@@ -503,7 +503,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                       merchant.logoInitials || (isBn ? "সিল" : "S")
                     )}
                   </div>
-                  <div className="flex-1 min-w-0 pb-1">
+                  <div className="flex-1 min-w-0 pt-2 sm:pt-3 pb-0.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h1 className="font-display font-black text-[#0F172A] dark:text-white text-xl sm:text-2xl truncate">
                         {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
