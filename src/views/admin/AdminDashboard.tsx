@@ -62,6 +62,8 @@ export default function AdminDashboard() {
       const data = await res.json()
       if (res.ok && data.success && data.token) {
         sessionStorage.setItem("silsila_admin_token", data.token)
+        localStorage.setItem("silsila_admin_token", data.token)
+        localStorage.setItem("silsila_token", data.token)
         setIsAuthenticated(true)
         setPinError(null)
       } else {

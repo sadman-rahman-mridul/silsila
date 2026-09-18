@@ -1401,10 +1401,11 @@ export const firebaseService = {
 
     try {
       const { api } = await import("./api")
-      return await api.sendSms(phone, message)
-    } catch (err) {
+      const res = await api.sendSms(phone, message)
+      return res
+    } catch (err: any) {
       console.error("Failed to send approval SMS:", err)
-      return { success: false, error: "SMS sending failed" }
+      return { success: false, error: err?.message || "SMS sending failed" }
     }
   },
 }

@@ -192,7 +192,13 @@ const API_BASE = "/api"
 const TOKEN_KEY = "silsila_token"
 
 function authHeaders(extra?: Record<string, string>): Record<string, string> {
-  const token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null
+  let token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null
+  if (!token && typeof window !== "undefined") {
+    token =
+      sessionStorage.getItem("silsila_admin_token") ||
+      localStorage.getItem("silsila_admin_token") ||
+      sessionStorage.getItem(TOKEN_KEY)
+  }
   return {
     ...(extra || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
