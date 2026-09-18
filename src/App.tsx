@@ -156,7 +156,9 @@ function LandingRoute({ forcedRole }: { forcedRole?: "customer" | "merchant" | "
   const roleParam = searchParams.get("role") as "customer" | "merchant" | "ops" | null
   const initialRole = forcedRole || roleParam || (redirect ? "customer" : undefined)
 
-  if (profile) {
+  // Only auto-redirect if current profile matches the requested role
+  const targetRole = forcedRole || roleParam
+  if (profile && (!targetRole || profile.role === targetRole)) {
     if (redirect && redirect.startsWith("/")) {
       return <Navigate to={redirect} replace />
     }

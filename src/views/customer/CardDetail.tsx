@@ -91,16 +91,24 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
       setError(null)
 
       let resolvedMerchantId = merchantId
-      const fbMerchant = await firebaseService.getMerchantByIdOrSlug(merchantId).catch(() => null)
+      // Fast fallback timeout (2.5s) for merchant lookup to guarantee responsiveness
+      const fbMerchant = await Promise.race([
+        firebaseService.getMerchantByIdOrSlug(merchantId),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+      ]).catch(() => null)
+
       if (fbMerchant?.id) {
         resolvedMerchantId = fbMerchant.id
       }
 
-      // 1. Try local API and Firestore Card
-      const [apiRes, fbCard, fbPrograms] = await Promise.all([
-        customerId ? api.getCardDetail(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
-        customerId ? firebaseService.getCustomerCard(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
-        firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => []),
+      // 1. Try local API and Firestore Card with safety timeout
+      const [apiRes, fbCard, fbPrograms] = await Promise.race([
+        Promise.all([
+          customerId ? api.getCardDetail(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
+          customerId ? firebaseService.getCustomerCard(customerId, resolvedMerchantId).catch(() => null) : Promise.resolve(null),
+          firebaseService.getRewardPrograms(resolvedMerchantId).catch(() => []),
+        ]),
+        new Promise<[null, null, any[]]>((resolve) => setTimeout(() => resolve([null, null, []]), 2500)),
       ])
 
       const merchant = fbMerchant || apiRes?.merchant || {
@@ -110,7 +118,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
         category: "ক্যাফে",
       }
 
-      const activeProgramsList = fbPrograms.length > 0
+      const activeProgramsList = fbPrograms && fbPrograms.length > 0
         ? fbPrograms
         : (Array.isArray(merchant.programs) && merchant.programs.length > 0
             ? merchant.programs.filter((p: any) => p && p.rewardText)
