@@ -295,59 +295,93 @@ export default function MarketingLanding() {
         </div>
 
         {/* ========================================================================= */}
-        {/* SECTION 1: WALKTHROUGH VIDEO: HOW DOES SEALSELA WORK */}
+        {/* SECTION 1: WALKTHROUGH VIDEO: HOW TO USE SEALSELA */}
         {/* ========================================================================= */}
         <section className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 dark:border-white/10">
-          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-[#10B981]/15 border border-emerald-500/20 dark:border-[#10B981]/30 text-[#059669] dark:text-[#34D399] text-xs font-mono font-bold tracking-wide">
-              <SparklesIcon size={13} className="text-[#F59E0B]" />
-              <span>{isBn ? "প্রোডাক্ট ডেমো ও গাইড" : "Live Product Walkthrough"}</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
-              {isBn ? "ভিডিও ওয়াকথ্রু: সিলসিলা কীভাবে কাজ করে!" : "Walkthrough Video: How does Sealsela work!"}
-            </h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-white/70">
-              {isBn
-                ? "দেখুন কীভাবে গ্রাহকরা কোনো অ্যাপ ডাউনলোড না করেই কাউন্টার QR স্ক্যান করে তাৎক্ষণিক ডিজিটাল স্ট্যাম্প পান এবং রিওয়ার্ড আনলক করেন।"
-                : "Watch how effortlessly customers scan counter QR codes, collect loyalty stamps, and unlock rewards directly in their mobile browser."}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Embedded Responsive YouTube Video */}
             <div className="lg:col-span-7">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-500/30 dark:border-white/15 bg-black aspect-video glow-emerald">
                 <iframe
                   className="w-full h-full object-cover"
                   src="https://www.youtube.com/embed/aAMlIs611vo?rel=0&modestbranding=1"
-                  title="How does Sealsela work"
+                  title="How to use Sealsela"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               </div>
             </div>
 
-            {/* Retention Marketing Highlight Graphic */}
-            <div className="lg:col-span-5 flex flex-col justify-center space-y-4">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 dark:border-white/15 group">
-                <img
-                  src="/retention-hero.png"
-                  alt="3X more Customer Retention with Sealsela"
-                  className="w-full h-auto object-cover rounded-3xl group-hover:scale-[1.02] transition-transform duration-500"
-                />
+            {/* Right Column: Walkthrough Video & How to use Sealsela */}
+            <div className="lg:col-span-5 flex flex-col justify-center space-y-5 text-center lg:text-left">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-[#10B981]/15 border border-emerald-500/20 dark:border-[#10B981]/30 text-[#059669] dark:text-[#34D399] text-xs font-mono font-bold tracking-wide mb-2.5">
+                  <SparklesIcon size={13} className="text-[#F59E0B]" />
+                  <span>{isBn ? "ভিডিও ওয়াকথ্রু" : "Walkthrough Video"}</span>
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white leading-tight">
+                  {isBn ? "সিলসিলা কীভাবে ব্যবহার করবেন" : "How to use Sealsela"}
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-white/70 mt-2 leading-relaxed">
+                  {isBn
+                    ? "কাউন্টার QR স্ক্যান থেকে শুরু করে স্ট্যাম্প সংগ্রহ ও রিওয়ার্ড রিডিম পর্যন্ত সহজ ৪টি ধাপ।"
+                    : "A complete step-by-step walkthrough of customer stamping, staff approval, and reward unlock."}
+                </p>
               </div>
-              <div className="p-4 rounded-2xl bg-white dark:bg-[#0E281C]/80 border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#10B981]/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center font-bold text-xl flex-shrink-0">
-                  📈
+
+              {/* 4 Steps */}
+              <div className="space-y-2.5 text-left">
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-white dark:bg-[#0E281C]/80 border border-slate-200 dark:border-white/10 shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-xs text-[#0F172A] dark:text-white">
+                      {isBn ? "কাউন্টার QR স্ক্যান" : "Scan Counter QR"}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-white/60">
+                      {isBn ? "কাস্টমার ফোনের ক্যামেরা দিয়ে স্ক্যান করেন।" : "Customer scans with their mobile camera."}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-display font-bold text-[#0F172A] dark:text-white text-xs sm:text-sm">
-                    {isBn ? "৩ গুণ বেশি কাস্টমার রিটেনশন" : "3X Higher Customer Repeat Visits"}
-                  </h4>
-                  <p className="text-[11px] text-slate-500 dark:text-white/60">
-                    {isBn ? "ব্র্যান্ডের লয়্যাল কাস্টমারদের ট্র্যাক ও রিওয়ার্ড দিন" : "Turn occasional visitors into loyal regulars with every visit."}
-                  </p>
+
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-white dark:bg-[#0E281C]/80 border border-slate-200 dark:border-white/10 shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-xs text-[#0F172A] dark:text-white">
+                      {isBn ? "১-ট্যাপ স্টাফ অনুমোদন" : "1-Tap Staff Approval"}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-white/60">
+                      {isBn ? "কর্মীরা পিন সুরক্ষিত স্টাফ মোডে সিল নিশ্চিত করেন।" : "Staff verify visit in secure counter mode."}
+                    </p>
+                  </div>
                 </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-white dark:bg-[#0E281C]/80 border border-slate-200 dark:border-white/10 shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-[#059669] dark:text-[#34D399] flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-display font-bold text-xs text-[#0F172A] dark:text-white">
+                      {isBn ? "স্বয়ংক্রিয় রিওয়ার্ড আনলক" : "Instant Reward Unlock"}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-white/60">
+                      {isBn ? "টার্গেট পূর্ণ হলে ডিজিটাল ভাউচার কোড তৈরি হয়।" : "Digital voucher generated upon target completion."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <button
+                  onClick={() => goToAuth("merchant")}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-110 text-white font-display font-bold text-xs sm:text-sm shadow-md glow-emerald flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+                >
+                  <span>{isBn ? "মার্চেন্ট কার্ড শুরু করুন" : "Start with Sealsela"}</span>
+                  <ChevronRightIcon size={16} />
+                </button>
               </div>
             </div>
           </div>
