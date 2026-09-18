@@ -152,22 +152,22 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
   return (
     <div className="flex flex-col h-full bg-transparent w-full">
       <div className="px-3.5 pt-4 pb-2 w-full">
-        <h1 className="font-display text-xl font-black text-white mb-2 drop-shadow-xs">
+        <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white mb-2 drop-shadow-xs">
           {isBn ? "কাস্টমার সিআরএম" : "Customer CRM"}
         </h1>
         <div className="relative">
-          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
+          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isBn ? "নাম বা মোবাইল নম্বর খুঁজুন..." : "Search name or phone number..."}
-            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-9 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
+            className="w-full bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl pl-10 pr-9 py-2.5 text-[#0F172A] dark:text-white placeholder-slate-400 dark:placeholder-white/40 text-sm outline-none focus:border-emerald-500 transition-colors shadow-sm dark:shadow-lg"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white flex items-center justify-center text-xs cursor-pointer transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-600 dark:text-white/70 flex items-center justify-center text-xs cursor-pointer transition-colors"
             >
               ✕
             </button>
@@ -184,7 +184,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 filter === t.key
                   ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                  : "bg-[#0E281C]/70 backdrop-blur-md text-white/70 border border-white/10 hover:text-white"
+                  : "bg-white dark:bg-[#0E281C]/70 backdrop-blur-md text-slate-700 dark:text-white/70 border border-slate-200/80 dark:border-white/10 hover:text-slate-950 dark:hover:text-white shadow-xs"
               }`}
             >
               {t.label}
@@ -196,11 +196,11 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
       <div className="flex-1 overflow-y-auto pb-20 px-3.5 pt-2 w-full">
         <div>
           {error && (
-            <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
+            <div className="mb-3 bg-red-500/15 border border-red-400/40 text-red-600 dark:text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
               ⚠️ {error}
             </div>
           )}
-          <p className="text-white/50 text-xs py-2 font-medium">
+          <p className="text-slate-500 dark:text-white/50 text-xs py-2 font-medium">
             {loading
               ? isBn
                 ? "লোড হচ্ছে..."
@@ -211,16 +211,16 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
           </p>
 
           {loading ? (
-            <div className="py-12 text-center text-white/70 text-sm">
+            <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
               <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
               <p>{isBn ? "কাস্টমার তালিকা প্রস্তুত হচ্ছে..." : "Preparing customer list..."}</p>
             </div>
           ) : customers.length === 0 ? (
-            <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
-              <p className="text-sm font-bold text-white">{isBn ? "কোনো কাস্টমার পাওয়া যায়নি" : "No customers found"}</p>
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-md dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20">
+              <p className="text-sm font-bold text-[#0F172A] dark:text-white">{isBn ? "কোনো কাস্টমার পাওয়া যায়নি" : "No customers found"}</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
               {customers.map((customer) => {
                 const badge = statusBadge[customer.status] || statusBadge.active
                 const totalCups = target || 5
@@ -229,7 +229,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                   <div
                     key={customer.id}
                     onClick={() => setSelectedCustomer(customer)}
-                    className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-2xl cursor-pointer hover:border-emerald-400/40 border border-white/10 transition-all active:scale-[0.99]"
+                    className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-md dark:shadow-2xl cursor-pointer hover:border-emerald-500/40 border border-slate-200/80 dark:border-white/10 transition-all active:scale-[0.99]"
                   >
                     <div className="flex items-start gap-3">
                       {customer.avatarUrl ? (
@@ -239,41 +239,41 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                           className="w-11 h-11 rounded-2xl object-cover border border-[#10B981]/30 flex-shrink-0 shadow-sm"
                         />
                       ) : (
-                        <div className="w-11 h-11 rounded-2xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg flex-shrink-0 shadow-sm">
+                        <div className="w-11 h-11 rounded-2xl bg-emerald-100 dark:bg-[#10B981]/20 text-emerald-800 dark:text-[#34D399] border border-emerald-300 dark:border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg flex-shrink-0 shadow-sm">
                           {customer.name?.slice(0, 1) || (isBn ? "ক" : "C")}
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="font-display font-bold text-white truncate">{customer.name}</p>
-                          <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold flex-shrink-0 border border-white/10 ${badge.bg} ${badge.text}`}>
+                          <p className="font-display font-bold text-[#0F172A] dark:text-white truncate">{customer.name}</p>
+                          <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold flex-shrink-0 border border-slate-200 dark:border-white/10 ${badge.bg} ${badge.text}`}>
                             {badge.label}
                           </span>
                         </div>
-                        <p className="text-white/50 text-xs font-mono tracking-wider">
+                        <p className="text-slate-500 dark:text-white/50 text-xs font-mono tracking-wider">
                           {formatMaskedPhone(customer.rawPhone || customer.phone)}
                         </p>
 
                         <div className="flex items-center gap-4 mt-2.5">
                           <div className="text-center">
-                            <p className="font-display font-bold text-[#34D399] text-base leading-none">
+                            <p className="font-display font-bold text-emerald-600 dark:text-[#34D399] text-base leading-none">
                               {customer.stamps}{target ? `/${target}` : ""}
                             </p>
-                            <p className="text-white/40 text-[10px] mt-0.5 font-medium">{isBn ? "সিল" : "Stamps"}</p>
+                            <p className="text-slate-400 dark:text-white/40 text-[10px] mt-0.5 font-medium">{isBn ? "সিল" : "Stamps"}</p>
                           </div>
                           <div className="text-center">
-                            <p className="font-display font-bold text-white text-base leading-none">
+                            <p className="font-display font-bold text-[#0F172A] dark:text-white text-base leading-none">
                               {customer.totalVisits}
                             </p>
-                            <p className="text-white/40 text-[10px] mt-0.5 font-medium">{isBn ? "ভিজিট" : "Visits"}</p>
+                            <p className="text-slate-400 dark:text-white/40 text-[10px] mt-0.5 font-medium">{isBn ? "ভিজিট" : "Visits"}</p>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-[#34D399] font-bold text-[10px]">{isBn ? "অগ্রগতি" : "Progress"}</span>
-                              <span className="text-white/40 text-[10px]">{customer.lastVisit}</span>
+                              <span className="text-emerald-700 dark:text-[#34D399] font-bold text-[10px]">{isBn ? "অগ্রগতি" : "Progress"}</span>
+                              <span className="text-slate-400 dark:text-white/40 text-[10px]">{customer.lastVisit}</span>
                             </div>
                             {/* Coffee Cup Progress Animation */}
-                            <div className="flex items-center gap-1 bg-[#071D13] px-2.5 py-1.5 rounded-xl border border-emerald-500/20">
+                            <div className="flex items-center gap-1 bg-slate-50 dark:bg-[#071D13] px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-emerald-500/20">
                               {Array.from({ length: totalCups }).map((_, i) => {
                                 const isFilled = i < customer.stamps
                                 return (
@@ -290,14 +290,14 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                                   </span>
                                 )
                               })}
-                              <span className="text-[10px] font-black text-[#34D399] ml-auto font-mono">
+                              <span className="text-[10px] font-black text-emerald-700 dark:text-[#34D399] ml-auto font-mono">
                                 {customer.stamps}/{totalCups}
                               </span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <ChevronRightIcon size={16} className="text-white/30 flex-shrink-0 mt-1" />
+                      <ChevronRightIcon size={16} className="text-slate-300 dark:text-white/30 flex-shrink-0 mt-1" />
                     </div>
                   </div>
                 )
@@ -307,18 +307,18 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
         </div>
 
         {/* PDPA Compliant CSV Export Box */}
-        <div className="mt-4 p-4 rounded-3xl bg-[#0E281C]/85 backdrop-blur-xl border border-emerald-500/20 flex items-center justify-between shadow-2xl">
+        <div className="mt-4 p-4 rounded-3xl bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 flex items-center justify-between shadow-md dark:shadow-2xl">
           <div>
-            <p className="font-bold text-white text-sm flex items-center gap-1.5">
-              <DownloadIcon size={15} className="text-[#34D399]" /> {isBn ? "PDPA সম্মত CSV এক্সপোর্ট" : "PDPA Compliant CSV Export"}
+            <p className="font-bold text-[#0F172A] dark:text-white text-sm flex items-center gap-1.5">
+              <DownloadIcon size={15} className="text-emerald-600 dark:text-[#34D399]" /> {isBn ? "PDPA সম্মত CSV এক্সপোর্ট" : "PDPA Compliant CSV Export"}
             </p>
-            <p className="text-white/60 text-xs mt-0.5">
+            <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">
               {isBn ? "কাস্টমার তালিকা সরাসরি স্প্রেডশিটে ডাউনলোড করুন" : "Download your customer list directly as a spreadsheet"}
             </p>
           </div>
           <button
             onClick={() => setShowExportModal(true)}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black shadow-md glow-emerald cursor-pointer transition-all active:scale-95"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-white dark:text-[#0A2318] text-xs font-black shadow-md glow-emerald cursor-pointer transition-all active:scale-95"
           >
             {isBn ? "এক্সপোর্ট" : "Export"}
           </button>
@@ -328,7 +328,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
       {/* Customer Detail Drawer / Modal */}
       {selectedCustomer && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl text-white">
+          <div className="bg-white dark:bg-[#0E281C] border border-slate-200 dark:border-emerald-500/30 rounded-t-3xl sm:rounded-3xl p-6 max-w-md w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl text-slate-900 dark:text-white">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 {selectedCustomer.avatarUrl ? (
@@ -338,47 +338,47 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                     className="w-12 h-12 rounded-2xl object-cover border border-[#10B981]/30 flex-shrink-0 shadow-md"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-[#34D399] text-xl shadow-md flex-shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-[#10B981]/20 border border-emerald-300 dark:border-[#10B981]/30 flex items-center justify-center font-display font-black text-emerald-700 dark:text-[#34D399] text-xl shadow-md flex-shrink-0">
                     {selectedCustomer.name?.slice(0, 1) || (isBn ? "ক" : "C")}
                   </div>
                 )}
                 <div>
-                  <h3 className="font-display font-bold text-lg text-white">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-white/50 font-mono tracking-wider">
+                  <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">{selectedCustomer.name}</h3>
+                  <p className="text-xs text-slate-500 dark:text-white/50 font-mono tracking-wider">
                     {formatMaskedPhone(selectedCustomer.rawPhone || selectedCustomer.phone)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 font-bold hover:bg-white/20 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-600 dark:text-white/70 font-bold hover:bg-slate-200 dark:hover:bg-white/20 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 bg-[#071D13] p-3.5 rounded-2xl mb-3 text-center border border-white/10">
+            <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-[#071D13] p-3.5 rounded-2xl mb-3 text-center border border-slate-200 dark:border-white/10">
               <div>
-                <p className="font-display font-black text-[#34D399] text-xl">
+                <p className="font-display font-black text-emerald-600 dark:text-[#34D399] text-xl">
                   {selectedCustomer.stamps}{target ? `/${target}` : ""}
                 </p>
-                <p className="text-[10px] text-white/50">{isBn ? "বর্তমান সিল" : "Current Stamps"}</p>
+                <p className="text-[10px] text-slate-500 dark:text-white/50">{isBn ? "বর্তমান সিল" : "Current Stamps"}</p>
               </div>
               <div>
-                <p className="font-display font-black text-white text-xl">{selectedCustomer.totalVisits}</p>
-                <p className="text-[10px] text-white/50">{isBn ? "মোট ভিজিট" : "Total Visits"}</p>
+                <p className="font-display font-black text-slate-900 dark:text-white text-xl">{selectedCustomer.totalVisits}</p>
+                <p className="text-[10px] text-slate-500 dark:text-white/50">{isBn ? "মোট ভিজিট" : "Total Visits"}</p>
               </div>
               <div>
                 <p className="font-display font-black text-[#F59E0B] text-xl">
                   {selectedCustomer.status === "completed" ? "১" : "০"}
                 </p>
-                <p className="text-[10px] text-white/50">{isBn ? "প্রস্তুত পুরস্কার" : "Ready Rewards"}</p>
+                <p className="text-[10px] text-slate-500 dark:text-white/50">{isBn ? "প্রস্তুত পুরস্কার" : "Ready Rewards"}</p>
               </div>
             </div>
 
             {/* Coffee Cups Progress in Modal */}
-            <div className="bg-[#071D13] border border-emerald-500/20 rounded-2xl p-3.5 mb-4 text-center">
-              <p className="text-xs font-bold text-[#34D399] mb-2">
+            <div className="bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-3.5 mb-4 text-center">
+              <p className="text-xs font-bold text-emerald-700 dark:text-[#34D399] mb-2">
                 {isBn
                   ? `কফি কাপ অগ্রগতি (${selectedCustomer.stamps}/${target || 5} কাপ সম্পন্ন)`
                   : `Coffee Cup Progress (${selectedCustomer.stamps}/${target || 5} cups completed)`}
@@ -391,8 +391,8 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                       key={i}
                       className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all duration-300 ${
                         isFilled
-                          ? "bg-[#10B981]/30 border border-[#34D399] shadow-sm scale-105"
-                          : "bg-white/5 border border-white/10 opacity-30 grayscale"
+                          ? "bg-emerald-100 dark:bg-[#10B981]/30 border border-emerald-400 dark:border-[#34D399] shadow-sm scale-105"
+                          : "bg-slate-200/60 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 opacity-40 grayscale"
                       }`}
                     >
                       ☕
@@ -402,26 +402,26 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               </div>
             </div>
 
-            <h4 className="font-bold text-white text-sm mb-2">
+            <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-2">
               {isBn ? "সিল অর্জনের অডিট ট্রেইল:" : "Stamp Audit Trail:"}
             </h4>
             <div className="space-y-2 mb-6">
               {selectedCustomer.history && selectedCustomer.history.length > 0 ? (
                 selectedCustomer.history.map((h, idx) => (
-                  <div key={idx} className="bg-[#071D13] border border-white/10 p-3 rounded-2xl flex items-center justify-between text-xs">
+                  <div key={idx} className="bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 p-3 rounded-2xl flex items-center justify-between text-xs">
                     <div>
-                      <p className="font-bold text-[#34D399]">
+                      <p className="font-bold text-emerald-700 dark:text-[#34D399]">
                         {isBn ? `সিল #${h.stampNo}` : `Stamp #${h.stampNo}`}
                       </p>
-                      <p className="text-white/50 text-[10px]">{h.date} · {h.time}</p>
+                      <p className="text-slate-400 dark:text-white/50 text-[10px]">{h.date} · {h.time}</p>
                     </div>
-                    <span className="bg-white/10 px-2.5 py-1 rounded-lg text-[10px] font-mono text-white/70">
+                    <span className="bg-slate-200 dark:bg-white/10 px-2.5 py-1 rounded-lg text-[10px] font-mono text-slate-700 dark:text-white/70">
                       {isBn ? "স্টাফ: " : "Staff: "}{h.staffId}
                     </span>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-white/40 py-2">
+                <p className="text-xs text-slate-400 dark:text-white/40 py-2">
                   {isBn ? "কোনো বিস্তারিত হিস্টোরি সংরক্ষিত নেই" : "No detailed history recorded"}
                 </p>
               )}
@@ -440,25 +440,25 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
       {/* PDPA Export Confirmation Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-slide-up text-white">
-            <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center mx-auto mb-3 text-2xl shadow-md">
+          <div className="bg-white dark:bg-[#0E281C] border border-slate-200 dark:border-emerald-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-slide-up text-slate-900 dark:text-white">
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-[#FEF3C7] text-amber-900 dark:text-[#0A2318] flex items-center justify-center mx-auto mb-3 text-2xl shadow-md">
               📋
             </div>
-            <h3 className="font-display font-black text-xl text-white text-center mb-1">
+            <h3 className="font-display font-black text-xl text-slate-900 dark:text-white text-center mb-1">
               {isBn ? "কাস্টমার ডেটা এক্সপোর্ট" : "Export Customer Data"}
             </h3>
-            <p className="text-xs text-white/60 text-center mb-4 leading-relaxed">
+            <p className="text-xs text-slate-500 dark:text-white/60 text-center mb-4 leading-relaxed">
               {isBn
                 ? "বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ (PDPA) ও Sealsela পলিসি অনুযায়ী কাস্টমারদের ফোন নম্বর ও ইতিহাস শুধুমাত্র আপনার নিজস্ব দোকানের যোগাযোগের কাজে ব্যবহারযোগ্য।"
                 : "Under Data Privacy regulations and Sealsela policy, customer information may only be used for your store's direct business communications."}
             </p>
 
-            <label className="flex items-start gap-2 mb-6 cursor-pointer text-xs text-white/80 bg-[#071D13] p-3 rounded-2xl border border-white/10">
+            <label className="flex items-start gap-2 mb-6 cursor-pointer text-xs text-slate-700 dark:text-white/80 bg-slate-50 dark:bg-[#071D13] p-3 rounded-2xl border border-slate-200 dark:border-white/10">
               <input
                 type="checkbox"
                 checked={consentAcknowledged}
                 onChange={(e) => setConsentAcknowledged(e.target.checked)}
-                className="mt-0.5 rounded text-[#34D399] focus:ring-0"
+                className="mt-0.5 rounded text-emerald-600 focus:ring-0"
               />
               <span className="font-medium">
                 {isBn
@@ -470,14 +470,14 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
             <div className="flex gap-2">
               <button
                 onClick={() => setShowExportModal(false)}
-                className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white rounded-2xl text-xs font-bold cursor-pointer"
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-white rounded-2xl text-xs font-bold cursor-pointer"
               >
                 {isBn ? "বাতিল" : "Cancel"}
               </button>
               <button
                 onClick={handleExportCsv}
                 disabled={!consentAcknowledged || exporting}
-                className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] rounded-2xl text-xs font-black disabled:opacity-40 shadow-md glow-emerald cursor-pointer"
+                className="flex-1 py-3 bg-gradient-to-r from-[#10B981] to-[#047857] text-white dark:text-[#0A2318] rounded-2xl text-xs font-black disabled:opacity-40 shadow-md glow-emerald cursor-pointer"
               >
                 {exporting ? (isBn ? "ডাউনলোড হচ্ছে..." : "Downloading...") : (isBn ? "CSV ডাউনলোড" : "Download CSV")}
               </button>

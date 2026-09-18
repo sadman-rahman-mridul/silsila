@@ -69,12 +69,12 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
   const hasActivity = !!stats?.hasActivity
 
   return (
-    <div className="min-h-full bg-[#F7F5F0] pb-24">
-      <div className="bg-[#1B4332] px-5 pt-6 pb-6 rounded-b-3xl">
+    <div className="min-h-full bg-[#F6F9F7] dark:bg-[#071D13] text-[#0F172A] dark:text-white pb-24">
+      <div className="bg-gradient-to-r from-[#064E3B] to-[#0D3824] dark:from-[#0E281C] dark:to-[#0A2318] px-5 pt-6 pb-6 rounded-b-3xl border-b border-emerald-800/30 dark:border-white/10 shadow-lg">
         <h1 className="font-display text-2xl font-bold text-white mb-1">রিপোর্ট</h1>
-        <p className="text-[#52B788] text-sm">আপনার দোকানের লাইভ মেট্রিক্স ও পারফরম্যান্স</p>
+        <p className="text-[#34D399] text-sm">আপনার দোকানের লাইভ মেট্রিক্স ও পারফরম্যান্স</p>
 
-        {/* The four headline tiles previously pinned to the home screen. */}
+        {/* The four headline tiles pinned to the top */}
         <div className="mt-4 grid grid-cols-2 gap-2">
           {[
             {
@@ -106,8 +106,8 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
               accent: true,
             },
           ].map((tile) => (
-            <div key={tile.label} className="bg-white/10 rounded-2xl p-3.5">
-              <div className="flex items-center gap-1.5 text-white/60 mb-2">
+            <div key={tile.label} className="bg-white/10 dark:bg-white/5 rounded-2xl p-3.5 border border-white/10">
+              <div className="flex items-center gap-1.5 text-white/70 mb-2">
                 {tile.icon}
                 <span className="text-xs">{tile.label}</span>
               </div>
@@ -118,7 +118,7 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
               >
                 {tile.value}
               </p>
-              <p className="text-white/40 text-[11px] mt-1">{tile.sub}</p>
+              <p className="text-white/50 text-[11px] mt-1">{tile.sub}</p>
             </div>
           ))}
         </div>
@@ -126,22 +126,22 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
 
       <div className="px-4 pt-4 space-y-4">
         {loading && (
-          <div className="py-4 text-center text-xs text-[#6B6158]">
+          <div className="py-4 text-center text-xs text-slate-500 dark:text-white/60">
             <span className="inline-block animate-spin mr-1">⏳</span> মেট্রিক্স লোড হচ্ছে...
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-4 py-3 rounded-2xl">
+          <div className="bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-400/40 text-red-600 dark:text-red-300 text-xs px-4 py-3 rounded-2xl">
             ⚠️ {error}
           </div>
         )}
 
         {!loading && !error && !hasActivity && (
-          <div className="bg-white rounded-2xl card-shadow p-8 text-center border border-[#E9E5DC]">
+          <div className="bg-white dark:bg-[#0E281C] rounded-2xl card-shadow p-8 text-center border border-slate-200 dark:border-white/10">
             <span className="text-3xl mb-2 block">📈</span>
-            <p className="font-display font-bold text-[#1A1916]">এখনো কোনো ডেটা নেই</p>
-            <p className="text-[#6B6158] text-xs mt-1 leading-relaxed">
+            <p className="font-display font-bold text-[#0F172A] dark:text-white">এখনো কোনো ডেটা নেই</p>
+            <p className="text-slate-500 dark:text-white/60 text-xs mt-1 leading-relaxed">
               প্রথম কাস্টমার কাউন্টার QR স্ক্যান করে সিল নিলেই এখানে রিপোর্ট তৈরি হতে শুরু করবে।
             </p>
           </div>
@@ -150,56 +150,56 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
         {hasActivity && stats && (
           <>
             {/* Weekly stamp trend */}
-            <div className="bg-white rounded-2xl card-shadow p-4">
+            <div className="bg-white dark:bg-[#0E281C] rounded-2xl card-shadow p-4 border border-slate-200 dark:border-white/10">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display font-bold text-[#1A1916]">সাপ্তাহিক সিল ট্রেন্ড</h2>
-                <span className="text-[#B0A99E] text-xs">গত ৭ দিন</span>
+                <h2 className="font-display font-bold text-[#0F172A] dark:text-white">সাপ্তাহিক সিল ট্রেন্ড</h2>
+                <span className="text-slate-400 dark:text-white/40 text-xs">গত ৭ দিন</span>
               </div>
               <div className="flex items-end gap-1.5 h-32">
                 {stats.dailyTrends.map((d, i) => (
                   <div key={`${d.day}-${i}`} className="flex-1 flex flex-col items-center gap-1">
                     <div className="w-full flex flex-col items-center justify-end h-24">
                       <div
-                        className="w-full rounded-t-lg bg-[#1B4332] transition-all duration-500"
+                        className="w-full rounded-t-lg bg-[#064E3B] dark:bg-[#10B981] transition-all duration-500"
                         style={{ height: `${(d.stamps / maxStamps) * 96}px`, minHeight: "3px" }}
                       />
                     </div>
-                    <p className="text-[#B0A99E] text-[10px]">{d.day}</p>
-                    <p className="font-display font-bold text-[#1B4332] text-xs">{d.stamps}</p>
+                    <p className="text-slate-400 dark:text-white/40 text-[10px]">{d.day}</p>
+                    <p className="font-display font-bold text-[#064E3B] dark:text-[#34D399] text-xs">{d.stamps}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 pt-3 border-t border-[#E9E5DC] flex items-center justify-between text-xs text-[#6B6158]">
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-xs text-slate-500 dark:text-white/60">
                 <span>
-                  মোট: <strong className="text-[#1A1916]">{stats.stampsThisWeek}</strong> সিল এই সপ্তাহে
+                  মোট: <strong className="text-[#0F172A] dark:text-white">{stats.stampsThisWeek}</strong> সিল এই সপ্তাহে
                 </span>
                 <span>
-                  গড়: <strong className="text-[#1A1916]">{(stats.stampsThisWeek / 7).toFixed(1)}</strong>/দিন
+                  গড়: <strong className="text-[#0F172A] dark:text-white">{(stats.stampsThisWeek / 7).toFixed(1)}</strong>/দিন
                 </span>
               </div>
             </div>
 
             {/* Retention funnel */}
             {stats.retentionFunnel.length > 0 && (
-              <div className="bg-white rounded-2xl card-shadow p-4">
-                <h2 className="font-display font-bold text-[#1A1916] mb-1">কাস্টমার রিটেনশন ফানেল</h2>
-                <p className="text-[#6B6158] text-xs mb-4">কত শতাংশ কাস্টমার পরবর্তী ভিজিটে ফিরে আসছেন</p>
+              <div className="bg-white dark:bg-[#0E281C] rounded-2xl card-shadow p-4 border border-slate-200 dark:border-white/10">
+                <h2 className="font-display font-bold text-[#0F172A] dark:text-white mb-1">কাস্টমার রিটেনশন ফানেল</h2>
+                <p className="text-slate-500 dark:text-white/60 text-xs mb-4">কত শতাংশ কাস্টমার পরবর্তী ভিজিটে ফিরে আসছেন</p>
                 <div className="space-y-3">
                   {stats.retentionFunnel.map((d, i) => (
                     <div key={`${d.visit}-${i}`}>
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-[#1A1916] text-sm font-medium">{funnelLabel(d.visit)}</p>
+                        <p className="text-[#0F172A] dark:text-white text-sm font-medium">{funnelLabel(d.visit)}</p>
                         <div className="flex items-center gap-2">
-                          <span className="font-display font-bold text-[#1B4332]">{d.customers} জন</span>
-                          <span className="text-[#B0A99E] text-xs">({d.pct}%)</span>
+                          <span className="font-display font-bold text-[#064E3B] dark:text-[#34D399]">{d.customers} জন</span>
+                          <span className="text-slate-400 dark:text-white/40 text-xs">({d.pct}%)</span>
                         </div>
                       </div>
-                      <div className="h-2 bg-[#F0EDE6] rounded-full overflow-hidden">
+                      <div className="h-2 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
                             width: `${d.pct}%`,
-                            background: d.visit === 0 ? "#F59E0B" : ["#1B4332", "#2D6A4F", "#52B788", "#86EFAC"][i] || "#52B788",
+                            background: d.visit === 0 ? "#F59E0B" : ["#064E3B", "#059669", "#10B981", "#34D399"][i] || "#10B981",
                           }}
                         />
                       </div>
@@ -210,9 +210,9 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
             )}
 
             {/* Peak hours */}
-            <div className="bg-white rounded-2xl card-shadow p-4">
-              <h2 className="font-display font-bold text-[#1A1916] mb-1">ব্যস্ততম সময় (Peak Hours)</h2>
-              <p className="text-[#6B6158] text-xs mb-4">দিনের কোন সময়ে সবচেয়ে বেশি কাউন্টার স্ক্যান হয়</p>
+            <div className="bg-white dark:bg-[#0E281C] rounded-2xl card-shadow p-4 border border-slate-200 dark:border-white/10">
+              <h2 className="font-display font-bold text-[#0F172A] dark:text-white mb-1">ব্যস্ততম সময় (Peak Hours)</h2>
+              <p className="text-slate-500 dark:text-white/60 text-xs mb-4">দিনের কোন সময়ে সবচেয়ে বেশি কাউন্টার স্ক্যান হয়</p>
               <div className="flex items-end gap-0.5 h-20">
                 {stats.hourlyDistribution.map((h, i) => (
                   <div
@@ -221,21 +221,21 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
                     style={{
                       height: `${(h.stamps / maxHourly) * 80}px`,
                       minHeight: "3px",
-                      background: h.stamps === maxHourly && h.stamps > 0 ? "#F59E0B" : "#D8EDDF",
+                      background: h.stamps === maxHourly && h.stamps > 0 ? "#F59E0B" : "#10B98133",
                     }}
                     title={`${HOUR_LABELS[i]}: ${h.stamps} স্ক্যান`}
                   />
                 ))}
               </div>
               <div className="flex justify-between mt-2">
-                <span className="text-[#B0A99E] text-[10px]">সকাল ৮টা</span>
-                <span className="text-[#B0A99E] text-[10px]">রাত ১১টা</span>
+                <span className="text-slate-400 dark:text-white/40 text-[10px]">সকাল ৮টা</span>
+                <span className="text-slate-400 dark:text-white/40 text-[10px]">রাত ১১টা</span>
               </div>
             </div>
 
             {/* Top customers */}
-            <div className="bg-white rounded-2xl card-shadow p-4">
-              <h2 className="font-display font-bold text-[#1A1916] mb-3">শীর্ষ বিশ্বস্ত কাস্টমার</h2>
+            <div className="bg-white dark:bg-[#0E281C] rounded-2xl card-shadow p-4 border border-slate-200 dark:border-white/10">
+              <h2 className="font-display font-bold text-[#0F172A] dark:text-white mb-3">শীর্ষ বিশ্বস্ত কাস্টমার</h2>
               {topCustomers.length > 0 ? (
                 <div className="space-y-3">
                   {topCustomers.map((c, i) => (
@@ -243,23 +243,23 @@ export default function ReportPage({ merchantId }: ReportPageProps) {
                       <span className="text-xl w-7 text-center">
                         {["🥇", "🥈", "🥉"][i] || `${i + 1}`}
                       </span>
-                      <div className="w-8 h-8 rounded-full bg-[#F0F7F2] flex items-center justify-center font-bold text-xs text-[#1B4332]">
+                      <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 flex items-center justify-center font-bold text-xs text-[#064E3B] dark:text-[#34D399]">
                         {c.name?.slice(0, 1) || "ক"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#1A1916] truncate">
+                        <p className="text-sm font-semibold text-[#0F172A] dark:text-white truncate">
                           {c.name || "নাম নেই"}
                         </p>
-                        <p className="text-xs text-[#6B6158]">{c.totalVisits} বার মোট ভিজিট</p>
+                        <p className="text-xs text-slate-500 dark:text-white/60">{c.totalVisits} বার মোট ভিজিট</p>
                       </div>
-                      <span className="text-xs bg-[#D8EDDF] text-[#1B4332] px-2 py-1 rounded-full font-bold flex-shrink-0">
+                      <span className="text-xs bg-emerald-100 dark:bg-[#10B981]/20 text-[#064E3B] dark:text-[#34D399] px-2 py-1 rounded-full font-bold flex-shrink-0">
                         {c.stamps} সিল
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-[#B0A99E] py-2 text-center">এখনো কোনো কাস্টমার নেই</p>
+                <p className="text-xs text-slate-400 dark:text-white/40 py-2 text-center">এখনো কোনো কাস্টমার নেই</p>
               )}
             </div>
           </>

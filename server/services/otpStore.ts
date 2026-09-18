@@ -66,7 +66,6 @@ export interface IssueResult {
   rateLimited?: boolean
   expiresIn?: number
   otpToken?: string
-  /** True when SMS credentials are missing and the code was only logged server-side. */
   smsSkipped?: boolean
 }
 
@@ -105,7 +104,11 @@ export async function issueOtp(
     return { success: false, rateLimited: true, error: "দৈনিক OTP কোটা পূর্ণ হয়েছে।" }
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString()
+  // CSPRNG 6-digit OTP generation
+  const randomBytes = crypto.randomBytes(4)
+  const codeInt = (randomBytes.readUInt32BE(0) % 900000) + 100000
+  const code = codeInt.toString()
+
   const expiresAt = now + OTP_TTL_MS
   record.code = code
   record.expiresAt = expiresAt
@@ -116,21 +119,25 @@ export async function issueOtp(
   const otpSig = createOtpSignature(clean, purpose, code, expiresAt)
   const otpToken = `${expiresAt}.${otpSig}`
 
-  const apiKey = process.env.BULKSMS_BD_API_KEY || "CEk1QvidKiArNccVNNqq"
-  const senderId = process.env.BULKSMS_BD_SENDER_ID || "8809617622724"
+  const apiKey = process.env.BULKSMS_BD_API_KEY
+  const senderId = process.env.BULKSMS_BD_SENDER_ID
   const credentialsConfigured = !!(apiKey && senderId)
 
   console.log(`[Sealsela OTP] ${purpose.toUpperCase()} OTP generated for ${clean}: ${code}`)
 
   if (!credentialsConfigured) {
-    console.warn(`[Sealsela OTP] BulkSMS credentials missing. Code: ${code}`)
+    console.warn(`[Sealsela OTP] BulkSMS credentials missing in environment. Code logged to server console: ${code}`)
     return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true }
   }
 
   const smsResult = await sendBulkSmsBd({ phone: clean, message: messageTemplate(code) })
   if (!smsResult.success) {
     console.warn(`[Silsila OTP] SMS delivery failed: ${smsResult.error} (Code: ${code})`)
-    return { success: false, error: smsResult.error || "OTP পাঠানো সম্ভব হয়নি।" }
+    if (process.env.NODE_ENV !== "production") {
+      // In local development, permit proceeding without blocking
+      return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken, smsSkipped: true }
+    }
+    return { success: false, error: smsResult.error || "এসএমএস গেটওয়ে সংযোগে ত্রুটি হয়েছে। দয়া করে কিছুক্ষণ পর চেষ্টা করুন।" }
   }
 
   return { success: true, expiresIn: OTP_TTL_MS / 1000, otpToken }

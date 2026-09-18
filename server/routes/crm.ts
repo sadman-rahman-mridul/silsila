@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { db } from "../db.js"
 import { requireMerchantOwner } from "../middleware/auth.js"
+import { sanitizeCsvValue } from "../services/cryptoService.js"
 
 const router = Router()
 
@@ -43,11 +44,13 @@ router.get("/customers", requireMerchantOwner("merchantId"), (req, res) => {
       else if (daysAgo === 1) lastVisitStr = "গতকাল"
       else if (daysAgo !== null && daysAgo > 1) lastVisitStr = `${daysAgo} দিন আগে`
 
+      // Masked phone strictly on server side (No rawPhone exposed)
+      const maskedPhone = cust.phone ? cust.phone.replace(/(\d{4})\d{3}(\d{4})/, "$1-***-$2") : "—"
+
       return {
         id: cust.id,
-        name: cust.name,
-        phone: cust.phone.replace(/(\d{4})\d{3}(\d{4})/, "$1-***-$2"),
-        rawPhone: cust.phone,
+        name: cust.name || "গ্রাহক",
+        phone: maskedPhone,
         stamps: currentStamps,
         totalVisits,
         lastVisit: lastVisitStr,
@@ -75,7 +78,7 @@ router.get("/customers", requireMerchantOwner("merchantId"), (req, res) => {
 
   if (search && typeof search === "string") {
     const q = search.toLowerCase()
-    filtered = filtered.filter((c) => c.name.toLowerCase().includes(q) || c.rawPhone.includes(q))
+    filtered = filtered.filter((c) => c.name.toLowerCase().includes(q) || c.phone.includes(q))
   }
 
   res.json(filtered)
@@ -99,9 +102,8 @@ router.post("/export-csv", requireMerchantOwner("merchantId"), (req, res) => {
   const cards = db.getData().cards.filter((c) => c.merchantId === merchantId)
   const customers = db.getData().customers
 
-  const rows = [
-    ["Customer ID", "Customer Name", "Phone", "Current Stamps", "Total Visits", "Status", "Consent Date"].join(","),
-  ]
+  const headers = ["Customer ID", "Customer Name", "Phone", "Current Stamps", "Total Visits", "Status", "Consent Date"]
+  const rows = [headers.map(sanitizeCsvValue).join(",")]
 
   customers.forEach((cust) => {
     const card = cards.find((c) => c.customerId === cust.id)
@@ -112,21 +114,20 @@ router.post("/export-csv", requireMerchantOwner("merchantId"), (req, res) => {
     const currentStamps = card?.stamps || 0
     const status = card?.voucherReady ? "completed" : totalVisits > 1 ? "active" : "new"
 
-    rows.push(
-      [
-        `"${cust.id}"`,
-        `"${cust.name}"`,
-        `"${cust.phone}"`,
-        currentStamps,
-        totalVisits,
-        `"${status}"`,
-        `"${cust.consentTimestamp || new Date().toISOString()}"`,
-      ].join(",")
-    )
+    const row = [
+      sanitizeCsvValue(cust.id),
+      sanitizeCsvValue(cust.name || "Customer"),
+      sanitizeCsvValue(cust.phone ? cust.phone.replace(/(\d{4})\d{3}(\d{4})/, "$1-***-$2") : ""),
+      sanitizeCsvValue(currentStamps),
+      sanitizeCsvValue(totalVisits),
+      sanitizeCsvValue(status),
+      sanitizeCsvValue(cust.consentTimestamp || new Date().toISOString()),
+    ]
+    rows.push(row.join(","))
   })
 
   res.setHeader("Content-Type", "text/csv; charset=utf-8")
-  res.setHeader("Content-Disposition", `attachment; filename="silsila_customers_${merchantId}.csv"`)
+  res.setHeader("Content-Disposition", `attachment; filename="sealsela_customers_${merchantId}.csv"`)
   res.send("\uFEFF" + rows.join("\n"))
 })
 

@@ -1,7 +1,11 @@
 import { Router } from "express"
 import { db } from "../db.js"
+import { requireAdmin } from "../middleware/auth.js"
 
 const router = Router()
+
+// All ops routes require verified Admin credentials
+router.use(requireAdmin())
 
 router.get("/merchants", (req, res) => {
   const all = db.getMerchants()
@@ -118,6 +122,22 @@ router.get("/cluster-stats", (req, res) => {
     uniqueCustomersCluster: new Set(stamps.map((s) => s.customerId)).size,
     avgRepeatRate,
   })
+})
+
+router.post("/send-sms", async (req, res) => {
+  const { phone, message } = req.body
+  if (!phone || !message) {
+    res.status(400).json({ error: "মোবাইল নম্বর ও মেসেজ প্রয়োজন" })
+    return
+  }
+
+  try {
+    const { sendBulkSmsBd } = await import("../services/smsService.js")
+    const result = await sendBulkSmsBd({ phone, message })
+    res.json(result)
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to send SMS" })
+  }
 })
 
 export default router

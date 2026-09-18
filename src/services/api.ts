@@ -27,8 +27,17 @@ export interface Merchant {
   ownerName?: string
   ownerPhone?: string
   onboarded?: boolean
-  status?: "active" | "pending" | "suspended"
+  status?: "active" | "pending" | "suspended" | "rejected"
+  approvalStatus?: "pending_approval" | "approved" | "rejected"
+  paymentPackage?: "6_months" | "12_months" | string
+  paymentAmount?: number
+  senderBkashNumber?: string
+  trxId?: string
+  paymentSubmittedAt?: any
+  approvedAt?: any
+  rejectedAt?: any
   distanceMeters?: number
+  createdAt?: any
 }
 
 export function generateMerchantSlug(merchant: { name: string; nameEn?: string; id: string }): string {
@@ -578,4 +587,14 @@ export const api = {
       body: JSON.stringify({ customerId, confirmation: "DELETE" }),
     })
   },
+
+  // ----- Admin & SMS -----
+  async sendSms(phone: string, message: string) {
+    return fetchJson<{ success: boolean; messageId?: string; error?: string }>(`${API_BASE}/ops/send-sms`, {
+      method: "POST",
+      headers: JSON_HEADERS,
+      body: JSON.stringify({ phone, message }),
+    })
+  },
 }
+

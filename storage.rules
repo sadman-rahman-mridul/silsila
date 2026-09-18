@@ -1,0 +1,44 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.admin == true
+      );
+    }
+
+    // Merchant Logos and Brand Assets
+    match /merchants/{merchantId}/{allPaths=**} {
+      // Publicly viewable for active logos
+      allow read: if true;
+      // Write allowed only by merchant owner or admin
+      allow write: if isAuthenticated() && (
+        request.auth.uid == merchantId ||
+        request.auth.token.merchantId == merchantId ||
+        isAdmin()
+      ) && request.resource.size < 5 * 1024 * 1024 // 5MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Customer Avatars
+    match /users/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (
+        request.auth.uid == userId || isAdmin()
+      ) && request.resource.size < 2 * 1024 * 1024 // 2MB max
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Fallback: deny all other storage access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

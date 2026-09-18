@@ -294,15 +294,15 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
   if (step === "pin") {
     return (
       <div className="flex flex-col h-full bg-transparent items-center justify-center px-6">
-        <div className="w-full max-w-xs bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/25 shadow-2xl">
+        <div className="w-full max-w-xs bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-6 border border-slate-200 dark:border-emerald-500/25 shadow-2xl">
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center mx-auto mb-3 shadow-lg glow-amber text-[#0A2318]">
               <LockIcon size={26} />
             </div>
-            <h1 className="font-display font-black text-white text-xl">
+            <h1 className="font-display font-black text-[#0F172A] dark:text-white text-xl">
               {isBn ? "কাউন্টার স্টাফ মোড" : "Counter Staff Mode"}
             </h1>
-            <p className="text-white/60 text-xs mt-1">
+            <p className="text-slate-500 dark:text-white/60 text-xs mt-1">
               {isBn ? "৪ সংখ্যার স্টাফ PIN দিন" : "Enter 4-digit Staff PIN"}
             </p>
           </div>
@@ -333,19 +333,19 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   pinError
                     ? "border-red-400 bg-red-500/20"
                     : pin.length > i
-                    ? "border-[#34D399] bg-[#34D399]/20 shadow-md glow-emerald"
-                    : "border-white/20 bg-white/5"
+                    ? "border-[#059669] dark:border-[#34D399] bg-[#059669]/15 dark:bg-[#34D399]/20 shadow-md glow-emerald"
+                    : "border-slate-200 dark:border-white/20 bg-slate-50 dark:bg-white/5"
                 )}
               >
                 {pin.length > i && (
-                  <div className={"w-3.5 h-3.5 rounded-full " + (pinError ? "bg-red-400" : "bg-[#34D399]")} />
+                  <div className={"w-3.5 h-3.5 rounded-full " + (pinError ? "bg-red-400" : "bg-[#059669] dark:bg-[#34D399]")} />
                 )}
               </div>
             ))}
           </div>
 
           {pinError && (
-            <p className="text-red-300 text-center text-xs mb-4 animate-slide-up font-bold">{pinError}</p>
+            <p className="text-red-600 dark:text-red-300 text-center text-xs mb-4 animate-slide-up font-bold">{pinError}</p>
           )}
 
           <div className="grid grid-cols-3 gap-2.5">
@@ -365,8 +365,8 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   d === ""
                     ? "pointer-events-none opacity-0"
                     : d === "⌫"
-                    ? "bg-white/10 text-white/60 hover:bg-white/20"
-                    : "bg-[#071D13] border border-white/10 text-white hover:bg-white/10"
+                    ? "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-transparent"
+                    : "bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 text-[#0F172A] dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
                 )}
               >
                 {d}
@@ -376,7 +376,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
 
           <button
             onClick={handleRequestOwnerExit}
-            className="w-full mt-5 py-2.5 rounded-xl text-white/50 text-xs font-bold hover:text-white transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
+            className="w-full mt-5 py-2.5 rounded-xl text-slate-500 dark:text-white/50 text-xs font-bold hover:text-[#0F172A] dark:hover:text-white transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5"
           >
             <span>{isBn ? "🔒 মালিকের ভিউতে ফিরুন (Owner PIN)" : "🔒 Back to Owner View (Owner PIN)"}</span>
           </button>
@@ -406,24 +406,24 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
       <div className="px-5 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider">
+            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider">
               {isBn ? "স্টাফ মোড" : "Staff Mode"}{merchantName ? " · " + merchantName : ""}
             </p>
-            <h1 className="font-display text-xl font-black text-white drop-shadow-xs">
+            <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white drop-shadow-xs">
               {isBn ? "কাউন্টার কন্ট্রোল" : "Counter Control"}
             </h1>
           </div>
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setStep("pin")}
-              className="px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-xs font-bold hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-white/70 text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer flex items-center gap-1"
             >
               <LockIcon size={12} />
               <span>{isBn ? "লক" : "Lock"}</span>
             </button>
             <button
               onClick={handleRequestOwnerExit}
-              className="px-2.5 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#F59E0B] text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+              className="px-2.5 py-1.5 rounded-xl bg-[#F59E0B]/20 border border-[#F59E0B]/40 text-[#D97706] dark:text-[#F59E0B] text-xs font-bold hover:bg-[#F59E0B]/30 transition-all cursor-pointer flex items-center gap-1 shadow-sm"
               title={isBn ? "মালিকের ড্যাশবোর্ডে ফিরুন" : "Exit to Owner Dashboard"}
             >
               <KeyIcon size={12} />
@@ -433,13 +433,13 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
         </div>
 
         {/* Sub-tab Switcher: সিল অনুমোদন | ভাউচার রিডিম */}
-        <div className="mt-3 grid grid-cols-2 gap-1.5 p-1 bg-[#0E281C]/90 border border-emerald-500/20 rounded-2xl backdrop-blur-md">
+        <div className="mt-3 grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-[#0E281C]/90 border border-slate-200 dark:border-emerald-500/20 rounded-2xl backdrop-blur-md">
           <button
             onClick={() => setActiveTab("approvals")}
             className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "approvals"
-                ? "bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] shadow-md glow-emerald font-black"
-                : "text-white/60 hover:text-white"
+                ? "bg-gradient-to-r from-[#059669] to-[#047857] dark:from-[#10B981] dark:to-[#047857] text-white dark:text-[#0A2318] shadow-md glow-emerald font-black"
+                : "text-slate-600 dark:text-white/60 hover:text-[#0F172A] dark:hover:text-white"
             }`}
           >
             <ShieldCheckIcon size={14} />
@@ -452,7 +452,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
             className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === "redeem"
                 ? "bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] text-[#0A2318] shadow-md glow-amber font-black"
-                : "text-white/60 hover:text-white"
+                : "text-slate-600 dark:text-white/60 hover:text-[#0F172A] dark:hover:text-white"
             }`}
           >
             <GiftIcon size={14} />
@@ -466,14 +466,14 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
         {activeTab === "approvals" && (
           <div>
             {approvals.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center py-16 bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl border border-emerald-500/20 shadow-2xl p-6">
-                <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mb-3 text-[#34D399]">
+              <div className="flex flex-col items-center justify-center text-center py-16 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-emerald-500/20 shadow-md dark:shadow-2xl p-6">
+                <div className="w-16 h-16 rounded-2xl bg-[#059669]/15 dark:bg-[#10B981]/20 border border-[#059669]/25 dark:border-[#10B981]/30 flex items-center justify-center mb-3 text-[#059669] dark:text-[#34D399]">
                   <ShieldCheckIcon size={32} />
                 </div>
-                <p className="font-display font-black text-white text-lg mb-1">
+                <p className="font-display font-black text-[#0F172A] dark:text-white text-lg mb-1">
                   {isBn ? "সব অনুমোদন সম্পন্ন" : "All Caught Up"}
                 </p>
-                <p className="text-white/60 text-xs">
+                <p className="text-slate-500 dark:text-white/60 text-xs">
                   {isBn
                     ? "কাউন্টারে কোনো কাস্টমার স্ক্যান করলে এখানে দৃশ্যমান হবে"
                     : "Customer scans at counter will appear here in real time"}
@@ -487,26 +487,26 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   return (
                     <div
                       key={approval.id}
-                      className={"rounded-3xl overflow-hidden transition-all duration-300 bg-[#0E281C]/90 backdrop-blur-xl border shadow-2xl " + (
+                      className={"rounded-3xl overflow-hidden transition-all duration-300 bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl border shadow-md dark:shadow-2xl " + (
                         res?.result === "approved"
-                          ? "border-[#10B981] shadow-md glow-emerald"
+                          ? "border-[#059669] dark:border-[#10B981] shadow-md glow-emerald"
                           : res?.result === "rejected"
                           ? "border-red-500/50 opacity-60"
-                          : "border-emerald-500/20"
+                          : "border-slate-200 dark:border-emerald-500/20"
                       )}
                     >
                       <div className="p-5">
                         <div className="text-center mb-4">
-                          <div className="w-16 h-16 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-2xl font-black text-[#34D399]">
+                          <div className="w-16 h-16 rounded-2xl bg-[#059669]/15 dark:bg-[#10B981]/20 border border-[#059669]/25 dark:border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-2xl font-black text-[#059669] dark:text-[#34D399]">
                             {approval.customerName?.slice(0, 1) || (isBn ? "ক" : "C")}
                           </div>
-                          <p className="font-display font-black text-white text-xl">
+                          <p className="font-display font-black text-[#0F172A] dark:text-white text-xl">
                             {approval.customerName || (isBn ? "সম্মানিত গ্রাহক" : "Customer")}
                           </p>
-                          <p className="text-white/60 text-xs mt-0.5 font-mono">{approval.customerPhone}</p>
+                          <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5 font-mono">{approval.customerPhone}</p>
                           {dist !== undefined && dist >= 0 && (
                             <div className="flex items-center justify-center gap-1.5 mt-2">
-                              <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/15 border border-[#34D399]/30 px-3 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="text-[#059669] dark:text-[#34D399] text-xs font-bold bg-[#059669]/10 dark:bg-[#34D399]/15 border border-[#059669]/20 dark:border-[#34D399]/30 px-3 py-0.5 rounded-full flex items-center gap-1">
                                 <MapPinIcon size={12} />
                                 <span>{isBn ? `${dist} মি. দূরে` : `${dist}m away`}</span>
                               </span>
@@ -517,7 +517,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                         {res ? (
                           <div
                             className={"text-center py-3.5 rounded-2xl font-display font-black text-sm flex items-center justify-center gap-2 " + (
-                              res.result === "approved" ? "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30" : "bg-red-500/20 text-red-300 border border-red-500/30"
+                              res.result === "approved" ? "bg-[#059669]/15 dark:bg-[#10B981]/20 text-[#059669] dark:text-[#34D399] border border-[#059669]/30 dark:border-[#10B981]/30" : "bg-red-500/15 dark:bg-red-500/20 text-red-600 dark:text-red-300 border border-red-500/30"
                             )}
                           >
                             {res.result === "approved" ? (
@@ -536,14 +536,14 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                           <div className="flex gap-3">
                             <button
                               onClick={() => handleReject(approval.id)}
-                              className="w-16 h-16 rounded-2xl bg-[#071D13] border border-white/10 flex flex-col items-center justify-center gap-1 text-white/50 transition-all active:scale-90 hover:border-red-400 hover:text-red-300 cursor-pointer"
+                              className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-1 text-slate-600 dark:text-white/50 transition-all active:scale-90 hover:border-red-400 hover:text-red-600 dark:hover:text-red-300 cursor-pointer"
                             >
                               <XIcon size={24} />
                               <span className="text-xs font-bold">{isBn ? "না" : "Reject"}</span>
                             </button>
                             <button
                               onClick={() => handleApprove(approval.id)}
-                              className="flex-1 h-16 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex flex-col items-center justify-center gap-0.5 text-[#0A2318] transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
+                              className="flex-1 h-16 rounded-2xl bg-gradient-to-r from-[#059669] to-[#047857] dark:from-[#10B981] dark:to-[#047857] flex flex-col items-center justify-center gap-0.5 text-white dark:text-[#0A2318] transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
                             >
                               <CheckIcon size={28} />
                               <span className="font-display font-black text-base">{isBn ? "সিল দিন" : "Grant Stamp"}</span>
@@ -563,16 +563,16 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
         {activeTab === "redeem" && (
           <div className="space-y-4">
             {/* Voucher Code Input Card */}
-            <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 border border-emerald-500/20 shadow-2xl">
+            <div className="bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-5 border border-slate-200 dark:border-emerald-500/20 shadow-md dark:shadow-2xl">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 flex items-center justify-center text-[#F59E0B]">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-[#FEF3C7]/20 border border-amber-200 dark:border-[#FEF3C7]/30 flex items-center justify-center text-[#D97706] dark:text-[#F59E0B]">
                   <GiftIcon size={18} />
                 </div>
                 <div>
-                  <h2 className="font-display font-bold text-white text-base">
+                  <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base">
                     {isBn ? "ভাউচার কোড রিডিম" : "Redeem Voucher Code"}
                   </h2>
-                  <p className="text-xs text-white/60">
+                  <p className="text-xs text-slate-500 dark:text-white/60">
                     {isBn ? "কাস্টমারের স্ক্রিনের ভাউচার কোডটি লিখুন" : "Enter customer's voucher code"}
                   </p>
                 </div>
@@ -585,7 +585,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                     value={voucherCodeInput}
                     onChange={(e) => setVoucherCodeInput(e.target.value.toUpperCase())}
                     placeholder={isBn ? "যেমন: SL-M1-5X9K" : "e.g. SL-M1-5X9K"}
-                    className="w-full bg-[#071D13] border border-emerald-500/25 rounded-2xl px-4 py-3.5 font-mono font-black text-lg text-[#F59E0B] tracking-widest uppercase outline-none focus:border-[#34D399] shadow-inner text-center"
+                    className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/25 rounded-2xl px-4 py-3.5 font-mono font-black text-lg text-[#D97706] dark:text-[#F59E0B] tracking-widest uppercase outline-none focus:border-[#059669] dark:focus:border-[#34D399] shadow-inner text-center"
                   />
                   {voucherCodeInput && (
                     <button
@@ -595,7 +595,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                         setVoucherError(null)
                         setRedeemSuccess(null)
                       }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/10 text-white/60 hover:text-white flex items-center justify-center text-xs cursor-pointer"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/60 hover:text-black dark:hover:text-white flex items-center justify-center text-xs cursor-pointer"
                     >
                       ✕
                     </button>
@@ -605,7 +605,7 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                 <button
                   onClick={() => handleLookupVoucher()}
                   disabled={lookingUpVoucher || !voucherCodeInput.trim()}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-sm shadow-lg glow-emerald active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#059669] to-[#047857] dark:from-[#10B981] dark:to-[#047857] text-white dark:text-[#0A2318] font-display font-black text-sm shadow-lg glow-emerald active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {lookingUpVoucher ? (
                     <>
@@ -624,35 +624,35 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
 
             {/* Error Message */}
             {voucherError && (
-              <div className="bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center gap-2 backdrop-blur-md">
-                <XIcon size={16} className="text-red-300 flex-shrink-0" />
+              <div className="bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-400/40 text-red-600 dark:text-red-200 text-xs px-4 py-3 rounded-2xl animate-fade-in flex items-center gap-2 backdrop-blur-md">
+                <XIcon size={16} className="text-red-500 dark:text-red-300 flex-shrink-0" />
                 <span>{voucherError}</span>
               </div>
             )}
 
             {/* Success Message */}
             {redeemSuccess && (
-              <div className="bg-[#10B981]/25 border border-[#10B981]/50 text-[#34D399] text-xs px-4 py-3.5 rounded-2xl animate-fade-in flex items-center gap-2.5 shadow-lg backdrop-blur-md">
-                <CheckIcon size={18} className="text-[#34D399] flex-shrink-0" />
+              <div className="bg-emerald-50 dark:bg-[#10B981]/25 border border-emerald-200 dark:border-[#10B981]/50 text-emerald-800 dark:text-[#34D399] text-xs px-4 py-3.5 rounded-2xl animate-fade-in flex items-center gap-2.5 shadow-lg backdrop-blur-md">
+                <CheckIcon size={18} className="text-emerald-600 dark:text-[#34D399] flex-shrink-0" />
                 <span className="font-bold">{redeemSuccess}</span>
               </div>
             )}
 
             {/* Verified Voucher Card Preview */}
             {voucherResult && (
-              <div className="bg-[#0E281C]/95 backdrop-blur-xl rounded-3xl p-5 border border-[#34D399]/40 shadow-2xl text-white animate-slide-up space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="bg-white dark:bg-[#0E281C]/95 backdrop-blur-xl rounded-3xl p-5 border border-slate-200 dark:border-[#34D399]/40 shadow-xl text-[#0F172A] dark:text-white animate-slide-up space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
                   <div className="flex items-center gap-2">
-                    <SparklesIcon size={18} className="text-[#F59E0B]" />
-                    <h3 className="font-display font-bold text-white text-sm">
+                    <SparklesIcon size={18} className="text-[#D97706] dark:text-[#F59E0B]" />
+                    <h3 className="font-display font-bold text-[#0F172A] dark:text-white text-sm">
                       {isBn ? "ভাউচারের বিবরণ" : "Voucher Details"}
                     </h3>
                   </div>
                   <span
                     className={`px-3 py-0.5 rounded-full text-xs font-bold ${
                       voucherResult.redeemed
-                        ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                        : "bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30"
+                        ? "bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-500/30"
+                        : "bg-emerald-50 dark:bg-[#10B981]/20 text-emerald-700 dark:text-[#34D399] border border-emerald-200 dark:border-[#10B981]/30"
                     }`}
                   >
                     {voucherResult.redeemed
@@ -661,29 +661,29 @@ export default function StaffMode({ onExit, merchantId: propId, activeMerchantId
                   </span>
                 </div>
 
-                <div className="bg-[#071D13] p-4 rounded-2xl border border-emerald-500/20 space-y-2 text-center">
-                  <p className="text-xs text-white/50 uppercase tracking-widest font-bold">
+                <div className="bg-slate-50 dark:bg-[#071D13] p-4 rounded-2xl border border-slate-200 dark:border-emerald-500/20 space-y-2 text-center">
+                  <p className="text-xs text-slate-500 dark:text-white/50 uppercase tracking-widest font-bold">
                     {isBn ? "পুরস্কার" : "Reward"}
                   </p>
-                  <p className="font-display font-black text-2xl text-[#F59E0B]">
+                  <p className="font-display font-black text-2xl text-[#D97706] dark:text-[#F59E0B]">
                     {voucherResult.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
                   </p>
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-around text-xs text-white/70">
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-around text-xs text-slate-600 dark:text-white/70">
                     <div>
-                      <p className="text-white/40 text-[11px]">{isBn ? "কাস্টমার" : "Customer"}</p>
-                      <p className="font-bold text-white mt-0.5">{voucherResult.customerName || (isBn ? "কাস্টমার" : "Customer")}</p>
+                      <p className="text-slate-400 dark:text-white/40 text-[11px]">{isBn ? "কাস্টমার" : "Customer"}</p>
+                      <p className="font-bold text-[#0F172A] dark:text-white mt-0.5">{voucherResult.customerName || (isBn ? "কাস্টমার" : "Customer")}</p>
                     </div>
                     {voucherResult.customerPhone && (
                       <div>
-                        <p className="text-white/40 text-[11px]">{isBn ? "ফোন" : "Phone"}</p>
-                        <p className="font-mono text-white mt-0.5">{voucherResult.customerPhone}</p>
+                        <p className="text-slate-400 dark:text-white/40 text-[11px]">{isBn ? "ফোন" : "Phone"}</p>
+                        <p className="font-mono text-[#0F172A] dark:text-white mt-0.5">{voucherResult.customerPhone}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {voucherResult.redeemed ? (
-                  <div className="py-3 bg-red-500/15 border border-red-500/30 rounded-2xl text-center text-red-300 text-xs font-bold">
+                  <div className="py-3 bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500/30 rounded-2xl text-center text-red-600 dark:text-red-300 text-xs font-bold">
                     {isBn
                       ? "⚠️ এই ভাউচারটি পূর্বে রিডিম করা হয়েছে! পুনরায় ব্যবহার করা যাবে না।"
                       : "⚠️ This voucher was already redeemed! Cannot be reused."}
@@ -753,31 +753,31 @@ function OwnerUnlockModal({
   onVerify: (pin?: string) => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#0A2318] border border-amber-500/30 rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-scale-up text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-white dark:bg-[#0A2318] border border-slate-200 dark:border-amber-500/30 rounded-3xl p-6 max-w-xs w-full shadow-2xl animate-scale-up text-[#0F172A] dark:text-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center text-[#0A2318] shadow-md glow-amber">
               <KeyIcon size={18} />
             </div>
             <div>
-              <h3 className="font-display font-black text-base text-white">
+              <h3 className="font-display font-black text-base text-[#0F172A] dark:text-white">
                 {isBn ? "মালিকের পিন যাচাই" : "Owner Verification"}
               </h3>
-              <p className="text-[11px] text-white/50">
+              <p className="text-[11px] text-slate-500 dark:text-white/50">
                 {isBn ? "অ্যাডমিন ড্যাশবোর্ড আনলক" : "Unlock Admin Dashboard"}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 cursor-pointer"
+            className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 flex items-center justify-center text-slate-600 dark:text-white/70 cursor-pointer"
           >
             <XIcon size={14} />
           </button>
         </div>
 
-        <p className="text-white/70 text-xs mb-4 text-center leading-relaxed">
+        <p className="text-slate-600 dark:text-white/70 text-xs mb-4 text-center leading-relaxed">
           {isBn
             ? "স্টাফ মোড থেকে মালিকের ড্যাশবোর্ডে প্রবেশ করতে আপনার ৬ সংখ্যার গোপন পিন দিন।"
             : "Enter your 6-digit Owner PIN to return to the full Merchant Dashboard."}
@@ -786,13 +786,13 @@ function OwnerUnlockModal({
         {/* 6 Digit Box Slots */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] text-white/60 font-semibold">
+            <span className="text-[11px] text-slate-600 dark:text-white/60 font-semibold">
               {isBn ? "মালিকের ৬ সংখ্যার পিন" : "6-Digit Owner PIN"}
             </span>
             <button
               type="button"
               onClick={() => setShowOwnerPin(!showOwnerPin)}
-              className="text-[11px] text-[#34D399] hover:text-white font-bold cursor-pointer"
+              className="text-[11px] text-[#059669] dark:text-[#34D399] hover:underline font-bold cursor-pointer"
             >
               {showOwnerPin ? (isBn ? "লুকান" : "Hide") : (isBn ? "দেখুন" : "Show")}
             </button>
@@ -808,12 +808,12 @@ function OwnerUnlockModal({
                     key={idx}
                     className={`flex-1 h-12 rounded-xl border-2 flex items-center justify-center font-display font-black text-lg transition-all ${
                       ownerPinError
-                        ? "border-red-400 bg-red-500/20 text-red-300"
+                        ? "border-red-400 bg-red-500/20 text-red-600 dark:text-red-300"
                         : digit
-                        ? "border-[#F59E0B] bg-[#F59E0B]/20 text-[#F59E0B] shadow-md glow-amber"
+                        ? "border-[#F59E0B] bg-[#F59E0B]/20 text-[#D97706] dark:text-[#F59E0B] shadow-md glow-amber"
                         : isFocused
-                        ? "border-[#34D399] bg-white/15 ring-2 ring-[#34D399]/30"
-                        : "border-white/20 bg-white/5 text-white/30"
+                        ? "border-[#059669] dark:border-[#34D399] bg-slate-100 dark:bg-white/15 ring-2 ring-[#059669]/30 dark:ring-[#34D399]/30"
+                        : "border-slate-200 dark:border-white/20 bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-white/30"
                     }`}
                   >
                     {digit ? (showOwnerPin ? digit : "●") : ""}
@@ -846,7 +846,7 @@ function OwnerUnlockModal({
           </div>
 
           {ownerPinError && (
-            <p className="text-red-300 text-center text-xs mt-2 font-bold animate-fade-in">
+            <p className="text-red-600 dark:text-red-300 text-center text-xs mt-2 font-bold animate-fade-in">
               ⚠️ {ownerPinError}
             </p>
           )}
@@ -855,7 +855,7 @@ function OwnerUnlockModal({
         <div className="flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold transition-all cursor-pointer"
+            className="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-white text-xs font-bold transition-all cursor-pointer border border-slate-200 dark:border-transparent"
           >
             {isBn ? "বাতিল" : "Cancel"}
           </button>

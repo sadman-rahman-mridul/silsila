@@ -79,31 +79,32 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0F1117] text-white">
-      <div className="px-5 pt-12 pb-4 bg-[#0F1117] border-b border-white/10">
+    <div className="flex flex-col h-full bg-[#F6F9F7] dark:bg-[#0F1117] text-[#0F172A] dark:text-white">
+      <div className="px-5 pt-12 pb-4 bg-white dark:bg-[#0F1117] border-b border-slate-200 dark:border-white/10 shadow-xs">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shadow-md p-1 border border-emerald-500/30">
-              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 dark:bg-emerald-500/20 flex items-center justify-center shadow-md p-1 border border-emerald-500/30">
+              <img src="/sealsela-logo-light.svg" alt="Sealsela" className="w-full h-full object-contain block dark:hidden" />
+              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain hidden dark:block" />
             </div>
             <div>
-              <h1 className="font-display font-bold text-white text-lg leading-none">
+              <h1 className="font-display font-bold text-[#0F172A] dark:text-white text-lg leading-none">
                 {isBn ? "অপারেশনস কনসোল (Ops)" : "Operations Console (Ops)"}
               </h1>
-              <p className="text-white/40 text-[11px] mt-0.5">Sealsela Network Admin</p>
+              <p className="text-slate-500 dark:text-white/40 text-[11px] mt-0.5">Sealsela Network Admin</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={toggleLanguage}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer border border-white/15 flex items-center gap-1"
+              className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer border border-slate-200 dark:border-white/15 flex items-center gap-1"
             >
-              <GlobeIcon size={12} className="text-[#34D399]" />
-              <span className="font-mono text-[10px] uppercase text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
+              <GlobeIcon size={12} className="text-[#059669] dark:text-[#34D399]" />
+              <span className="font-mono text-[10px] uppercase text-[#059669] dark:text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
             </button>
             <button
               onClick={onBack}
-              className="flex items-center gap-1 text-white/60 hover:text-white text-xs bg-white/5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-slate-600 dark:text-white/60 hover:text-[#0F172A] dark:hover:text-white text-xs bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-transparent px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer"
             >
               <LogOutIcon size={13} /> {isBn ? "বের হন" : "Exit"}
             </button>
@@ -134,10 +135,10 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
               sub: isBn ? "৩০ দিনে" : "30 days",
             },
           ].map((s) => (
-            <div key={s.label} className="bg-white/5 rounded-xl p-2.5 text-center border border-white/5">
-              <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{s.value}</p>
-              <p className="text-white/60 text-[10px] mt-1 font-medium">{s.label}</p>
-              <p className="text-white/30 text-[9px]">{s.sub}</p>
+            <div key={s.label} className="bg-slate-50 dark:bg-white/5 rounded-xl p-2.5 text-center border border-slate-200 dark:border-white/5">
+              <p className="font-display font-black text-[#D97706] dark:text-[#F59E0B] text-xl leading-none">{s.value}</p>
+              <p className="text-slate-600 dark:text-white/60 text-[10px] mt-1 font-medium">{s.label}</p>
+              <p className="text-slate-400 dark:text-white/30 text-[9px]">{s.sub}</p>
             </div>
           ))}
         </div>
@@ -148,7 +149,9 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                tab === t ? "bg-[#F59E0B] text-[#1B4332] shadow-sm" : "bg-white/5 text-white/60 hover:bg-white/10"
+                tab === t
+                  ? "bg-[#064E3B] dark:bg-[#F59E0B] text-white dark:text-[#1B4332] shadow-sm"
+                  : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-white/60 hover:bg-slate-200 dark:hover:bg-white/10"
               }`}
             >
               {t === "merchants"
@@ -163,12 +166,12 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
 
       <div className="flex-1 overflow-y-auto pb-8">
         {error && (
-          <div className="mx-4 mt-4 bg-red-500/10 border border-red-500/30 text-red-300 text-xs px-4 py-3 rounded-2xl">
+          <div className="mx-4 mt-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-300 text-xs px-4 py-3 rounded-2xl">
             ⚠️ {error}
           </div>
         )}
         {loading && (
-          <div className="p-6 text-center text-xs text-white/50">
+          <div className="p-6 text-center text-xs text-slate-500 dark:text-white/50">
             <span className="inline-block animate-spin mr-1">⏳</span>{" "}
             {isBn ? "মেট্রিক্স রিফ্রেশ হচ্ছে..." : "Refreshing metrics..."}
           </div>
@@ -178,18 +181,18 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
           <div className="px-4 pt-4 space-y-4">
             {pendingMerchants.length > 0 && (
               <div>
-                <h2 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                <h2 className="text-slate-500 dark:text-white/60 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse" />
                   {isBn ? `অনুমোদনের অপেক্ষায় (${pendingMerchants.length})` : `Pending Approvals (${pendingMerchants.length})`}
                 </h2>
                 <div className="space-y-2">
                   {pendingMerchants.map((m) => (
-                    <div key={m.id} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                    <div key={m.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-4 card-shadow">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <p className="font-display font-bold text-white text-base">{m.name}</p>
-                          <p className="text-white/60 text-xs mt-0.5">{m.owner} · {m.phone}</p>
-                          <p className="text-white/40 text-[11px] mt-0.5">
+                          <p className="font-display font-bold text-[#0F172A] dark:text-white text-base">{m.name}</p>
+                          <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">{m.owner} · {m.phone}</p>
+                          <p className="text-slate-400 dark:text-white/40 text-[11px] mt-0.5">
                             {[categoryLabel(m.category), m.area].filter(Boolean).join(" · ")}
                             {m.submittedAt ? ` · ${new Date(m.submittedAt).toLocaleDateString()}` : ""}
                           </p>
@@ -198,13 +201,13 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleSuspend(m.id)}
-                          className="flex-1 py-2 rounded-xl border border-white/10 text-white/60 text-xs font-semibold flex items-center justify-center gap-1.5 hover:border-red-500/40 hover:text-red-400 cursor-pointer"
+                          className="flex-1 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 text-xs font-semibold flex items-center justify-center gap-1.5 hover:border-red-500/40 hover:text-red-500 cursor-pointer"
                         >
                           <XIcon size={14} /> {isBn ? "প্রত্যাখ্যান" : "Reject"}
                         </button>
                         <button
                           onClick={() => handleApprove(m.id)}
-                          className="flex-[2] py-2 rounded-xl bg-[#1B4332] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#2D6A4F] cursor-pointer"
+                          className="flex-[2] py-2 rounded-xl bg-[#064E3B] dark:bg-[#10B981] text-white dark:text-[#0A2318] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#053d2e] dark:hover:bg-[#059669] cursor-pointer shadow-md"
                         >
                           <CheckIcon size={14} /> {isBn ? "অনুমোদন দিন" : "Approve"}
                         </button>
@@ -217,29 +220,29 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-white/60 text-xs font-bold uppercase tracking-wider flex-1">
+                <h2 className="text-slate-500 dark:text-white/60 text-xs font-bold uppercase tracking-wider flex-1">
                   {isBn ? "সক্রিয় মার্চেন্ট তালিকা" : "Active Merchant List"}
                 </h2>
                 <div className="relative">
-                  <SearchIcon size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
+                  <SearchIcon size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30" />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={isBn ? "খুঁজুন..." : "Search..."}
-                    className="bg-white/5 border border-white/10 rounded-xl pl-7 pr-3 py-1.5 text-white text-xs outline-none w-32 focus:border-white/30"
+                    className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-7 pr-3 py-1.5 text-[#0F172A] dark:text-white text-xs outline-none w-32 focus:border-slate-400 dark:focus:border-white/30"
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 {activeMerchants.map((m) => {
-                  const statusColor = m.status === "active" ? "text-[#52B788]" : m.status === "at_risk" ? "text-[#F59E0B]" : "text-red-400"
+                  const statusColor = m.status === "active" ? "text-emerald-700 dark:text-[#34D399]" : m.status === "at_risk" ? "text-amber-700 dark:text-[#F59E0B]" : "text-red-600 dark:text-red-400"
                   return (
-                    <div key={m.id} className="bg-white/5 border border-white/10 rounded-xl p-3.5 hover:border-white/20 transition-all">
+                    <div key={m.id} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3.5 hover:border-slate-300 dark:hover:border-white/20 transition-all card-shadow">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-bold text-white text-sm">{m.name}</p>
+                            <p className="font-bold text-[#0F172A] dark:text-white text-sm">{m.name}</p>
                             <span className={`text-[11px] font-semibold ${statusColor}`}>
                               {m.status === "active"
                                 ? isBn ? "● সক্রিয়" : "● Active"
@@ -248,30 +251,30 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
                                 : isBn ? "● নিষ্ক্রিয়" : "● Inactive"}
                             </span>
                           </div>
-                          <p className="text-white/40 text-xs">
+                          <p className="text-slate-500 dark:text-white/40 text-xs">
                             {m.area || "—"} · {isBn ? "শেষ সিল: " : "Last stamp: "}
                             {m.lastStamp ? new Date(m.lastStamp).toLocaleDateString() : (isBn ? "কখনো নয়" : "Never")}
                           </p>
                           <div className="flex items-center gap-4 mt-2">
                             <div>
-                              <span className="font-display font-black text-[#F59E0B] text-sm">{m.stampsWeek}</span>
-                              <span className="text-white/40 text-xs">{isBn ? " সিল/সপ্তাহ" : " stamps/wk"}</span>
+                              <span className="font-display font-black text-[#D97706] dark:text-[#F59E0B] text-sm">{m.stampsWeek}</span>
+                              <span className="text-slate-500 dark:text-white/40 text-xs">{isBn ? " সিল/সপ্তাহ" : " stamps/wk"}</span>
                             </div>
                             <div>
-                              <span className="font-display font-black text-white text-sm">{m.customers}</span>
-                              <span className="text-white/40 text-xs">{isBn ? " কাস্টমার" : " customers"}</span>
+                              <span className="font-display font-black text-[#0F172A] dark:text-white text-sm">{m.customers}</span>
+                              <span className="text-slate-500 dark:text-white/40 text-xs">{isBn ? " কাস্টমার" : " customers"}</span>
                             </div>
                             <div>
-                              <span className={`font-display font-black text-sm ${m.repeatRate >= 50 ? "text-[#52B788]" : "text-[#F59E0B]"}`}>
+                              <span className={`font-display font-black text-sm ${m.repeatRate >= 50 ? "text-[#059669] dark:text-[#34D399]" : "text-[#D97706] dark:text-[#F59E0B]"}`}>
                                 {m.repeatRate}%
                               </span>
-                              <span className="text-white/40 text-xs">{isBn ? " রিপিট" : " repeat"}</span>
+                              <span className="text-slate-500 dark:text-white/40 text-xs">{isBn ? " রিপিট" : " repeat"}</span>
                             </div>
                           </div>
                         </div>
                         <button
                           onClick={() => handleSuspend(m.id)}
-                          className="px-2.5 py-1 rounded-lg border border-white/10 text-white/40 text-xs hover:border-red-500/40 hover:text-red-400 cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 text-xs hover:border-red-500/40 hover:text-red-500 cursor-pointer"
                         >
                           {isBn ? "স্থগিত" : "Suspend"}
                         </button>
@@ -286,11 +289,11 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
 
         {tab === "fraud" && (
           <div className="px-4 pt-4">
-            <p className="text-white/40 text-xs mb-3">স্বয়ংক্রিয় অ্যান্টি-ফ্রড অ্যালগরিদম সিগনাল</p>
+            <p className="text-slate-500 dark:text-white/40 text-xs mb-3">স্বয়ংক্রিয় অ্যান্টি-ফ্রড অ্যালগরিদম সিগনাল</p>
             {fraudSignals.length === 0 && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-                <p className="text-white/60 text-sm font-bold">কোনো ফ্রড সিগনাল নেই</p>
-                <p className="text-white/30 text-xs mt-1">সন্দেহজনক স্ক্যান শনাক্ত হলে এখানে দেখা যাবে</p>
+              <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 text-center card-shadow">
+                <p className="text-slate-600 dark:text-white/60 text-sm font-bold">কোনো ফ্রড সিগনাল নেই</p>
+                <p className="text-slate-400 dark:text-white/30 text-xs mt-1">সন্দেহজনক স্ক্যান শনাক্ত হলে এখানে দেখা যাবে</p>
               </div>
             )}
             <div className="space-y-3">
@@ -299,19 +302,19 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
                 return (
                   <div
                     key={i}
-                    className={`rounded-xl p-4 border ${signal.severity === "critical" ? "border-red-500/20" : signal.severity === "warning" ? "border-[#F59E0B]/20" : "border-purple-500/20"} bg-white/5`}
+                    className={`rounded-xl p-4 border ${signal.severity === "critical" ? "border-red-500/20" : signal.severity === "warning" ? "border-[#F59E0B]/20" : "border-purple-500/20"} bg-white dark:bg-white/5 card-shadow`}
                   >
                     <div className="flex items-start gap-3">
                       <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                       <div className="flex-1">
-                        <p className="text-white font-bold text-sm">{signal.merchantName}</p>
-                        <p className="text-white/70 text-xs mt-0.5 leading-relaxed">{signal.signal}</p>
+                        <p className="text-[#0F172A] dark:text-white font-bold text-sm">{signal.merchantName}</p>
+                        <p className="text-slate-600 dark:text-white/70 text-xs mt-0.5 leading-relaxed">{signal.signal}</p>
                         <div className="flex items-center gap-3 mt-2">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full ${s.bg} ${s.text} font-bold`}>
                             {signal.severity === "critical" ? "গুরুতর" : signal.severity === "warning" ? "সতর্কতা" : "তথ্য"}
                           </span>
-                          <span className="text-white/30 text-[10px]">{signal.timestamp}</span>
-                          <span className="text-white/30 text-[10px]">রেকর্ড: {signal.count}</span>
+                          <span className="text-slate-400 dark:text-white/30 text-[10px]">{signal.timestamp}</span>
+                          <span className="text-slate-400 dark:text-white/30 text-[10px]">রেকর্ড: {signal.count}</span>
                         </div>
                       </div>
                     </div>
@@ -324,20 +327,20 @@ export default function OpsConsole({ onBack }: OpsConsoleProps) {
 
         {tab === "cluster" && (
           <div className="px-4 pt-4 space-y-4">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-              <h3 className="font-bold text-white text-sm mb-1">নেটওয়ার্ক সারাংশ</h3>
-              <p className="text-white/50 text-xs mb-4">
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-4 card-shadow">
+              <h3 className="font-bold text-[#0F172A] dark:text-white text-sm mb-1">নেটওয়ার্ক সারাংশ</h3>
+              <p className="text-slate-500 dark:text-white/50 text-xs mb-4">
                 Sealsela-তে নিবন্ধিত সব মার্চেন্টের বর্তমান অবস্থা
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { label: "সক্রিয়", value: metrics?.clusterStats.active ?? 0, color: "text-[#52B788]" },
-                  { label: "ঝুঁকিতে", value: metrics?.clusterStats.atRisk ?? 0, color: "text-[#F59E0B]" },
-                  { label: "নিষ্ক্রিয় / স্থগিত", value: metrics?.clusterStats.inactive ?? 0, color: "text-red-400" },
-                  { label: "মোট অনবোর্ডেড", value: metrics?.clusterStats.total ?? 0, color: "text-white" },
+                  { label: "সক্রিয়", value: metrics?.clusterStats.active ?? 0, color: "text-[#059669] dark:text-[#34D399]" },
+                  { label: "ঝুঁকিতে", value: metrics?.clusterStats.atRisk ?? 0, color: "text-[#D97706] dark:text-[#F59E0B]" },
+                  { label: "নিষ্ক্রিয় / স্থগিত", value: metrics?.clusterStats.inactive ?? 0, color: "text-red-500 dark:text-red-400" },
+                  { label: "মোট অনবোর্ডেড", value: metrics?.clusterStats.total ?? 0, color: "text-[#0F172A] dark:text-white" },
                 ].map((row) => (
-                  <div key={row.label} className="bg-white/5 rounded-xl p-3">
-                    <p className="text-white/50 text-xs">{row.label}</p>
+                  <div key={row.label} className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-200 dark:border-transparent">
+                    <p className="text-slate-500 dark:text-white/50 text-xs">{row.label}</p>
                     <p className={`font-display font-black text-2xl mt-0.5 ${row.color}`}>{row.value}</p>
                   </div>
                 ))}

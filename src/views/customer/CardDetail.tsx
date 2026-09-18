@@ -398,7 +398,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
   return (
     <div className="flex flex-col h-full bg-transparent overflow-y-auto" {...swipeHandlers}>
       {/* UNIFIED SCROLLING CONTAINER */}
-      <div>
+      <div className="max-w-2xl mx-auto w-full">
         {/* Top Header with Merchant Cover Photo */}
         <div className="relative overflow-hidden min-h-[190px]">
           {/* Cover Photo Background or Stylized Fallback */}
@@ -522,7 +522,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
             )}
 
             {/* Stamp Card Component */}
-            <div className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-4 border border-emerald-500/25 shadow-2xl">
+            <div className="bg-gradient-to-br from-[#064E3B] to-[#0D3824] dark:bg-none dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl p-4 border border-emerald-500/25 shadow-xl text-white">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-1">
@@ -610,8 +610,8 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
 
         {/* Card Info & Rules */}
         <div className="px-3.5 py-3 space-y-3 pb-24">
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-4 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
               {isBn ? "পরবর্তী পুরস্কার" : "Upcoming Reward"}
             </p>
             <div className="flex items-center gap-3">
@@ -619,10 +619,10 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                 <GiftIcon size={24} className="text-[#0A2318]" />
               </div>
               <div>
-                <p className="font-display font-bold text-white text-base">
+                <p className="font-display font-bold text-[#0F172A] dark:text-white text-base">
                   {card.rewardText || program?.rewardText || (isBn ? "১টি বিশেষ উপহার" : "1 Special Reward")}
                 </p>
-                <p className="text-white/60 text-xs mt-0.5">
+                <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">
                   {isBn
                     ? `${target}টি সিল সম্পূর্ণ হলে বিনামূল্যে উপহার প্রদান করা হবে`
                     : `Collect ${target} stamps to redeem your reward`}
@@ -630,22 +630,22 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
               </div>
             </div>
             {card.voucherReady && card.voucherCode && (
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <p className="text-white/70 text-xs mb-1.5 font-medium">
+              <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10">
+                <p className="text-slate-600 dark:text-white/70 text-xs mb-1.5 font-medium">
                   {isBn ? "আপনার একক ভাউচার কোড" : "Your Unique Voucher Code"}
                 </p>
-                <div className="flex items-center justify-between gap-2 bg-[#0A2318] border border-[#34D399]/30 rounded-2xl p-3">
-                  <p className="font-display font-black text-[#34D399] text-lg tracking-widest">
+                <div className="flex items-center justify-between gap-2 bg-slate-100 dark:bg-[#0A2318] border border-emerald-500/30 rounded-2xl p-3">
+                  <p className="font-display font-black text-[#059669] dark:text-[#34D399] text-lg tracking-widest">
                     {card.voucherCode}
                   </p>
                   <button
                     onClick={() => handleCopyCode(card.voucherCode!)}
-                    className="text-xs bg-[#34D399] text-[#0A2318] px-3.5 py-1.5 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
+                    className="text-xs bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] px-3.5 py-1.5 rounded-xl font-black cursor-pointer shadow-sm active:scale-95"
                   >
                     {copied ? (isBn ? "কপি হয়েছে ✓" : "Copied ✓") : isBn ? "কপি" : "Copy"}
                   </button>
                 </div>
-                <p className="text-white/50 text-[11px] mt-2">
+                <p className="text-slate-400 dark:text-white/50 text-[11px] mt-2">
                   {isBn
                     ? "কাউন্টারে এই কোডটি দেখান, স্টাফ পিন দিয়ে রিডিম নিশ্চিত করবেন।"
                     : "Show this code at counter. Staff will verify with their PIN."}
@@ -654,42 +654,42 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
             )}
           </div>
 
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
               {isBn ? "সিল অর্জনের ইতিহাস" : "Stamp History"}
             </p>
             <div className="space-y-3">
               {stampsHistory && stampsHistory.length > 0 ? (
                 stampsHistory.map((visit, i) => (
                   <div key={visit.id || i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 font-bold text-xs">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-emerald-100 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30 font-bold text-xs">
                       ✓
                     </div>
                     <div className="flex-1">
-                      <p className="text-white text-sm font-medium">
+                      <p className="text-[#0F172A] dark:text-white text-sm font-medium">
                         {isBn ? `সিল #${stampsHistory.length - i}` : `Stamp #${stampsHistory.length - i}`}
                       </p>
-                      <p className="text-white/40 text-xs">{visit.formattedDate}</p>
+                      <p className="text-slate-400 dark:text-white/40 text-xs">{visit.formattedDate}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-white/50 py-2">
+                <p className="text-xs text-slate-400 dark:text-white/50 py-2">
                   {isBn ? "কোনো অতীত ভিজিট রেকর্ড নেই" : "No past visit records"}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
               {isBn ? "দোকানের অবস্থান ও সময়সূচি" : "Location & Hours"}
             </p>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <MapPinIcon size={16} className="text-[#34D399] mt-0.5 flex-shrink-0" />
+                <MapPinIcon size={16} className="text-[#059669] dark:text-[#34D399] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-white text-sm leading-relaxed">
+                  <p className="text-[#0F172A] dark:text-white text-sm leading-relaxed">
                     {merchant.address || (isBn ? "ঢাকা, বাংলাদেশ" : "Dhaka, Bangladesh")}
                   </p>
                   {merchant.lat && merchant.lng && (
@@ -697,7 +697,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                       href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
+                      className="text-[#059669] dark:text-[#34D399] text-xs font-bold mt-1.5 inline-flex items-center gap-1 hover:underline"
                     >
                       {isBn ? "গুগল ম্যাপে দেখুন" : "View on Google Maps"} <ExternalLinkIcon size={11} />
                     </a>
@@ -705,16 +705,16 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <ClockIcon size={16} className="text-[#34D399] flex-shrink-0" />
-                <p className="text-white text-sm">
+                <ClockIcon size={16} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
+                <p className="text-[#0F172A] dark:text-white text-sm">
                   {merchant.hours || (isBn ? "সকাল ৯:০০ - রাত ১০:০০ (প্রতিদিন)" : "9:00 AM – 10:00 PM (Daily)")}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-2xl border border-emerald-500/20">
-            <p className="text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-5 shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+            <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold uppercase tracking-wider mb-3">
               {isBn ? "সোশ্যাল মিডিয়া ও রিভিউ" : "Social Media & Reviews"}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -723,7 +723,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                   href={`https://instagram.com/${merchant.instagram}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/15 transition-colors border border-white/10"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
                 >
                   <InstagramIcon size={14} />
                   Instagram
@@ -734,7 +734,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                   href={`https://facebook.com/${merchant.facebook}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/15 transition-colors border border-white/10"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/15 transition-colors border border-slate-200 dark:border-white/10"
                 >
                   <FacebookIcon size={14} />
                   Facebook

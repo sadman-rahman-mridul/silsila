@@ -284,24 +284,24 @@ export default function MerchantDashboard({
   })
 
   return (
-    <div className="flex flex-col h-full bg-transparent w-full">
+    <div className="flex flex-col h-full bg-transparent w-full text-[#0F172A] dark:text-white transition-colors">
       {/* Scrollable body */}
-      <div className="flex-1 overflow-y-auto px-3.5 pt-3 pb-20 space-y-3 w-full">
-        {/* Real-time Netflix-style Search Bar + Quick Voucher Redeem */}
+      <div className="flex-1 overflow-y-auto px-1 sm:px-2 pt-1 pb-20 space-y-4 w-full">
+        {/* Real-time Search Bar + Quick Voucher Redeem */}
         <div className="flex items-center gap-2">
-          <div className="flex-1 bg-[#0E281C]/90 backdrop-blur-xl rounded-2xl p-2.5 border border-emerald-500/25 shadow-xl flex items-center gap-2.5">
-            <SearchIcon size={18} className="text-[#34D399] flex-shrink-0 ml-1.5" />
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-2xl p-2.5 border border-slate-200 dark:border-emerald-500/25 shadow-sm dark:shadow-xl flex items-center gap-2.5">
+            <SearchIcon size={18} className="text-[#059669] dark:text-[#34D399] flex-shrink-0 ml-1.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isBn ? "কাস্টমারের নাম বা ফোন নম্বর দিয়ে খুঁজুন..." : "Search by customer name or phone..."}
-              className="flex-1 bg-transparent text-white text-xs font-medium placeholder-white/40 outline-none"
+              className="flex-1 bg-transparent text-[#0F172A] dark:text-white text-xs font-medium placeholder-slate-400 dark:placeholder-white/40 outline-none"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white flex items-center justify-center text-xs transition-all cursor-pointer mr-1"
+                className="w-6 h-6 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-500 dark:text-white/60 hover:text-[#0F172A] dark:hover:text-white flex items-center justify-center text-xs transition-all cursor-pointer mr-1"
               >
                 ✕
               </button>
@@ -315,253 +315,265 @@ export default function MerchantDashboard({
               setVoucherResult(null)
               setRedeemSuccess(null)
             }}
-            className="px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] font-black text-xs flex items-center gap-1.5 shadow-lg glow-amber cursor-pointer hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
+            className="px-4 py-3 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-lg glow-amber cursor-pointer hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
           >
             <GiftIcon size={16} />
             <span>{isBn ? "ভাউচার রিডিম" : "Redeem Voucher"}</span>
           </button>
         </div>
 
-        {/* Pending Approvals */}
-        {approvals.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-3 px-1">
-              <h2 className="font-display font-bold text-white text-base flex items-center gap-2 drop-shadow-xs">
-                <span>{isBn ? "অনুমোদন প্রয়োজন" : "Approvals Needed"}</span>
-                <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black px-2 py-0.5 rounded-full flex items-center justify-center shadow-md">
-                  {filteredApprovals.length}{searchQuery ? ` / ${approvals.length}` : ""}
-                </span>
-              </h2>
-              <span className="text-white/60 text-xs font-medium">
-                {isBn ? "মেয়াদ: ৩০ মিনিট" : "Valid: 30 mins"}
-              </span>
-            </div>
+        {/* Responsive Grid on Desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 w-full items-start">
+          {/* Left Column (Approvals & Program) */}
+          <div className="lg:col-span-7 space-y-4">
+            {/* Pending Approvals */}
+            {approvals.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base flex items-center gap-2 drop-shadow-xs">
+                    <span>{isBn ? "অনুমোদন প্রয়োজন" : "Approvals Needed"}</span>
+                    <span className="bg-[#F59E0B] text-[#0A2318] text-xs font-black px-2 py-0.5 rounded-full flex items-center justify-center shadow-md">
+                      {filteredApprovals.length}{searchQuery ? ` / ${approvals.length}` : ""}
+                    </span>
+                  </h2>
+                  <span className="text-slate-500 dark:text-white/60 text-xs font-medium">
+                    {isBn ? "মেয়াদ: ৩০ মিনিট" : "Valid: 30 mins"}
+                  </span>
+                </div>
 
-            {filteredApprovals.length === 0 ? (
-              <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
-                <SearchIcon size={28} className="text-white/40 mx-auto mb-2" />
-                <p className="font-display font-bold text-white text-sm">
-                  {isBn ? `"${searchQuery}" দিয়ে কোনো অনুরোধ পাওয়া যায়নি` : `No requests found for "${searchQuery}"`}
-                </p>
-                <p className="text-white/50 text-xs mt-1">
-                  {isBn ? "নাম বা সঠিক ফোন নম্বর দিয়ে আবার চেষ্টা করুন" : "Try searching with name or exact phone number"}
-                </p>
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="mt-3 px-4 py-1.5 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 transition-all cursor-pointer"
-                >
-                  {isBn ? "ফিল্টার মুছুন" : "Clear Filter"}
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredApprovals.map((approval) => {
-                  const isApproved = approved.includes(approval.id)
-                  const isRejected = rejected.includes(approval.id)
-                  const dist = approval.distanceMeters ?? approval.distance ?? 12
-                  return (
-                    <div
-                      key={approval.id}
-                      className={`bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 border ${
-                        isApproved
-                          ? "border-[#34D399] bg-[#10B981]/15"
-                          : isRejected
-                          ? "border-red-400/40 opacity-50"
-                          : "border-emerald-500/30"
-                      }`}
+                {filteredApprovals.length === 0 ? (
+                  <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-sm dark:shadow-2xl text-center border border-slate-200 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+                    <SearchIcon size={28} className="text-slate-400 dark:text-white/40 mx-auto mb-2" />
+                    <p className="font-display font-bold text-[#0F172A] dark:text-white text-sm">
+                      {isBn ? `"${searchQuery}" দিয়ে কোনো অনুরোধ পাওয়া যায়নি` : `No requests found for "${searchQuery}"`}
+                    </p>
+                    <p className="text-slate-400 dark:text-white/50 text-xs mt-1">
+                      {isBn ? "নাম বা সঠিক ফোন নম্বর দিয়ে আবার চেষ্টা করুন" : "Try searching with name or exact phone number"}
+                    </p>
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="mt-3 px-4 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer"
                     >
-                      <div className="p-4">
-                        <div className="flex items-start gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#34D399] flex-shrink-0">
-                            {approval.customerName?.slice(0, 1) || (isBn ? "ক" : "C")}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-display font-bold text-white text-lg leading-tight truncate">
-                              {approval.customerName}
-                            </p>
-                            <p className="text-white/60 text-xs font-mono">{approval.customerPhone}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-white/40 text-[11px]">
-                                {approval.scannedAt || (isBn ? "এইমাত্র" : "Just now")}
-                              </span>
-                              <span className="text-[#34D399] text-xs font-bold bg-[#10B981]/15 border border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                <MapPinIcon size={11} />
-                                <span>{isBn ? `${dist}মি. দূরত্বে` : `${dist}m away`}</span>
-                              </span>
+                      {isBn ? "ফিল্টার মুছুন" : "Clear Filter"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredApprovals.map((approval) => {
+                      const isApproved = approved.includes(approval.id)
+                      const isRejected = rejected.includes(approval.id)
+                      const dist = approval.distanceMeters ?? approval.distance ?? 12
+                      return (
+                        <div
+                          key={approval.id}
+                          className={`bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl shadow-sm dark:shadow-2xl overflow-hidden transition-all duration-300 border ${
+                            isApproved
+                              ? "border-[#10B981] bg-emerald-50 dark:bg-[#10B981]/15"
+                              : isRejected
+                              ? "border-red-400/40 opacity-50"
+                              : "border-slate-200/80 dark:border-emerald-500/30"
+                          }`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start gap-3 mb-4">
+                              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/30 flex items-center justify-center font-display font-black text-lg text-[#059669] dark:text-[#34D399] flex-shrink-0">
+                                {approval.customerName?.slice(0, 1) || (isBn ? "ক" : "C")}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg leading-tight truncate">
+                                  {approval.customerName}
+                                </p>
+                                <p className="text-slate-500 dark:text-white/60 text-xs font-mono">{approval.customerPhone}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-slate-400 dark:text-white/40 text-[11px]">
+                                    {approval.scannedAt || (isBn ? "এইমাত্র" : "Just now")}
+                                  </span>
+                                  <span className="text-[#059669] dark:text-[#34D399] text-xs font-bold bg-emerald-50 dark:bg-[#10B981]/15 border border-emerald-200 dark:border-[#10B981]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                    <MapPinIcon size={11} />
+                                    <span>{isBn ? `${dist}মি. দূরত্বে` : `${dist}m away`}</span>
+                                  </span>
+                                </div>
+                              </div>
                             </div>
+
+                            {isApproved ? (
+                              <div className="flex items-center justify-center gap-2 py-3 bg-emerald-100 dark:bg-[#10B981]/20 border border-emerald-300 dark:border-[#10B981]/40 rounded-2xl text-[#059669] dark:text-[#34D399] font-bold">
+                                {isBn ? "✓ সিল দেওয়া সম্পন্ন!" : "✓ Stamp Granted!"}
+                              </div>
+                            ) : isRejected ? (
+                              <div className="flex items-center justify-center gap-2 py-3 bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/30 rounded-2xl text-red-700 dark:text-red-300 font-medium">
+                                {isBn ? "প্রত্যাখ্যান করা হয়েছে" : "Rejected"}
+                              </div>
+                            ) : (
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleReject(approval.id)}
+                                  className="flex-1 py-3.5 rounded-2xl border border-slate-200 dark:border-white/20 bg-slate-50 dark:bg-white/5 flex items-center justify-center gap-1.5 text-slate-600 dark:text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-500 cursor-pointer text-xs"
+                                >
+                                  <XIcon size={16} />
+                                  <span>{isBn ? "বাতিল" : "Reject"}</span>
+                                </button>
+                                <button
+                                  onClick={() => handleApprove(approval.id)}
+                                  className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-white dark:text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-lg glow-emerald cursor-pointer"
+                                >
+                                  <CheckIcon size={18} />
+                                  <span className="font-display text-base">{isBn ? "সিল দিন ✓" : "Grant Stamp ✓"}</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
-
-                        {isApproved ? (
-                          <div className="flex items-center justify-center gap-2 py-3 bg-[#10B981]/20 border border-[#10B981]/40 rounded-2xl text-[#34D399] font-bold">
-                            {isBn ? "✓ সিল দেওয়া সম্পন্ন!" : "✓ Stamp Granted!"}
-                          </div>
-                        ) : isRejected ? (
-                          <div className="flex items-center justify-center gap-2 py-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 font-medium">
-                            {isBn ? "প্রত্যাখ্যান করা হয়েছে" : "Rejected"}
-                          </div>
-                        ) : (
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => handleReject(approval.id)}
-                              className="flex-1 py-3.5 rounded-2xl border border-white/20 bg-white/5 flex items-center justify-center gap-1.5 text-white/70 font-bold transition-all active:scale-[0.97] hover:border-red-400 hover:text-red-300 cursor-pointer text-xs"
-                            >
-                              <XIcon size={16} />
-                              <span>{isBn ? "বাতিল" : "Reject"}</span>
-                            </button>
-                            <button
-                              onClick={() => handleApprove(approval.id)}
-                              className="flex-[2] py-3.5 rounded-2xl bg-gradient-to-r from-[#10B981] to-[#047857] flex items-center justify-center gap-2 text-[#0A2318] font-black transition-all active:scale-[0.97] shadow-xl glow-emerald cursor-pointer"
-                            >
-                              <CheckIcon size={18} />
-                              <span className="font-display text-base">{isBn ? "সিল দিন ✓" : "Grant Stamp ✓"}</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {approvals.length === 0 && (
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
-            <div className="w-14 h-14 rounded-2xl bg-[#10B981]/20 border border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#34D399]">
-              <ShieldCheckIcon size={30} />
-            </div>
-            <p className="font-display font-bold text-white text-base">
-              {isBn ? "সব অনুমোদন সম্পন্ন" : "All Caught Up"}
-            </p>
-            <p className="text-white/60 text-xs mt-1 leading-relaxed">
-              {isBn
-                ? "কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে"
-                : "Customer scans at counter will appear here in real time"}
-            </p>
-          </div>
-        )}
-
-        {/* Active Loyalty Program */}
-        {program && (
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-emerald-500/20">
-            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <h2 className="font-display font-bold text-white text-sm">
-                {isBn ? "সক্রিয় লয়্যালটি প্রোগ্রাম" : "Active Loyalty Program"}
-              </h2>
-              <span className="bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 text-xs px-2.5 py-0.5 rounded-full font-bold">
-                {isBn ? "সক্রিয়" : "Active"}
-              </span>
-            </div>
-            <div className="p-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
-                <GiftIcon size={24} className="text-[#0A2318]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-white font-bold text-sm">{program.rewardText}</p>
-                <p className="text-white/60 text-xs mt-0.5">
+            {approvals.length === 0 && (
+              <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/30 flex items-center justify-center mx-auto mb-3 text-[#059669] dark:text-[#34D399]">
+                  <ShieldCheckIcon size={30} />
+                </div>
+                <p className="font-display font-bold text-[#0F172A] dark:text-white text-base sm:text-lg">
+                  {isBn ? "সব অনুমোদন সম্পন্ন" : "All Caught Up"}
+                </p>
+                <p className="text-slate-500 dark:text-white/60 text-xs sm:text-sm mt-1 leading-relaxed max-w-sm mx-auto">
                   {isBn
-                    ? `${program.target}টি সিলে সম্পূর্ণ — ${program.expiryDays} দিনের মেয়াদ`
-                    : `Complete at ${program.target} stamps — ${program.expiryDays} days validity`}
+                    ? "কাউন্টার থেকে কোনো কাস্টমার স্ক্যান করলে সরাসরি এখানে ভেসে উঠবে"
+                    : "Customer scans at counter will appear here in real time"}
                 </p>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Counter QR Code & Download */}
-        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-emerald-500/20">
-          <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 flex items-center justify-center">
-                <QRIcon size={16} />
+            {/* Active Loyalty Program */}
+            {program && (
+              <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-sm dark:shadow-2xl overflow-hidden border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+                <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
+                  <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-sm">
+                    {isBn ? "সক্রিয় লয়্যালটি প্রোগ্রাম" : "Active Loyalty Program"}
+                  </h2>
+                  <span className="bg-emerald-50 dark:bg-[#10B981]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#10B981]/30 text-xs px-2.5 py-0.5 rounded-full font-bold">
+                    {isBn ? "সক্রিয়" : "Active"}
+                  </span>
+                </div>
+                <div className="p-4 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl flex-shrink-0 shadow-md">
+                    <GiftIcon size={24} className="text-[#0A2318]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[#0F172A] dark:text-white font-bold text-sm">{program.rewardText}</p>
+                    <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">
+                      {isBn
+                        ? `${program.target}টি সিলে সম্পূর্ণ — ${program.expiryDays} দিনের মেয়াদ`
+                        : `Complete at ${program.target} stamps — ${program.expiryDays} days validity`}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <h2 className="font-display font-bold text-white text-sm">
-                {isBn ? "কাউন্টার QR কোড" : "Counter QR Code"}
-              </h2>
-            </div>
-            {qrDisplayLink && (
-              <span className="text-[#34D399] text-[11px] font-mono font-bold">
-                {qrDisplayLink}
-              </span>
             )}
           </div>
 
-          <div className="p-4">
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              {/* QR Code Canvas/Image - Click to Enlarge */}
-              <div
-                onClick={() => dashboardQrDataUrl && setShowFullscreenQr(true)}
-                className="w-32 h-32 bg-white rounded-2xl p-2 shadow-2xl flex flex-col items-center justify-center flex-shrink-0 cursor-pointer group hover:scale-105 active:scale-95 transition-all relative border-2 border-emerald-500/30 glow-emerald"
-                title={isBn ? "কাস্টমারকে দেখাতে QR কোড বড় করুন" : "Click to enlarge QR code"}
-              >
-                {dashboardQrDataUrl ? (
-                  <>
-                    <img
-                      src={dashboardQrDataUrl}
-                      alt="Counter QR Code"
-                      className="w-full h-full object-contain"
-                    />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-2xl flex items-center justify-center transition-opacity">
-                      <span className="text-[10px] font-black bg-[#0A2318]/90 text-[#34D399] px-2 py-0.5 rounded-full shadow-md backdrop-blur-xs">
-                        🔍 {isBn ? "বড় করুন" : "Enlarge"}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-gray-400 text-xs font-mono">
-                    {isBn ? "তৈরি হচ্ছে..." : "Generating..."}
+          {/* Right Column (Counter QR Code & Standee) */}
+          <div className="lg:col-span-5 space-y-4">
+            {/* Counter QR Code & Download */}
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-sm dark:shadow-2xl overflow-hidden border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-[#10B981]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#10B981]/30 flex items-center justify-center">
+                    <QRIcon size={16} />
                   </div>
+                  <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-sm">
+                    {isBn ? "কাউন্টার QR কোড" : "Counter QR Code"}
+                  </h2>
+                </div>
+                {qrDisplayLink && (
+                  <span className="text-[#059669] dark:text-[#34D399] text-[11px] font-mono font-bold truncate max-w-[150px]">
+                    {qrDisplayLink}
+                  </span>
                 )}
               </div>
 
-              <div className="flex-1 space-y-2 text-center sm:text-left">
-                <p className="font-bold text-white text-sm">
-                  {merchantName || (isBn ? "আপনার দোকান" : "Your Store")} {isBn ? "QR কোড" : "QR Code"}
-                </p>
-
-                {/* Toast notification */}
-                {qrDownloadedToast && (
-                  <div className="bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 justify-center sm:justify-start animate-fade-in backdrop-blur-md">
-                    <CheckIcon size={14} />
-                    <span>{isBn ? "QR কোড সফলভাবে ডাউনলোড হয়েছে!" : "QR Code downloaded successfully!"}</span>
+              <div className="p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-center gap-4">
+                  {/* QR Code Canvas/Image - Click to Enlarge */}
+                  <div
+                    onClick={() => dashboardQrDataUrl && setShowFullscreenQr(true)}
+                    className="w-36 h-36 bg-white rounded-2xl p-2 shadow-md dark:shadow-2xl flex flex-col items-center justify-center flex-shrink-0 cursor-pointer group hover:scale-105 active:scale-95 transition-all relative border-2 border-emerald-500/30 glow-emerald"
+                    title={isBn ? "কাস্টমারকে দেখাতে QR কোড বড় করুন" : "Click to enlarge QR code"}
+                  >
+                    {dashboardQrDataUrl ? (
+                      <>
+                        <img
+                          src={dashboardQrDataUrl}
+                          alt="Counter QR Code"
+                          className="w-full h-full object-contain"
+                        />
+                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 rounded-2xl flex items-center justify-center transition-opacity">
+                          <span className="text-[10px] font-black bg-[#0A2318]/90 text-[#34D399] px-2 py-0.5 rounded-full shadow-md backdrop-blur-xs">
+                            🔍 {isBn ? "বড় করুন" : "Enlarge"}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-gray-400 text-xs font-mono">
+                        {isBn ? "তৈরি হচ্ছে..." : "Generating..."}
+                      </div>
+                    )}
                   </div>
-                )}
 
-                <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start">
-                  <button
-                    onClick={handleDownloadCounterQr}
-                    disabled={downloadingQr || !dashboardQrDataUrl}
-                    className="px-4 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-                  >
-                    <DownloadIcon size={14} />
-                    <span>
-                      {downloadingQr
-                        ? isBn
-                          ? "ডাউনলোড হচ্ছে..."
-                          : "Downloading..."
-                        : isBn
-                        ? "QR ডাউনলোড (HD PNG)"
-                        : "Download QR (HD PNG)"}
-                    </span>
-                  </button>
+                  <div className="flex-1 space-y-2 text-center sm:text-left lg:text-center xl:text-left">
+                    <p className="font-bold text-[#0F172A] dark:text-white text-sm">
+                      {merchantName || (isBn ? "আপনার দোকান" : "Your Store")} {isBn ? "QR কোড" : "QR Code"}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-white/60">
+                      {isBn ? "কাউন্টারে রাখুন যাতে কাস্টমাররা সহজে স্ক্যান করতে পারেন" : "Display at counter for instant customer scans"}
+                    </p>
 
-                  <button
-                    onClick={handleCopyStoreLink}
-                    className="px-3.5 py-2.5 border border-white/20 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 backdrop-blur-md"
-                  >
-                    {copiedLink ? <CheckIcon size={14} className="text-[#34D399]" /> : <CopyIcon size={14} />}
-                    <span>
-                      {copiedLink
-                        ? isBn
-                          ? "লিংক কপি হয়েছে!"
-                          : "Link Copied!"
-                        : isBn
-                        ? "লিংক কপি"
-                        : "Copy Link"}
-                    </span>
-                  </button>
+                    {/* Toast notification */}
+                    {qrDownloadedToast && (
+                      <div className="bg-emerald-50 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/40 text-[#059669] dark:text-[#34D399] px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 justify-center sm:justify-start animate-fade-in backdrop-blur-md">
+                        <CheckIcon size={14} />
+                        <span>{isBn ? "QR কোড সফলভাবে ডাউনলোড হয়েছে!" : "QR Code downloaded successfully!"}</span>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-2 pt-1 justify-center sm:justify-start lg:justify-center xl:justify-start">
+                      <button
+                        onClick={handleDownloadCounterQr}
+                        disabled={downloadingQr || !dashboardQrDataUrl}
+                        className="px-4 py-2.5 bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-white dark:text-[#0A2318] text-xs font-black rounded-xl shadow-lg glow-emerald flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                      >
+                        <DownloadIcon size={14} />
+                        <span>
+                          {downloadingQr
+                            ? isBn
+                              ? "ডাউনলোড হচ্ছে..."
+                              : "Downloading..."
+                            : isBn
+                            ? "QR ডাউনলোড (HD PNG)"
+                            : "Download QR (HD PNG)"}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={handleCopyStoreLink}
+                        className="px-3.5 py-2.5 border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-[#0F172A] dark:text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
+                      >
+                        {copiedLink ? <CheckIcon size={14} className="text-[#059669] dark:text-[#34D399]" /> : <CopyIcon size={14} />}
+                        <span>
+                          {copiedLink
+                            ? isBn
+                              ? "লিংক কপি হয়েছে!"
+                              : "Link Copied!"
+                            : isBn
+                            ? "লিংক কপি"
+                            : "Copy Link"}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

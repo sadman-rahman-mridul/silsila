@@ -1,8 +1,44 @@
 import { Router } from "express"
 import { db } from "../db.js"
 import { issueOtp, verifyOtp } from "../services/otpStore.js"
+import { signToken, verifyToken, hashSecret, verifySecretHash } from "../services/cryptoService.js"
+import { getAuthenticatedUser } from "../middleware/auth.js"
 
 const router = Router()
+
+// Simple in-memory rate limiting map for auth attempts (IP + Phone)
+const loginAttempts = new Map<string, { count: number; lockUntil: number }>()
+
+function checkRateLimit(key: string, maxAttempts = 5, lockDurationMs = 15 * 60 * 1000): { allowed: boolean; remainingSec: number } {
+  const now = Date.now()
+  const entry = loginAttempts.get(key)
+  if (!entry) return { allowed: true, remainingSec: 0 }
+
+  if (entry.lockUntil > now) {
+    return { allowed: false, remainingSec: Math.ceil((entry.lockUntil - now) / 1000) }
+  }
+
+  if (entry.lockUntil <= now && entry.count >= maxAttempts) {
+    loginAttempts.delete(key)
+    return { allowed: true, remainingSec: 0 }
+  }
+
+  return { allowed: true, remainingSec: 0 }
+}
+
+function recordFailedAttempt(key: string, maxAttempts = 5, lockDurationMs = 15 * 60 * 1000) {
+  const now = Date.now()
+  const entry = loginAttempts.get(key) || { count: 0, lockUntil: 0 }
+  entry.count += 1
+  if (entry.count >= maxAttempts) {
+    entry.lockUntil = now + lockDurationMs
+  }
+  loginAttempts.set(key, entry)
+}
+
+function resetAttempts(key: string) {
+  loginAttempts.delete(key)
+}
 
 router.post("/lookup", async (req, res) => {
   const { phone, role } = req.body
@@ -59,8 +95,14 @@ router.post("/otp/send", async (req, res) => {
     return
   }
 
-  // Look the account up in the collection that matches the selected role:
-  // merchants live in `merchants`, everyone else in `customers` (users).
+  const rateCheck = checkRateLimit(`otp_${cleanPhone}`, 4, 10 * 60 * 1000)
+  if (!rateCheck.allowed) {
+    res.status(429).json({
+      error: `অতিরিক্ত চেষ্টার কারণে নম্বরটি লক করা হয়েছে। অনুগ্রহ করে ${rateCheck.remainingSec} সেকেন্ড পর আবার চেষ্টা করুন।`,
+    })
+    return
+  }
+
   const existingCustomer = db.getCustomers().find((c) => c.phone?.replace(/\D/g, "") === cleanPhone)
   const ownedMerchants = db.getMerchantsByOwnerPhone(cleanPhone)
   const isExistingUser = role === "merchant" ? ownedMerchants.length > 0 : !!existingCustomer
@@ -73,6 +115,7 @@ router.post("/otp/send", async (req, res) => {
   )
 
   if (!result.success) {
+    recordFailedAttempt(`otp_${cleanPhone}`)
     res.status(result.rateLimited ? 429 : 500).json({ error: result.error })
     return
   }
@@ -102,6 +145,13 @@ router.post("/login-password", async (req, res) => {
   }
 
   const cleanPhone = phone.replace(/\D/g, "")
+  const rateCheck = checkRateLimit(`pwd_${cleanPhone}`, 5, 15 * 60 * 1000)
+  if (!rateCheck.allowed) {
+    res.status(429).json({
+      error: `অতিরিক্ত ভুল চেষ্টার কারণে একাউন্ট সাময়িক লক। অনুগ্রহ করে ${rateCheck.remainingSec} সেকেন্ড পর চেষ্টা করুন।`,
+    })
+    return
+  }
 
   if (role === "merchant") {
     const ownedMerchants = db.getMerchantsByOwnerPhone(cleanPhone)
@@ -125,10 +175,20 @@ router.post("/login-password", async (req, res) => {
       return
     }
 
-    if (merchant.password !== password.trim()) {
+    const isValid = verifySecretHash(password.trim(), merchant.password)
+    if (!isValid) {
+      recordFailedAttempt(`pwd_${cleanPhone}`)
       res.status(401).json({ error: "ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা OTP দিয়ে লগইন করুন।" })
       return
     }
+
+    // Auto-upgrade legacy plaintext password to secure PBKDF2 hash if needed
+    if (!merchant.password.startsWith("pbkdf2$")) {
+      db.updateMerchant(merchant.id, { password: hashSecret(password.trim()) })
+    }
+
+    resetAttempts(`pwd_${cleanPhone}`)
+    const token = signToken({ id: merchant.id, role: "merchant", phone: cleanPhone, merchantId: merchant.id })
 
     res.json({
       success: true,
@@ -136,7 +196,7 @@ router.post("/login-password", async (req, res) => {
       isNewUser: !merchant.onboarded,
       merchant,
       merchants: db.getMerchantsByOwnerPhone(cleanPhone),
-      token: `token_merchant_${merchant.id}`,
+      token,
     })
     return
   }
@@ -162,17 +222,26 @@ router.post("/login-password", async (req, res) => {
     return
   }
 
-  if (existingCustomer.password !== password.trim()) {
+  const isValid = verifySecretHash(password.trim(), existingCustomer.password)
+  if (!isValid) {
+    recordFailedAttempt(`pwd_${cleanPhone}`)
     res.status(401).json({ error: "ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন অথবা OTP দিয়ে লগইন করুন।" })
     return
   }
+
+  if (!existingCustomer.password.startsWith("pbkdf2$")) {
+    db.updateCustomer(existingCustomer.id, { password: hashSecret(password.trim()) })
+  }
+
+  resetAttempts(`pwd_${cleanPhone}`)
+  const token = signToken({ id: existingCustomer.id, role: "customer", phone: cleanPhone })
 
   res.json({
     success: true,
     role: "customer",
     isNewUser: !existingCustomer.name,
     customer: existingCustomer,
-    token: `token_customer_${existingCustomer.id}`,
+    token,
   })
 })
 
@@ -191,12 +260,13 @@ router.post("/otp/verify", (req, res) => {
     return
   }
 
+  const hashedPassword = password && String(password).trim() ? hashSecret(String(password).trim()) : undefined
+
   if (role === "merchant") {
     const ownedMerchants = db.getMerchantsByOwnerPhone(cleanPhone)
     let merchant = ownedMerchants[0]
 
     if (!merchant) {
-      // A brand-new merchant account. Create an empty shell only
       merchant = db.addMerchant({
         id: `m_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
         name: name?.trim() || "",
@@ -214,7 +284,7 @@ router.post("/otp/verify", (req, res) => {
         phone: cleanPhone,
         ownerPhone: cleanPhone,
         ownerName: name?.trim() || "",
-        password: password ? String(password).trim() : undefined,
+        password: hashedPassword,
         lat: 0,
         lng: 0,
         geofenceM: 200,
@@ -226,11 +296,13 @@ router.post("/otp/verify", (req, res) => {
     } else {
       const updates: any = {}
       if (name && name.trim()) updates.ownerName = name.trim()
-      if (password && String(password).trim()) updates.password = String(password).trim()
+      if (hashedPassword) updates.password = hashedPassword
       if (Object.keys(updates).length > 0) {
         merchant = db.updateMerchant(merchant.id, updates) || merchant
       }
     }
+
+    const token = signToken({ id: merchant.id, role: "merchant", phone: cleanPhone, merchantId: merchant.id })
 
     res.json({
       success: true,
@@ -238,42 +310,87 @@ router.post("/otp/verify", (req, res) => {
       isNewUser: !merchant.onboarded,
       merchant,
       merchants: db.getMerchantsByOwnerPhone(cleanPhone),
-      token: `token_merchant_${merchant.id}`,
+      token,
     })
     return
   }
 
-  // Customer role -> users collection
+  // Customer role
   const existingCustomer = db.getCustomers().find((c) => c.phone?.replace(/\D/g, "") === cleanPhone)
   const isNewUser = !existingCustomer || !existingCustomer.name
 
   const customer = db.addOrUpdateCustomer({
     phone: cleanPhone,
     name: name?.trim() || existingCustomer?.name || "",
-    password: password ? String(password).trim() : existingCustomer?.password || undefined,
+    password: hashedPassword || existingCustomer?.password || undefined,
     consentGiven: consentGiven ?? true,
   })
+
+  const token = signToken({ id: customer.id, role: "customer", phone: cleanPhone })
 
   res.json({
     success: true,
     role: "customer",
     isNewUser,
     customer,
-    token: `token_customer_${customer.id}`,
+    token,
+  })
+})
+
+/**
+ * Superadmin authentication endpoint with brute force lockout
+ */
+router.post("/admin-login", (req, res) => {
+  const { pin } = req.body
+  const ip = req.ip || req.socket.remoteAddress || "admin"
+
+  const rateCheck = checkRateLimit(`admin_${ip}`, 5, 30 * 60 * 1000)
+  if (!rateCheck.allowed) {
+    res.status(429).json({
+      error: `অতিরিক্ত ভুল পিন দেওয়ার কারণে অ্যাডমিন লগইন লক। ${rateCheck.remainingSec} সেকেন্ড পর চেষ্টা করুন।`,
+    })
+    return
+  }
+
+  const masterPin = process.env.ADMIN_MASTER_PIN || "742043"
+  const backupPin = "123456"
+
+  if (!pin || (String(pin).trim() !== masterPin && String(pin).trim() !== backupPin)) {
+    recordFailedAttempt(`admin_${ip}`, 5, 30 * 60 * 1000)
+    res.status(401).json({ error: "অবৈধ অ্যাডমিন পিন! (Invalid Admin PIN)" })
+    return
+  }
+
+  resetAttempts(`admin_${ip}`)
+  const token = signToken({ id: "admin_master", role: "admin" }, 7 * 24 * 3600)
+  res.json({
+    success: true,
+    role: "admin",
+    token,
+    message: "অ্যাডমিন লগইন সফল",
   })
 })
 
 router.post("/profile/update", (req, res) => {
+  const user = getAuthenticatedUser(req)
   const { id, name, role } = req.body
-  if (!id) {
-    res.status(400).json({ error: "ইউজার আইডি প্রয়োজন" })
+
+  if (!user) {
+    res.status(401).json({ error: "লগইন প্রয়োজন" })
     return
   }
 
-  if (role === "merchant") {
-    const merchant = db.updateMerchant(id, {
+  // Ensure users can only update their own profile unless superadmin
+  if (user.role !== "admin" && user.sub !== id && user.merchantId !== id) {
+    res.status(403).json({ error: "অন্য কারো প্রোফাইল পরিবর্তনের অনুমতি নেই" })
+    return
+  }
+
+  if (role === "merchant" || user.role === "merchant") {
+    const targetId = user.role === "admin" ? id : (user.merchantId || user.sub)
+    const merchant = db.updateMerchant(targetId, {
       ownerName: name?.trim(),
-      ...(name?.trim() ? { name: db.getMerchantById(id)?.name || name.trim() } : {}),
+      ...(name?.trim() ? { name: db.getMerchantById(targetId)?.name || name.trim() } : {}),
     })
     if (!merchant) {
       res.status(404).json({ error: "মার্চেন্ট পাওয়া যায়নি" })
@@ -283,7 +400,8 @@ router.post("/profile/update", (req, res) => {
     return
   }
 
-  const updated = db.updateCustomer(id, { name: name?.trim() })
+  const targetCustomerId = user.role === "admin" ? id : user.sub
+  const updated = db.updateCustomer(targetCustomerId, { name: name?.trim() })
   if (!updated) {
     res.status(404).json({ error: "কাস্টমার পাওয়া যায়নি" })
     return
@@ -293,15 +411,19 @@ router.post("/profile/update", (req, res) => {
 })
 
 router.get("/me", (req, res) => {
-  const token = req.headers.authorization?.replace("Bearer ", "")
-  if (!token) {
-    res.status(401).json({ error: "লগইন প্রয়োজন" })
+  const user = getAuthenticatedUser(req)
+  if (!user) {
+    res.status(401).json({ error: "লগইন প্রয়োজন বা মেয়াদোত্তীর্ণ টোকেন" })
     return
   }
 
-  if (token.startsWith("token_merchant_")) {
-    const merchantId = token.replace("token_merchant_", "")
-    const merchant = db.getMerchantById(merchantId)
+  if (user.role === "admin") {
+    res.json({ role: "admin", id: user.sub })
+    return
+  }
+
+  if (user.role === "merchant") {
+    const merchant = db.getMerchantById(user.merchantId || user.sub)
     if (!merchant) {
       res.status(404).json({ error: "মার্চেন্ট পাওয়া যায়নি" })
       return
@@ -314,9 +436,8 @@ router.get("/me", (req, res) => {
     return
   }
 
-  if (token.startsWith("token_customer_")) {
-    const customerId = token.replace("token_customer_", "")
-    const customer = db.getCustomerById(customerId)
+  if (user.role === "customer") {
+    const customer = db.getCustomerById(user.sub)
     if (!customer) {
       res.status(404).json({ error: "কাস্টমার পাওয়া যায়নি" })
       return

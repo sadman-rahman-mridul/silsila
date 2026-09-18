@@ -160,32 +160,32 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
   return (
     <div className="flex flex-col h-full bg-transparent w-full">
       <div className="px-3.5 pt-4 pb-3 w-full">
-        <h1 className="font-display text-xl font-black text-white mb-0.5 drop-shadow-xs">
+        <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white mb-0.5 drop-shadow-xs">
           {isBn ? "লয়্যালটি ও পুরস্কার" : "Loyalty & Rewards"}
         </h1>
-        <p className="text-[#34D399] text-xs font-semibold">
+        <p className="text-emerald-700 dark:text-[#34D399] text-xs font-semibold">
           {isBn ? "ডিজিটাল স্ট্যাম্প ও রিওয়ার্ড নিয়মাবলি" : "Digital stamp cards & reward rules"}
         </p>
 
         <div className="mt-3.5 flex gap-2">
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
             <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{stats?.rewardsRedeemed || 0}</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিডিম হয়েছে" : "Redeemed"}</p>
+            <p className="text-slate-500 dark:text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিডিম হয়েছে" : "Redeemed"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-xl leading-none">{stats?.repeatRate ?? 0}%</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিপিট রেট" : "Repeat Rate"}</p>
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
+            <p className="font-display font-black text-emerald-700 dark:text-[#34D399] text-xl leading-none">{stats?.repeatRate ?? 0}%</p>
+            <p className="text-slate-500 dark:text-white/50 text-[10px] mt-1 font-medium">{isBn ? "রিপিট রেট" : "Repeat Rate"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-white text-xl leading-none">{programs.length}</p>
-            <p className="text-white/50 text-[10px] mt-1 font-medium">{isBn ? "সক্রিয় প্রোগ্রাম" : "Active Programs"}</p>
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
+            <p className="font-display font-black text-[#0F172A] dark:text-white text-xl leading-none">{programs.length}</p>
+            <p className="text-slate-500 dark:text-white/50 text-[10px] mt-1 font-medium">{isBn ? "সক্রিয় প্রোগ্রাম" : "Active Programs"}</p>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-white text-base drop-shadow-xs">
+          <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base drop-shadow-xs">
             {isBn ? "সক্রিয় প্রোগ্রামসমূহ" : "Active Programs"}
           </h2>
           <button
@@ -193,23 +193,23 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
               setEditingProgram(null)
               setShowCreate(!showCreate)
             }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-[#0A2318] text-xs font-black transition-all active:scale-[0.98] shadow-lg glow-emerald cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] hover:brightness-105 text-white dark:text-[#0A2318] text-xs font-black transition-all active:scale-[0.98] shadow-md glow-emerald cursor-pointer"
           >
             {isBn ? "+ নতুন প্রোগ্রাম" : "+ New Program"}
           </button>
         </div>
 
         {error && (
-          <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
+          <div className="mb-3 bg-red-500/15 border border-red-400/40 text-red-600 dark:text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
             ⚠️ {error}
           </div>
         )}
 
         {programs.length === 0 && !showCreate && (
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-md dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20">
             <GiftIcon size={36} className="text-[#F59E0B] mx-auto mb-2" />
-            <p className="font-display font-bold text-white">{isBn ? "কোনো প্রোগ্রাম নেই" : "No Programs Found"}</p>
-            <p className="text-white/60 text-xs mt-1">
+            <p className="font-display font-bold text-[#0F172A] dark:text-white">{isBn ? "কোনো প্রোগ্রাম নেই" : "No Programs Found"}</p>
+            <p className="text-slate-500 dark:text-white/60 text-xs mt-1">
               {isBn
                 ? '"নতুন প্রোগ্রাম" চেপে আপনার প্রথম স্ট্যাম্প কার্ড চালু করুন।'
                 : 'Tap "New Program" to launch your first loyalty card.'}
@@ -217,17 +217,17 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
           </div>
         )}
 
-        <div className="space-y-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {programs.map((program) => (
-            <div key={program.id} className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-emerald-500/20">
+            <div key={program.id} className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl shadow-md dark:shadow-2xl p-4 border border-slate-200/80 dark:border-emerald-500/20">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#FEF3C7] text-[#0A2318] flex items-center justify-center text-2xl shadow-sm">
+                  <div className="w-11 h-11 rounded-2xl bg-amber-100 dark:bg-[#FEF3C7] text-amber-900 dark:text-[#0A2318] flex items-center justify-center text-2xl shadow-sm">
                     🎁
                   </div>
                   <div>
-                    <p className="font-display font-bold text-white text-sm">{program.rewardText}</p>
-                    <p className="text-[#34D399] text-xs font-semibold mt-0.5">
+                    <p className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{program.rewardText}</p>
+                    <p className="text-emerald-700 dark:text-[#34D399] text-xs font-semibold mt-0.5">
                       {isBn
                         ? `${program.target}টি সিলে · ${program.expiryDays} দিনের মেয়াদ`
                         : `${program.target} stamps · ${program.expiryDays} days validity`}
@@ -240,13 +240,13 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                       setShowCreate(false)
                       setEditingProgram(program)
                     }}
-                    className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/15 text-white transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-white/10"
+                    className="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-white transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-slate-200 dark:border-white/10"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => setDeleteConfirmId(program.id)}
-                    className="px-3 py-1 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-red-500/30"
+                    className="px-3 py-1 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1 border border-red-500/20 dark:border-red-500/30"
                   >
                     Delete
                   </button>
@@ -255,14 +255,14 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
               {/* Delete confirmation inline */}
               {deleteConfirmId === program.id && (
-                <div className="mb-3 p-3.5 bg-red-500/20 rounded-2xl border border-red-400/40 animate-slide-up backdrop-blur-md">
-                  <p className="text-xs font-bold text-red-200 mb-2.5">
+                <div className="mb-3 p-3.5 bg-red-500/15 rounded-2xl border border-red-400/40 animate-slide-up backdrop-blur-md">
+                  <p className="text-xs font-bold text-red-600 dark:text-red-200 mb-2.5">
                     {isBn ? "আপনি কি নিশ্চিতভাবে এই প্রোগ্রামটি মুছে ফেলতে চান?" : "Are you sure you want to delete this program?"}
                   </p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setDeleteConfirmId(null)}
-                      className="px-3.5 py-1.5 bg-white/10 border border-white/20 text-white rounded-xl text-xs font-bold hover:bg-white/20 cursor-pointer"
+                      className="px-3.5 py-1.5 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-700 dark:text-white rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/20 cursor-pointer"
                     >
                       {isBn ? "বাতিল" : "Cancel"}
                     </button>
@@ -277,22 +277,22 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 </div>
               )}
 
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center">
+              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-200/80 dark:border-white/10 text-center">
                 <div>
-                  <p className="font-display font-black text-white text-base">{stats?.activeCards ?? 0}</p>
-                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "চলমান কার্ড" : "Active Cards"}</p>
+                  <p className="font-display font-black text-[#0F172A] dark:text-white text-base">{stats?.activeCards ?? 0}</p>
+                  <p className="text-slate-400 dark:text-white/40 text-[10px] font-medium">{isBn ? "চলমান কার্ড" : "Active Cards"}</p>
                 </div>
                 <div>
-                  <p className="font-display font-black text-[#34D399] text-base">
+                  <p className="font-display font-black text-emerald-700 dark:text-[#34D399] text-base">
                     {stats?.rewardsRedeemed ?? 0}
                   </p>
-                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "সম্পন্ন রিডিম" : "Redeemed"}</p>
+                  <p className="text-slate-400 dark:text-white/40 text-[10px] font-medium">{isBn ? "সম্পন্ন রিডিম" : "Redeemed"}</p>
                 </div>
                 <div>
                   <p className="font-display font-black text-[#F59E0B] text-base">
                     {stats?.stampsThisWeek ?? 0}
                   </p>
-                  <p className="text-white/40 text-[10px] font-medium">{isBn ? "এই সপ্তাহের সিল" : "Stamps This Week"}</p>
+                  <p className="text-slate-400 dark:text-white/40 text-[10px] font-medium">{isBn ? "এই সপ্তাহের সিল" : "Stamps This Week"}</p>
                 </div>
               </div>
             </div>
@@ -302,28 +302,28 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
       {/* Edit Program Modal */}
       {editingProgram && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-white">
-          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-[#0E281C] border border-slate-200 dark:border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#F59E0B] text-[#0A2318] flex items-center justify-center font-bold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-[#F59E0B] text-amber-900 dark:text-[#0A2318] flex items-center justify-center font-bold text-sm">
                   🎁
                 </div>
-                <h3 className="font-display font-black text-white text-base">
+                <h3 className="font-display font-black text-slate-900 dark:text-white text-base">
                   {isBn ? "রিওয়ার্ড প্রোগ্রাম সম্পাদনা" : "Edit Reward Program"}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setEditingProgram(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-xs cursor-pointer active:scale-95 transition-all"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-700 dark:text-white text-xs cursor-pointer active:scale-95 transition-all"
               >
                 ✕
               </button>
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-2">
                 {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
               </label>
               <div className="flex gap-2">
@@ -335,7 +335,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                     className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                       editingProgram.target === n
                         ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                        : "bg-[#071D13] text-white/70 border border-white/10 hover:bg-white/10"
+                        : "bg-slate-50 dark:bg-[#071D13] text-slate-700 dark:text-white/70 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10"
                     }`}
                   >
                     {n}
@@ -345,7 +345,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-1.5">
                 {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
               </label>
               <input
@@ -353,28 +353,28 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 value={editingProgram.rewardText}
                 onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
                 placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
+                className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-3 text-slate-900 dark:text-white text-sm outline-none focus:border-emerald-500 font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-1.5">
                 {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
               </label>
               <input
                 type="number"
                 value={editingProgram.expiryDays}
                 onChange={(e) => setEditingProgram({ ...editingProgram, expiryDays: Number(e.target.value) })}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
+                className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-2.5 text-slate-900 dark:text-white text-sm outline-none font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-2">
                 {isBn ? "লাইভ কার্ড প্রিভিউ" : "Live Card Preview"}
               </label>
-              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
-                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
+              <div className="bg-slate-50 dark:bg-[#071D13] rounded-2xl p-3.5 border border-slate-200 dark:border-emerald-500/20">
+                <div className="bg-gradient-to-br from-[#064E3B] to-[#0D3824] rounded-xl p-3.5 border border-emerald-500/20 shadow-md">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
                       {merchantName.slice(0, 2) || "—"}
@@ -400,7 +400,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
               <button
                 type="button"
                 onClick={() => setEditingProgram(null)}
-                className="flex-1 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
+                className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
               >
                 {isBn ? "বাতিল" : "Cancel"}
               </button>
@@ -408,7 +408,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 type="button"
                 onClick={handleUpdateProgram}
                 disabled={savingEdit || !editingProgram.rewardText.trim()}
-                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
+                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-white dark:text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
               >
                 <CheckIcon size={15} />
                 {savingEdit ? (isBn ? "সংরক্ষণ হচ্ছে..." : "Saving...") : (isBn ? "আপডেট সংরক্ষণ করুন" : "Save Changes")}
@@ -420,28 +420,28 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
 
       {/* Create Program Modal */}
       {showCreate && !editingProgram && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-white">
-          <div className="bg-[#0E281C] border border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in text-slate-900 dark:text-white">
+          <div className="bg-white dark:bg-[#0E281C] border border-slate-200 dark:border-emerald-500/30 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl animate-slide-up">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#10B981] text-[#0A2318] flex items-center justify-center font-bold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white dark:bg-[#10B981] dark:text-[#0A2318] flex items-center justify-center font-bold text-sm">
                   +
                 </div>
-                <h3 className="font-display font-black text-white text-base">
+                <h3 className="font-display font-black text-slate-900 dark:text-white text-base">
                   {isBn ? "নতুন রিওয়ার্ড প্রোগ্রাম তৈরি" : "Create New Reward Program"}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white text-xs cursor-pointer active:scale-95 transition-all"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/15 flex items-center justify-center text-slate-700 dark:text-white text-xs cursor-pointer active:scale-95 transition-all"
               >
                 ✕
               </button>
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-2">
                 {isBn ? "প্রয়োজনীয় সিল সংখ্যা (Target)" : "Required Stamps (Target)"}
               </label>
               <div className="flex gap-2">
@@ -453,7 +453,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                     className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                       previewStamps === n
                         ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                        : "bg-[#071D13] text-white/70 border border-white/10 hover:bg-white/10"
+                        : "bg-slate-50 dark:bg-[#071D13] text-slate-700 dark:text-white/70 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10"
                     }`}
                   >
                     {n}
@@ -463,7 +463,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-1.5">
                 {isBn ? "পুরস্কারের বিবরণ" : "Reward Description"}
               </label>
               <input
@@ -471,28 +471,28 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 value={rewardText}
                 onChange={(e) => setRewardText(e.target.value)}
                 placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-3 text-white text-sm outline-none focus:border-[#34D399] font-medium"
+                className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-3 text-slate-900 dark:text-white text-sm outline-none focus:border-emerald-500 font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-1.5">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-1.5">
                 {isBn ? "মেয়াদ (দিন)" : "Validity (Days)"}
               </label>
               <input
                 type="number"
                 value={expiryDays}
                 onChange={(e) => setExpiryDays(Number(e.target.value))}
-                className="w-full bg-[#071D13] border border-emerald-500/20 rounded-2xl px-4 py-2.5 text-white text-sm outline-none font-medium"
+                className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-2.5 text-slate-900 dark:text-white text-sm outline-none font-medium"
               />
             </div>
 
             <div className="mb-4">
-              <label className="text-white/70 text-xs font-semibold block mb-2">
+              <label className="text-slate-700 dark:text-white/70 text-xs font-semibold block mb-2">
                 {isBn ? "লাইভ কাস্টমার প্রিভিউ" : "Live Customer Preview"}
               </label>
-              <div className="bg-[#071D13] rounded-2xl p-3.5 border border-emerald-500/20">
-                <div className="bg-[#0E281C] rounded-xl p-3.5 border border-white/10">
+              <div className="bg-slate-50 dark:bg-[#071D13] rounded-2xl p-3.5 border border-slate-200 dark:border-emerald-500/20">
+                <div className="bg-gradient-to-br from-[#064E3B] to-[#0D3824] rounded-xl p-3.5 border border-emerald-500/20 shadow-md">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-9 h-9 rounded-lg bg-[#34D399]/20 text-[#34D399] flex items-center justify-center font-display font-bold text-xs border border-[#34D399]/30">
                       {merchantName.slice(0, 2) || "—"}
@@ -518,7 +518,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
               <button
                 type="button"
                 onClick={() => setShowCreate(false)}
-                className="flex-1 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
+                className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white font-bold text-xs cursor-pointer transition-all active:scale-95"
               >
                 {isBn ? "বাতিল" : "Cancel"}
               </button>
@@ -526,7 +526,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 type="button"
                 onClick={handleCreateProgram}
                 disabled={creating || !rewardText.trim()}
-                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
+                className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#10B981] to-[#047857] text-white dark:text-[#0A2318] font-display font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer transition-all active:scale-95 glow-emerald"
               >
                 <CheckIcon size={15} />
                 {creating ? (isBn ? "চালু হচ্ছে..." : "Launching...") : (isBn ? "প্রোগ্রাম চালু করুন" : "Launch Program")}

@@ -1,11 +1,16 @@
 import { Router } from "express"
 import { db } from "../db.js"
+import { getAuthenticatedUser } from "../middleware/auth.js"
 
 const router = Router()
 
 // Customer Wallet Home - list cards (PRD E4a)
 router.get("/", (req, res) => {
-  const { customerId } = req.query
+  const user = getAuthenticatedUser(req)
+  const { customerId: queryCustomerId } = req.query
+
+  const customerId = user && user.role === "customer" ? user.sub : (queryCustomerId as string | undefined)
+
   if (!customerId || typeof customerId !== "string") {
     res.status(400).json({ error: "কাস্টমার আইডি প্রদান করুন" })
     return
@@ -51,10 +56,7 @@ router.get("/", (req, res) => {
     }
   })
 
-  // Sort logic (PRD E4a.4, E4a.6):
-  // 1. Unredeemed voucher ready to claim pinned to top
-  // 2. Closest to completion (least stamps remaining)
-  // 3. Most recent visit
+  // Sort logic: 1. Unredeemed voucher ready -> 2. Closest to completion -> 3. Recent visit
   walletCards.sort((a, b) => {
     if (a.voucherReady && !b.voucherReady) return -1
     if (!a.voucherReady && b.voucherReady) return 1
@@ -67,7 +69,11 @@ router.get("/", (req, res) => {
 
 // Canonical Card Detail Page for a customer at a merchant (PRD E4b)
 router.get("/detail", (req, res) => {
-  const { customerId, merchantId } = req.query
+  const user = getAuthenticatedUser(req)
+  const { customerId: queryCustomerId, merchantId } = req.query
+
+  const customerId = user && user.role === "customer" ? user.sub : (queryCustomerId as string | undefined)
+
   if (!customerId || !merchantId || typeof customerId !== "string" || typeof merchantId !== "string") {
     res.status(400).json({ error: "কাস্টমার ও মার্চেন্ট আইডি প্রয়োজন" })
     return
@@ -100,25 +106,39 @@ router.get("/detail", (req, res) => {
     card: {
       ...card,
       target: program?.target || 5,
-      rewardText: program?.rewardText || "বিনামূল্যে উপহার",
-      rewardImage: program?.rewardImage,
+      rewardText: program?.rewardText || "বিশেষ উপহার",
       voucherReady: card.stamps >= (program?.target || 5) || !!activeVoucher,
       voucherCode: activeVoucher?.code || card.voucherCode,
-      voucherExpiry: activeVoucher?.expiresAt || card.voucherExpiry,
+      voucherExpiry: activeVoucher?.expiresAt ? new Date(activeVoucher.expiresAt).toLocaleDateString("bn-BD") : card.voucherExpiry,
     },
-    merchant,
+    merchant: {
+      id: merchant.id,
+      name: merchant.name,
+      nameEn: merchant.nameEn,
+      category: merchant.category,
+      area: merchant.area,
+      address: merchant.address,
+      hours: merchant.hours,
+      isOpen: merchant.isOpen,
+      logoInitials: merchant.logoInitials,
+      logoBg: merchant.logoBg,
+      logoColor: merchant.logoColor,
+      verified: merchant.verified,
+      distance: merchant.distance || "০.৪ কি.মি.",
+      phone: merchant.phone,
+    },
     program,
-    programs,
-    stampsHistory: stamps.map((s) => ({
-      id: s.id,
-      timestamp: s.timestamp,
-      createdAt: s.createdAt,
-      formattedDate: new Date(s.createdAt).toLocaleDateString("bn-BD", {
+    stamps: stamps.map((s) => ({
+      ...s,
+      dateFormatted: new Date(s.createdAt).toLocaleDateString("bn-BD", {
         day: "numeric",
         month: "short",
         year: "numeric",
       }),
-      staffId: s.staffId,
+      timeFormatted: new Date(s.createdAt).toLocaleTimeString("bn-BD", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     })),
   })
 })

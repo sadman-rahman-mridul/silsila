@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { collection, onSnapshot } from "firebase/firestore"
+import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore"
 import { firestore } from "../../lib/firebase"
 import { api, type CustomerCard } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
+import { useTheme } from "../../context/ThemeContext"
 import { firebaseService } from "../../services/firebaseService"
 import StampGrid from "../../components/StampGrid"
-import { FireIcon, GiftIcon, LogOutIcon, CompassIcon, RefreshIcon } from "../../components/Icons"
+import { FireIcon, GiftIcon, LogOutIcon, CompassIcon, RefreshIcon, SunIcon, MoonIcon, GlobeIcon } from "../../components/Icons"
 
 interface WalletHomeProps {
   onSelectCard: (merchantId: string) => void
@@ -37,7 +38,8 @@ function formatVisitDate(iso?: string, isBn = true) {
 
 export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: WalletHomeProps) {
   const { user, profile } = useAuth()
-  const { isBn } = useLanguage()
+  const { isBn, toggleLanguage } = useLanguage()
+  const { isDark, toggleTheme } = useTheme()
   const [cards, setCards] = useState<CustomerCard[]>([])
   const [availableMerchants, setAvailableMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -132,30 +134,51 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
   })
 
   return (
-    <div className="flex flex-col h-full bg-transparent w-full">
+    <div className="flex flex-col h-full bg-transparent w-full text-[#0F172A] dark:text-white transition-colors">
       {/* Top Header with ambient lighting */}
       <div className="px-3.5 pt-4 pb-3 w-full">
-        {/* Top Bar: Logo on Left, Logout on Right */}
-        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
+        {/* Top Bar: Logo on Left, Theme / Lang / Logout on Right */}
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-200 dark:border-white/10">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title={isBn ? "হোম" : "Home"}
           >
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 p-1.5 flex items-center justify-center shadow-lg glow-emerald border border-emerald-500/30 flex-shrink-0">
-              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 dark:bg-emerald-500/20 p-1.5 flex items-center justify-center shadow-sm dark:shadow-lg dark:glow-emerald border border-emerald-500/20 dark:border-emerald-500/30 flex-shrink-0">
+              <img src="/sealsela-logo-light.svg" alt="Sealsela" className="w-full h-full object-contain block dark:hidden" />
+              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain hidden dark:block" />
             </div>
-            <span className="font-display font-black text-white text-lg tracking-wide group-hover:text-[#34D399] transition-colors drop-shadow-sm">
+            <span className="font-display font-black text-[#0F172A] dark:text-white text-lg tracking-wide group-hover:text-[#059669] dark:group-hover:text-[#34D399] transition-colors drop-shadow-xs">
               Sealsela
             </span>
           </button>
 
           <div className="flex items-center gap-1.5">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-[#34D399] hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer border border-slate-200 dark:border-white/15 active:scale-95 shadow-sm"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle Theme"
+            >
+              {isDark ? <SunIcon size={14} className="text-[#F59E0B]" /> : <MoonIcon size={14} className="text-[#064E3B]" />}
+            </button>
+
+            {/* Language Toggle Button */}
+            <button
+              onClick={toggleLanguage}
+              className="px-2 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 text-[#0F172A] dark:text-white text-xs font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer border border-slate-200 dark:border-white/15 flex items-center gap-1 active:scale-95 shadow-sm"
+              title={isBn ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
+            >
+              <GlobeIcon size={12} className="text-[#059669] dark:text-[#34D399]" />
+              <span className="font-mono text-[10px] font-black uppercase text-[#059669] dark:text-[#34D399]">{isBn ? "EN" : "বাং"}</span>
+            </button>
+
             {onLogout && (
               <button
                 onClick={onLogout}
                 title={isBn ? "লগআউট করুন" : "Log Out"}
-                className="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white flex items-center gap-1 border border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm backdrop-blur-md"
+                className="px-2.5 py-1.5 rounded-xl bg-red-500/10 dark:bg-red-500/20 hover:bg-red-500/20 dark:hover:bg-red-500/30 text-red-700 dark:text-red-200 hover:text-red-900 dark:hover:text-white flex items-center gap-1 border border-red-500/20 dark:border-red-500/30 transition-all cursor-pointer active:scale-95 text-xs font-bold shadow-sm"
               >
                 <LogOutIcon size={13} />
                 <span>{isBn ? "লগ আউট" : "Log Out"}</span>
@@ -183,31 +206,31 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             )}
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="text-[#34D399] text-[11px] font-bold uppercase tracking-wider">
+            <p className="text-[#059669] dark:text-[#34D399] text-[11px] font-bold uppercase tracking-wider">
               {isBn ? "স্বাগতম" : "Welcome"}
             </p>
-            <h1 className="font-display text-xl font-black text-white truncate leading-tight mt-0.5 drop-shadow-sm">{displayName}</h1>
+            <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white truncate leading-tight mt-0.5 drop-shadow-xs">{displayName}</h1>
           </div>
         </div>
 
-        {/* Glass Stats Bar */}
-        <div className="mt-3 bg-[#0F2A1E]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 flex items-center justify-around text-center shadow-2xl">
+        {/* Hero Loyalty / Stats Card (Deep emerald gradient matching reference UI) */}
+        <div className="mt-3 bg-gradient-to-br from-[#064E3B] to-[#0D3824] border border-emerald-500/30 rounded-3xl p-4 flex items-center justify-around text-center shadow-xl text-white">
           <div>
-            <p className="font-display font-black text-white text-xl leading-none">{totalStamps}</p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "মোট সিল" : "Total Stamps"}</p>
+            <p className="font-display font-black text-white text-2xl leading-none">{totalStamps}</p>
+            <p className="text-white/70 text-[11px] mt-1 font-medium">{isBn ? "মোট সিল" : "Total Stamps"}</p>
           </div>
-          <div className="w-px h-7 bg-white/10" />
+          <div className="w-px h-8 bg-white/15" />
           <div>
-            <p className="font-display font-black text-[#34D399] text-xl leading-none">{completedCardsCount}</p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "কার্ড সম্পন্ন" : "Completed"}</p>
+            <p className="font-display font-black text-[#34D399] text-2xl leading-none">{completedCardsCount}</p>
+            <p className="text-white/70 text-[11px] mt-1 font-medium">{isBn ? "কার্ড সম্পন্ন" : "Completed"}</p>
           </div>
-          <div className="w-px h-7 bg-white/10" />
+          <div className="w-px h-8 bg-white/15" />
           <div>
-            <p className="font-display font-black text-[#F59E0B] text-xl leading-none flex items-center justify-center gap-0.5 drop-shadow-xs">
-              <FireIcon size={18} className="text-[#F59E0B]" />
+            <p className="font-display font-black text-[#F59E0B] text-2xl leading-none flex items-center justify-center gap-0.5 drop-shadow-xs">
+              <FireIcon size={20} className="text-[#F59E0B]" />
               {maxStreak}
             </p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "সপ্তাহের ধারা" : "Streak"}</p>
+            <p className="text-white/70 text-[11px] mt-1 font-medium">{isBn ? "সপ্তাহের ধারা" : "Streak"}</p>
           </div>
         </div>
       </div>
@@ -215,14 +238,14 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
       <div className="flex-1 overflow-y-auto px-3.5 pt-1 pb-20 w-full">
         {/* Filter Tabs */}
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-display font-bold text-white text-lg drop-shadow-xs">
+          <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-lg drop-shadow-xs">
             {isBn ? "আমার কার্ডগুলো" : "My Cards"}
           </h2>
-          <div className="flex gap-1 bg-[#092015]/80 backdrop-blur-md p-1 rounded-xl border border-white/10">
+          <div className="flex gap-1 bg-slate-100 dark:bg-[#092015]/80 backdrop-blur-md p-1 rounded-xl border border-slate-200 dark:border-white/10">
             <button
               onClick={() => setFilter("all")}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                filter === "all" ? "bg-[#34D399] text-[#0A2318] shadow-sm" : "text-white/60 hover:text-white"
+                filter === "all" ? "bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] shadow-sm font-black" : "text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {isBn ? `সব (${cards.length})` : `All (${cards.length})`}
@@ -230,7 +253,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             <button
               onClick={() => setFilter("claim")}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                filter === "claim" ? "bg-[#F59E0B] text-[#0A2318] shadow-sm" : "text-white/60 hover:text-white"
+                filter === "claim" ? "bg-[#F59E0B] text-[#0A2318] shadow-sm font-black" : "text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {isBn ? `দাবিযোগ্য (${cards.filter((c) => c.voucherReady).length})` : `Claimable (${cards.filter((c) => c.voucherReady).length})`}
@@ -239,12 +262,12 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-white/70 text-sm">
-            <RefreshIcon size={24} className="animate-spin text-[#34D399] mx-auto mb-2" />
+          <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
+            <RefreshIcon size={24} className="animate-spin text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
             <p>{isBn ? "কার্ড লোড হচ্ছে..." : "Loading cards..."}</p>
           </div>
         ) : filteredCards.length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {filteredCards.map((card) => {
               const cleanMId = (card.merchantId || "").toLowerCase().replace(/[^a-z0-9]/g, "")
               const found = availableMerchants.find((m) => {
@@ -285,17 +308,17 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                 <button
                   key={card.id}
                   onClick={() => onSelectCard(card.merchantId)}
-                  className="w-full text-left rounded-3xl overflow-hidden shadow-2xl transition-all active:scale-[0.99] cursor-pointer hover:border-emerald-400/40 border border-white/10 bg-[#0E281C]/90 backdrop-blur-xl group relative"
+                  className="w-full text-left rounded-3xl overflow-hidden shadow-sm dark:shadow-2xl transition-all active:scale-[0.99] cursor-pointer hover:border-emerald-400/50 border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl group relative text-[#0F172A] dark:text-white"
                 >
                   {/* Realistic Top Cover Banner */}
                   {merchant.coverUrl && (
-                    <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-[#0A2318]">
+                    <div className="relative h-28 sm:h-32 w-full overflow-hidden bg-slate-100 dark:bg-[#0A2318]">
                       <img
                         src={merchant.coverUrl}
                         alt={merchant.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0E281C]/30 to-[#0E281C]" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-transparent dark:via-[#0E281C]/30 dark:to-[#0E281C]" />
                     </div>
                   )}
 
@@ -316,7 +339,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                   <div className={`p-4 ${merchant.coverUrl ? "pt-2" : ""}`}>
                     <div className="flex items-start gap-3 mb-3">
                       <div
-                        className={`w-13 h-13 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-xl border-2 border-white/25 overflow-hidden bg-[#0A2318] glow-emerald ${
+                        className={`w-13 h-13 rounded-2xl flex items-center justify-center font-display font-bold text-base flex-shrink-0 shadow-md border-2 border-white/80 dark:border-white/25 overflow-hidden bg-emerald-800 text-white ${
                           merchant.coverUrl ? "-mt-7 relative z-10" : ""
                         }`}
                         style={{ background: merchant.logoBg || "#0D3824", color: merchant.logoColor || "#34D399" }}
@@ -329,60 +352,60 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-display font-bold text-base truncate text-white group-hover:text-[#34D399] transition-colors">
+                          <p className="font-display font-bold text-base truncate text-[#0F172A] dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#34D399] transition-colors">
                             {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                           </p>
                           {merchant.verified && (
-                            <span className="text-[#34D399] flex-shrink-0 text-sm">✓</span>
+                            <span className="text-[#059669] dark:text-[#34D399] flex-shrink-0 text-sm font-bold">✓</span>
                           )}
                         </div>
-                        <p className="text-xs mt-0.5 text-white/60">
+                        <p className="text-xs mt-0.5 text-slate-500 dark:text-white/60">
                           {merchant.category} {merchant.area ? `· ${merchant.area}` : ""}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className={`font-display font-black text-xl leading-none ${card.voucherReady ? "text-[#F59E0B]" : "text-[#34D399]"}`}>
-                          {card.stamps}<span className="text-sm font-medium text-white/40">/{target}</span>
+                        <p className={`font-display font-black text-xl leading-none ${card.voucherReady ? "text-[#F59E0B]" : "text-[#059669] dark:text-[#34D399]"}`}>
+                          {card.stamps}<span className="text-sm font-medium text-slate-400 dark:text-white/40">/{target}</span>
                         </p>
-                        <p className="text-xs mt-0.5 text-white/50 font-medium">{isBn ? "সিল" : "Stamps"}</p>
+                        <p className="text-xs mt-0.5 text-slate-400 dark:text-white/50 font-medium">{isBn ? "সিল" : "Stamps"}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-[#071D13] border border-emerald-500/20 mb-3">
+                    <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-[#071D13] border border-slate-200/80 dark:border-emerald-500/20 mb-3">
                       <StampGrid filled={card.stamps} total={target} size="sm" variant="coffee" />
-                      <span className="text-[11px] font-black text-[#34D399] font-mono whitespace-nowrap">
+                      <span className="text-[11px] font-black text-[#059669] dark:text-[#34D399] font-mono whitespace-nowrap">
                         {card.stamps}/{target} ☕
                       </span>
                     </div>
 
-                    <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                      <p className="text-xs text-white/80">
+                    <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
+                      <p className="text-xs text-slate-700 dark:text-white/80">
                         {card.voucherReady ? (
                           <span className="font-bold text-[#F59E0B]">
                             {card.rewardText || (isBn ? "পুরস্কার প্রস্তুত" : "Reward Ready")}
                           </span>
                         ) : isNearComplete ? (
-                          <span className="text-[#F59E0B] font-bold flex items-center gap-1">
-                            <FireIcon size={12} className="inline text-[#F59E0B]" />
+                          <span className="text-[#D97706] dark:text-[#F59E0B] font-bold flex items-center gap-1">
+                            <FireIcon size={12} className="inline text-[#D97706] dark:text-[#F59E0B]" />
                             {isBn ? "আর মাত্র ১টি সিল বাকি!" : "Only 1 stamp left!"}
                           </span>
                         ) : (
                           <>
                             {isBn ? (
-                              <>আর <span className="font-bold text-[#34D399]">{remaining}টি</span> সিলে: {card.rewardText || "পুরস্কার"}</>
+                              <>আর <span className="font-bold text-[#059669] dark:text-[#34D399]">{remaining}টি</span> সিলে: {card.rewardText || "পুরস্কার"}</>
                             ) : (
-                              <><span className="font-bold text-[#34D399]">{remaining} stamps</span> until: {card.rewardText || "Reward"}</>
+                              <><span className="font-bold text-[#059669] dark:text-[#34D399]">{remaining} stamps</span> until: {card.rewardText || "Reward"}</>
                             )}
                           </>
                         )}
                       </p>
-                      <p className="text-xs font-medium text-white/40">
+                      <p className="text-xs font-medium text-slate-400 dark:text-white/40">
                         {formatVisitDate(card.lastVisit || card.updatedAt, isBn)}
                       </p>
                     </div>
 
                     {!card.voucherReady && (
-                      <div className="mt-2.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div className="mt-2.5 h-1.5 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-[#10B981] to-[#34D399] transition-all duration-500 shadow-sm"
                           style={{ width: `${pct}%` }}
@@ -397,12 +420,12 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         ) : (
           /* When 0 cards scanned yet, show available restaurants & cafes */
           <div className="space-y-4">
-            <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-2xl text-center border border-emerald-500/20">
-              <CompassIcon size={32} className="text-[#34D399] mx-auto mb-2" />
-              <p className="font-display font-bold text-white text-lg drop-shadow-sm">
+            <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-sm dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+              <CompassIcon size={32} className="text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
+              <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg drop-shadow-xs">
                 {isBn ? "উপলব্ধ ক্যাফে ও রেস্তোরাঁ" : "Available Cafes & Stores"}
               </p>
-              <p className="text-white/60 text-xs leading-relaxed mt-1">
+              <p className="text-slate-500 dark:text-white/60 text-xs leading-relaxed mt-1">
                 {isBn
                   ? "নিচের যেকোনো দোকানে ক্লিক করে স্ট্যাম্প কার্ড দেখুন ও সিল সংগ্রহ করুন"
                   : "Tap any store below to view their loyalty card and start stamping"}
@@ -415,11 +438,11 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                   <button
                     key={merchant.id}
                     onClick={() => onSelectCard(merchant.id)}
-                    className="w-full text-left bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl p-4 transition-all active:scale-[0.99] hover:border-emerald-400/40 border border-white/10 cursor-pointer group"
+                    className="w-full text-left bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl overflow-hidden shadow-sm dark:shadow-2xl p-4 transition-all active:scale-[0.99] hover:border-emerald-400/50 border border-slate-200/80 dark:border-white/10 cursor-pointer group text-[#0F172A] dark:text-white"
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-base flex-shrink-0 shadow-md border border-white/15"
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-black text-base flex-shrink-0 shadow-sm border border-slate-200 dark:border-white/15"
                         style={{
                           background: merchant.logoBg || "#D8EDDF",
                           color: merchant.logoColor || "#1B4332",
@@ -429,27 +452,27 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-display font-bold text-base text-white group-hover:text-[#34D399] transition-colors truncate">
+                          <p className="font-display font-bold text-base text-[#0F172A] dark:text-white group-hover:text-[#059669] dark:group-hover:text-[#34D399] transition-colors truncate">
                             {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                           </p>
                           {merchant.verified && (
-                            <span className="text-[#34D399] text-xs font-bold">✓</span>
+                            <span className="text-[#059669] dark:text-[#34D399] text-xs font-bold">✓</span>
                           )}
                         </div>
-                        <p className="text-xs text-white/60 mt-0.5">
+                        <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5">
                           {merchant.category} · {merchant.area || (isBn ? "ঢাকা" : "Dhaka")}
                         </p>
                       </div>
-                      <span className="text-[#0A2318] font-black text-xs bg-[#34D399] px-3 py-1 rounded-full flex-shrink-0 shadow-sm">
+                      <span className="text-white dark:text-[#0A2318] font-black text-xs bg-[#059669] dark:bg-[#34D399] px-3 py-1 rounded-full flex-shrink-0 shadow-sm">
                         {isBn ? "কার্ড খুলুন →" : "Open Card →"}
                       </span>
                     </div>
 
                     <StampGrid filled={0} total={5} size="sm" />
 
-                    <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/10 flex items-center justify-between text-xs text-slate-600 dark:text-white/70">
                       <span>{isBn ? "🎁 অর্ডারে ফ্রি উপহার রিওয়ার্ড পান" : "🎁 Earn free rewards on orders"}</span>
-                      <span className="text-[#34D399] font-bold">{isBn ? "স্ট্যাম্প কার্ড দেখুন" : "View Card"}</span>
+                      <span className="text-[#059669] dark:text-[#34D399] font-bold">{isBn ? "স্ট্যাম্প কার্ড দেখুন" : "View Card"}</span>
                     </div>
                   </button>
                 ))}
@@ -458,10 +481,10 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
           </div>
         )}
 
-        <div className="mt-6 p-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md flex items-center gap-3 text-white/60">
+        <div className="mt-6 p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-white/5 backdrop-blur-md flex items-center gap-3 text-slate-600 dark:text-white/60 shadow-sm">
           <span className="text-2xl">🏪</span>
           <div>
-            <p className="text-sm font-medium text-white/80">
+            <p className="text-sm font-medium text-[#0F172A] dark:text-white/80">
               {isBn ? "একটি অ্যাকাউন্ট, সব দোকান" : "One Account, All Stores"}
             </p>
             <p className="text-xs mt-0.5">

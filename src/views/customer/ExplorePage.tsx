@@ -70,24 +70,24 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent w-full">
+    <div className="flex flex-col h-full bg-transparent w-full text-[#0F172A] dark:text-white transition-colors">
       <div className="px-3.5 pt-5 pb-3">
-        <h1 className="font-display text-xl font-black text-white mb-2.5 drop-shadow-sm">
+        <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white mb-2.5 drop-shadow-xs">
           {isBn ? "আশেপাশের দোকান" : "Nearby Stores"}
         </h1>
         <div className="relative">
-          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/50" />
+          <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/50" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={isBn ? "দোকান বা এলাকা খুঁজুন..." : "Search store or area..."}
-            className="w-full bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl pl-10 pr-4 py-2.5 text-white placeholder-white/40 text-sm outline-none focus:border-[#34D399] transition-colors shadow-lg"
+            className="w-full bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200 dark:border-emerald-500/20 rounded-2xl pl-10 pr-4 py-2.5 text-[#0F172A] dark:text-white placeholder-slate-400 dark:placeholder-white/40 text-sm outline-none focus:border-[#059669] dark:focus:border-[#34D399] transition-colors shadow-sm"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/60 text-xs hover:text-white cursor-pointer"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/60 text-xs hover:text-[#0F172A] dark:hover:text-white cursor-pointer"
             >
               ✕
             </button>
@@ -103,8 +103,8 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
               onClick={() => setSelectedCategory(cat.value)}
               className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 selectedCategory === cat.value
-                  ? "bg-[#34D399] text-[#0A2318] shadow-md glow-emerald"
-                  : "bg-[#0E281C]/70 backdrop-blur-md text-white/70 border border-white/10 hover:text-white"
+                  ? "bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] shadow-sm"
+                  : "bg-white dark:bg-[#0E281C]/70 backdrop-blur-md text-slate-600 dark:text-white/70 border border-slate-200 dark:border-white/10 hover:text-[#0F172A] dark:hover:text-white shadow-xs"
               }`}
             >
               {cat.emoji ? `${cat.emoji} ` : ""}{cat.label}
@@ -115,7 +115,7 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-white/60 text-xs font-medium">
+          <p className="text-slate-500 dark:text-white/60 text-xs font-medium">
             {loading
               ? isBn
                 ? "খোঁজা হচ্ছে..."
@@ -125,40 +125,40 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
               : `${merchants.length} stores found`}
           </p>
           {coords && (
-            <p className="text-[#34D399] text-xs flex items-center gap-1 font-bold">
-              <MapPinIcon size={12} className="text-[#34D399]" /> {isBn ? "আপনার আশেপাশে" : "Nearby you"}
+            <p className="text-[#059669] dark:text-[#34D399] text-xs flex items-center gap-1 font-bold">
+              <MapPinIcon size={12} className="text-[#059669] dark:text-[#34D399]" /> {isBn ? "আপনার আশেপাশে" : "Nearby you"}
             </p>
           )}
         </div>
 
         {error && (
-          <div className="mb-3 bg-red-500/20 border border-red-400/40 text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
+          <div className="mb-3 bg-red-500/10 dark:bg-red-500/20 border border-red-400/40 text-red-700 dark:text-red-200 text-xs px-4 py-3 rounded-2xl backdrop-blur-md">
             ⚠️ {error}
           </div>
         )}
 
         {loading ? (
-          <div className="py-12 text-center text-white/70 text-sm">
-            <RefreshIcon size={24} className="animate-spin text-[#34D399] mx-auto mb-2" />
+          <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
+            <RefreshIcon size={24} className="animate-spin text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
             <p>{isBn ? "দোকানের তালিকা লোড হচ্ছে..." : "Loading stores..."}</p>
           </div>
         ) : merchants.length === 0 ? (
-          <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-2xl text-center border border-emerald-500/20">
-            <SearchIcon size={32} className="text-[#34D399] mx-auto mb-2" />
-            <p className="font-bold text-white">{isBn ? "কোনো দোকান খুঁজে পাওয়া যায়নি" : "No stores found"}</p>
-            <p className="text-xs text-white/60 mt-1">
+          <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-sm dark:shadow-2xl text-center border border-slate-200 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
+            <SearchIcon size={32} className="text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
+            <p className="font-bold text-[#0F172A] dark:text-white">{isBn ? "কোনো দোকান খুঁজে পাওয়া যায়নি" : "No stores found"}</p>
+            <p className="text-xs text-slate-500 dark:text-white/60 mt-1">
               {isBn ? "অন্য কোনো নাম বা ক্যাটাগরি দিয়ে অনুসন্ধান করুন" : "Try searching with another name or category"}
             </p>
           </div>
         ) : (
-          <div className="space-y-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {merchants.map((merchant) => (
               <div
                 key={merchant.id}
                 onClick={() => onSelectMerchant && onSelectMerchant(merchant.id)}
-                className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl cursor-pointer transition-all active:scale-[0.99] hover:border-emerald-400/40 border border-white/10 group"
+                className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl overflow-hidden shadow-sm dark:shadow-2xl cursor-pointer transition-all active:scale-[0.99] hover:border-emerald-400/50 border border-slate-200/80 dark:border-white/10 group text-[#0F172A] dark:text-white"
               >
-                <div className="h-32 relative bg-[#071D13] overflow-hidden">
+                <div className="h-32 relative bg-slate-100 dark:bg-[#071D13] overflow-hidden">
                   {merchant.coverUrl ? (
                     <img
                       src={merchant.coverUrl}
@@ -181,11 +181,11 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0E281C] via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 dark:from-[#0E281C] via-transparent to-transparent" />
 
                   <div className="absolute top-3 left-3">
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-sm shadow-md overflow-hidden bg-[#0A2318] border border-white/20"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center font-display font-bold text-sm shadow-md overflow-hidden bg-slate-900 border border-white/20"
                     >
                       {merchant.logoUrl ? (
                         <img src={merchant.logoUrl} alt={merchant.name} className="w-full h-full object-cover" />
@@ -198,8 +198,8 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                   </div>
                   <div className="absolute top-3 right-3 flex gap-2">
                     {merchant.verified && (
-                      <span className="bg-[#10B981]/20 text-[#34D399] border border-[#10B981]/30 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1 backdrop-blur-md shadow-xs">
-                        <ShieldCheckIcon size={10} /> {isBn ? "যাচাইকৃত" : "Verified"}
+                      <span className="bg-[#059669]/90 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
+                        ✓ {isBn ? "যাচাইকৃত" : "Verified"}
                       </span>
                     )}
                     <span
@@ -215,20 +215,20 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-display font-bold text-white text-lg leading-tight group-hover:text-[#34D399] transition-colors">
+                      <h3 className="font-display font-bold text-[#0F172A] dark:text-white text-lg leading-tight group-hover:text-[#059669] dark:group-hover:text-[#34D399] transition-colors">
                         {(!isBn && merchant.nameEn) ? merchant.nameEn : merchant.name}
                       </h3>
-                      <p className="text-white/60 text-xs mt-0.5">{categoryLabel(merchant.category)}</p>
+                      <p className="text-slate-500 dark:text-white/60 text-xs mt-0.5">{categoryLabel(merchant.category, isBn)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[#34D399] font-bold text-xs flex items-center justify-end gap-1">
+                      <p className="text-[#059669] dark:text-[#34D399] font-bold text-xs flex items-center justify-end gap-1">
                         <MapPinIcon size={12} /> {merchant.distance || (isBn ? "১৫০মি" : "150m")}
                       </p>
-                      <p className="text-white/40 text-[11px] mt-0.5">{merchant.area}</p>
+                      <p className="text-slate-400 dark:text-white/40 text-[11px] mt-0.5">{merchant.area}</p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-white/60 mb-3.5 leading-relaxed">{merchant.address}</p>
+                  <p className="text-xs text-slate-500 dark:text-white/60 mb-3.5 leading-relaxed">{merchant.address}</p>
 
                   <div className="flex items-center gap-2">
                     <button
@@ -237,24 +237,24 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
                         e.stopPropagation()
                         if (onSelectMerchant) onSelectMerchant(merchant.id)
                       }}
-                      className="flex-1 bg-gradient-to-r from-[#10B981]/20 to-[#047857]/30 hover:from-[#10B981]/30 hover:to-[#047857]/40 border border-[#10B981]/30 rounded-2xl px-4 py-2.5 flex items-center justify-between transition-all cursor-pointer text-left active:scale-[0.98]"
+                      className="flex-1 bg-emerald-50 dark:bg-gradient-to-r dark:from-[#10B981]/20 dark:to-[#047857]/30 hover:bg-emerald-100 dark:hover:from-[#10B981]/30 dark:hover:to-[#047857]/40 border border-emerald-200 dark:border-[#10B981]/30 rounded-2xl px-4 py-2.5 flex items-center justify-between transition-all cursor-pointer text-left active:scale-[0.98]"
                     >
                       <div>
-                        <p className="text-[#34D399] text-xs font-black">
+                        <p className="text-[#059669] dark:text-[#34D399] text-xs font-black">
                           {isBn ? "লয়্যালটি কার্ড দেখুন" : "View Loyalty Card"}
                         </p>
-                        <p className="text-white/60 text-[10px] mt-0.5">
+                        <p className="text-slate-500 dark:text-white/60 text-[10px] mt-0.5">
                           {isBn ? "স্ট্যাম্প সংগ্রহ করতে ক্লিক করুন" : "Click to collect stamps"}
                         </p>
                       </div>
-                      <span className="text-[#34D399] font-black text-sm group-hover:translate-x-1 transition-transform">→</span>
+                      <span className="text-[#059669] dark:text-[#34D399] font-black text-sm group-hover:translate-x-1 transition-transform">→</span>
                     </button>
                     <a
                       href={`https://maps.google.com/?q=${merchant.lat},${merchant.lng}`}
                       target="_blank"
                       rel="noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="px-4 py-2.5 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 text-xs font-bold transition-all cursor-pointer backdrop-blur-md"
+                      className="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white/80 text-xs font-bold transition-all cursor-pointer"
                     >
                       {isBn ? "ম্যাপ" : "Map"}
                     </a>

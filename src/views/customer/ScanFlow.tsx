@@ -487,15 +487,15 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
   const selectedMerchant = merchants.find((m) => m.id === selectedMerchantId) || null
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F5F0]">
+    <div className="flex flex-col h-full bg-[#F6F9F7] dark:bg-[#071D13] text-[#0F172A] dark:text-white">
       {/* Header */}
-      <div className="bg-[#1B4332] px-5 pt-12 pb-5 text-white">
+      <div className="bg-gradient-to-r from-[#064E3B] to-[#0D3824] dark:from-[#0E281C] dark:to-[#0A2318] px-5 pt-12 pb-5 text-white border-b border-emerald-800/30 dark:border-white/10 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold text-white">
               {isBn ? "রিয়েল-টাইম QR স্ক্যানার" : "Real-Time QR Scanner"}
             </h1>
-            <p className="text-[#52B788] text-xs mt-0.5">
+            <p className="text-[#34D399] text-xs mt-0.5">
               {isBn ? "দোকানের কাউন্টার কিউআর কোডে ক্যামেরা তাক করুন" : "Point your camera at the store counter QR code"}
             </p>
           </div>
@@ -504,8 +504,8 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
               {torchSupported && (
                 <button
                   onClick={toggleTorch}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                    torchOn ? "bg-[#F59E0B] text-[#1B4332]" : "bg-white/10 text-white hover:bg-white/20"
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                    torchOn ? "bg-[#F59E0B] text-[#0A2318]" : "bg-white/10 text-white hover:bg-white/20"
                   }`}
                   title={isBn ? "টর্চ অন/অফ" : "Toggle Flashlight"}
                 >
@@ -514,7 +514,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
               )}
               <button
                 onClick={handleFlipCamera}
-                className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer"
                 title={isBn ? "ক্যামেরা পরিবর্তন" : "Switch Camera"}
               >
                 <FlipCameraIcon size={16} />
@@ -586,7 +586,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
 
             {/* Quick Actions Bar (Photo upload & direct test) */}
             <div className="flex items-center justify-center gap-2 mb-4">
-              <label className="cursor-pointer px-3.5 py-2 rounded-xl bg-white border border-[#E9E5DC] text-[#1B4332] text-xs font-bold flex items-center gap-1.5 shadow-xs hover:bg-[#F7F5F0]">
+              <label className="cursor-pointer px-3.5 py-2 rounded-xl bg-white dark:bg-[#0E281C] border border-slate-200 dark:border-white/10 text-[#064E3B] dark:text-[#34D399] text-xs font-bold flex items-center gap-1.5 shadow-xs hover:bg-slate-50 dark:hover:bg-white/5">
                 <span>{isBn ? "🖼️ ছবি থেকে QR স্ক্যান" : "🖼️ Upload QR Photo"}</span>
                 <input
                   type="file"
@@ -603,23 +603,23 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         {step === "pending" && (
           <div className="w-full max-w-sm animate-fade-in text-center py-4">
             <div className="relative mx-auto w-24 h-24 mb-5">
-              <div className="absolute inset-0 rounded-full bg-[#D8EDDF] animate-ping opacity-70" />
-              <div className="relative w-24 h-24 rounded-full bg-[#D8EDDF] flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 animate-ping opacity-70" />
+              <div className="relative w-24 h-24 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 flex items-center justify-center">
                 <span className="text-4xl animate-bounce">⏳</span>
               </div>
             </div>
 
-            <h2 className="font-display font-bold text-[#1A1916] text-2xl mb-1">
+            <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-2xl mb-1">
               {isBn ? `অনুমোদনের অপেক্ষায়${".".repeat(dots)}` : `Waiting for Approval${".".repeat(dots)}`}
             </h2>
-            <p className="text-[#6B6158] text-xs mb-5 leading-relaxed">
+            <p className="text-slate-500 dark:text-white/60 text-xs mb-5 leading-relaxed">
               {isBn
                 ? "কাউন্টার স্টাফ আপনার স্ক্যান ও বিল যাচাই করছে। অনুগ্রহ করে কয়েক সেকেন্ড অপেক্ষা করুন।"
                 : "Counter staff is verifying your stamp request. Please wait a moment."}
             </p>
 
             {selectedMerchant && (
-              <div className="bg-white rounded-2xl p-4 card-shadow mb-4 text-left border border-[#E9E5DC]">
+              <div className="bg-white dark:bg-[#0E281C] rounded-2xl p-4 card-shadow mb-4 text-left border border-slate-200 dark:border-white/10">
                 <div className="flex items-center gap-3">
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-sm"
@@ -628,23 +628,23 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
                     {selectedMerchant.logoInitials}
                   </div>
                   <div>
-                    <p className="font-display font-bold text-[#1A1916]">
+                    <p className="font-display font-bold text-[#0F172A] dark:text-white">
                       {(!isBn && selectedMerchant.nameEn) ? selectedMerchant.nameEn : selectedMerchant.name}
                     </p>
-                    <p className="text-[#6B6158] text-xs">{selectedMerchant.area}</p>
+                    <p className="text-slate-500 dark:text-white/60 text-xs">{selectedMerchant.area}</p>
                   </div>
                 </div>
               </div>
             )}
 
             <div className="flex items-center justify-center gap-2 mb-5">
-              <div className="w-full h-2 bg-[#E9E5DC] rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#F59E0B] rounded-full transition-all duration-1000"
                   style={{ width: `${(secondsLeft / 60) * 100}%` }}
                 />
               </div>
-              <span className="text-[#6B6158] text-xs font-mono min-w-[2.5rem] text-right">{secondsLeft}s</span>
+              <span className="text-slate-500 dark:text-white/60 text-xs font-mono min-w-[2.5rem] text-right">{secondsLeft}s</span>
             </div>
           </div>
         )}
@@ -653,22 +653,22 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         {step === "confirmed" && (
           <div className="w-full max-w-sm text-center animate-slide-up py-4">
             <div className="relative mx-auto w-24 h-24 mb-4">
-              <div className="absolute inset-0 rounded-full bg-[#D8EDDF] scale-110" />
-              <div className="relative w-24 h-24 rounded-full bg-[#1B4332] flex items-center justify-center shadow-lg text-white text-4xl">
+              <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 scale-110" />
+              <div className="relative w-24 h-24 rounded-full bg-[#064E3B] dark:bg-[#10B981] flex items-center justify-center shadow-lg text-white dark:text-[#0A2318] text-4xl">
                 ✓
               </div>
             </div>
 
-            <h2 className="font-display font-black text-[#1A1916] text-3xl mb-1">
+            <h2 className="font-display font-black text-[#0F172A] dark:text-white text-3xl mb-1">
               {isBn ? "সিল পেয়েছেন!" : "Stamp Received!"}
             </h2>
-            <p className="text-[#6B6158] text-xs mb-5">
+            <p className="text-slate-500 dark:text-white/60 text-xs mb-5">
               {isBn
                 ? `${selectedMerchant?.name || "দোকান"} থেকে ১টি নতুন সিল আপনার লয়্যালটি কার্ডে যুক্ত হয়েছে`
                 : `1 new stamp added to your loyalty card at ${selectedMerchant?.name || "Store"}`}
             </p>
 
-            <div className="bg-white rounded-3xl p-5 card-shadow mb-5 text-left border border-[#E9E5DC]">
+            <div className="bg-white dark:bg-[#0E281C] rounded-3xl p-5 card-shadow mb-5 text-left border border-slate-200 dark:border-white/10">
               <div className="flex items-center gap-3 mb-4">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-sm"
@@ -677,10 +677,10 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
                   {selectedMerchant?.logoInitials || (isBn ? "সি" : "S")}
                 </div>
                 <div className="flex-1">
-                  <p className="font-display font-bold text-[#1A1916]">
+                  <p className="font-display font-bold text-[#0F172A] dark:text-white">
                     {selectedMerchant ? ((!isBn && selectedMerchant.nameEn) ? selectedMerchant.nameEn : selectedMerchant.name) : (isBn ? "দোকান" : "Store")}
                   </p>
-                  <p className="text-[#52B788] text-xs font-bold">
+                  <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold">
                     {stampsData
                       ? isBn
                         ? `${stampsData.stamps} / ${stampsData.target} সিল সম্পন্ন`
@@ -694,9 +694,9 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
 
               <StampGrid filled={stampsData?.stamps ?? 0} total={stampsData?.target ?? 0} size="sm" />
 
-              <div className="mt-4 pt-3 border-t border-[#E9E5DC] flex items-center justify-between text-xs">
-                <span className="text-[#6B6158]">{isBn ? "আজকের স্ট্যাম্প প্রাপ্তি" : "Today's stamp credit"}</span>
-                <span className="font-bold text-[#1B4332] bg-[#D8EDDF] px-2 py-0.5 rounded-full">
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
+                <span className="text-slate-500 dark:text-white/60">{isBn ? "আজকের স্ট্যাম্প প্রাপ্তি" : "Today's stamp credit"}</span>
+                <span className="font-bold text-[#064E3B] dark:text-[#34D399] bg-emerald-100 dark:bg-[#10B981]/20 px-2 py-0.5 rounded-full">
                   {isBn ? "✓ ভেরিফায়েড" : "✓ Verified"}
                 </span>
               </div>
@@ -713,7 +713,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
                     setStep("scan")
                   }
                 }}
-                className="w-full py-3.5 rounded-2xl bg-[#1B4332] text-white font-display font-bold text-sm flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full py-3.5 rounded-2xl bg-[#064E3B] dark:bg-[#10B981] text-white dark:text-[#0A2318] font-display font-bold text-sm flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] transition-all cursor-pointer"
               >
                 <span>{isBn ? "কার্ড দেখুন ও পয়েন্ট চেক করুন" : "View Card & Rewards"}</span>
                 <ChevronRightIcon size={16} />
@@ -721,7 +721,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
 
               <button
                 onClick={() => setStep("scan")}
-                className="w-full py-3 rounded-2xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs hover:bg-white active:scale-[0.98] cursor-pointer"
+                className="w-full py-3 rounded-2xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/70 font-bold text-xs hover:bg-white dark:hover:bg-white/5 active:scale-[0.98] cursor-pointer"
               >
                 {isBn ? "আরেকটি কিউআর স্ক্যান করুন" : "Scan Another QR"}
               </button>
@@ -732,20 +732,20 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         {/* Rejected Screen */}
         {step === "rejected" && (
           <div className="w-full max-w-sm text-center animate-fade-in py-4">
-            <div className="w-20 h-20 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-4xl mx-auto mb-4">
+            <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-4xl mx-auto mb-4">
               ✕
             </div>
-            <h2 className="font-display font-bold text-[#1A1916] text-2xl mb-1">
+            <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-2xl mb-1">
               {isBn ? "অনুমোদন প্রত্যাখ্যাত" : "Request Rejected"}
             </h2>
-            <p className="text-[#6B6158] text-xs mb-6 leading-relaxed">
+            <p className="text-slate-500 dark:text-white/60 text-xs mb-6 leading-relaxed">
               {isBn
                 ? "কাউন্টার স্টাফ এই মুহূর্তে স্ক্যানটি অনুমোদন করেননি। বিল বা অর্ডার সম্পর্কিত তথ্যের জন্য ক্যাশিয়ারের সাথে যোগাযোগ করুন।"
                 : "Counter staff did not approve the scan. Please check your bill or order with the cashier."}
             </p>
             <button
               onClick={() => setStep("scan")}
-              className="w-full py-3.5 rounded-2xl bg-[#1B4332] text-white font-bold text-sm cursor-pointer"
+              className="w-full py-3.5 rounded-2xl bg-[#064E3B] dark:bg-[#10B981] text-white dark:text-[#0A2318] font-bold text-sm cursor-pointer shadow-md"
             >
               {isBn ? "আবার স্ক্যান করুন" : "Scan Again"}
             </button>
@@ -755,13 +755,13 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         {/* Error / Geofence Fault Screen */}
         {step === "error" && (
           <div className="w-full max-w-sm text-center animate-fade-in py-4">
-            <div className="w-20 h-20 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-3xl mx-auto mb-4">
+            <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 flex items-center justify-center text-3xl mx-auto mb-4">
               ⚠️
             </div>
-            <h2 className="font-display font-bold text-[#1A1916] text-xl mb-2">
+            <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-xl mb-2">
               {isBn ? "স্ক্যান সম্পন্ন হয়নি" : "Scan Failed"}
             </h2>
-            <p className="text-red-700 bg-red-50 p-3.5 rounded-2xl text-xs mb-6 leading-relaxed border border-red-200 text-left">
+            <p className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/20 p-3.5 rounded-2xl text-xs mb-6 leading-relaxed border border-red-200 dark:border-red-500/30 text-left">
               {errorMsg || (isBn ? "স্ক্যান যাচাই ব্যর্থ হয়েছে" : "QR verification failed")}
             </p>
             <button
@@ -769,7 +769,7 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
                 setErrorMsg(null)
                 setStep("scan")
               }}
-              className="w-full py-3.5 rounded-2xl bg-[#1B4332] text-white font-bold text-sm shadow-sm cursor-pointer"
+              className="w-full py-3.5 rounded-2xl bg-[#064E3B] dark:bg-[#10B981] text-white dark:text-[#0A2318] font-bold text-sm shadow-md cursor-pointer"
             >
               {isBn ? "পুনরায় চেষ্টা করুন" : "Try Again"}
             </button>

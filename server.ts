@@ -40,7 +40,20 @@ async function startServer() {
   const PORT = 3000
 
   app.use(cors())
-  app.use(express.json())
+  app.use(express.json({ limit: "1mb" })) // Protect against large payload DoS
+
+  // Production Security Headers Middleware
+  app.use((_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff")
+    res.setHeader("X-Frame-Options", "SAMEORIGIN")
+    res.setHeader("X-XSS-Protection", "1; mode=block")
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin")
+    res.setHeader("Permissions-Policy", "camera=(self), microphone=(), geolocation=()")
+    if (process.env.NODE_ENV === "production") {
+      res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    }
+    next()
+  })
 
   // API Routes
   app.use("/api/auth", authRoutes)

@@ -1,11 +1,17 @@
 import { Router } from "express"
 import { db, calculateDistanceMeters } from "../db.js"
+import { requireMerchantOwner, getAuthenticatedUser } from "../middleware/auth.js"
+import { generateSecureId } from "../services/cryptoService.js"
 
 const router = Router()
 
 // Scan QR code -> Create Pending Approval (PRD E2.2, E2.6, E2.7)
 router.post("/scan", (req, res) => {
-  const { merchantId, customerId, customerName, customerPhone, scanLat, scanLng } = req.body
+  const user = getAuthenticatedUser(req)
+  const { merchantId, customerId: bodyCustomerId, customerName, customerPhone, scanLat, scanLng } = req.body
+
+  // Derive verified customer identity
+  const customerId = user && user.role === "customer" ? user.sub : bodyCustomerId
 
   if (!merchantId || !customerId) {
     res.status(400).json({ error: "মার্চেন্ট এবং কাস্টমার তথ্য প্রয়োজন" })
@@ -22,7 +28,6 @@ router.post("/scan", (req, res) => {
     })
   }
 
-  // Create temporary in-memory placeholder if freshly started serverless instance
   if (!merchant) {
     merchant = {
       id: merchantId,
@@ -34,9 +39,7 @@ router.post("/scan", (req, res) => {
     } as any
   }
 
-  // 1. Geofence Verification (PRD E2.6: Scans beyond 200m rejected)
-  // Unknown location stays unknown — it is never reported as a plausible-looking
-  // distance the counter staff might trust.
+  // 1. Geofence Verification (PRD E2.6: Scans beyond allowedRadius rejected)
   let distanceMeters = -1
   if (typeof scanLat === "number" && typeof scanLng === "number" && merchant.lat && merchant.lng) {
     distanceMeters = calculateDistanceMeters(scanLat, scanLng, merchant.lat, merchant.lng)
@@ -96,7 +99,6 @@ router.post("/scan", (req, res) => {
     return
   }
 
-
   // Check if there is already an active pending approval for this customer at this merchant
   const existingPending = db
     .getPendingApprovals(merchantId)
@@ -112,17 +114,13 @@ router.post("/scan", (req, res) => {
   }
 
   const customer = db.getCustomerById(customerId)
-  if (!customer) {
-    res.status(404).json({ error: "কাস্টমার পাওয়া যায়নি" })
-    return
-  }
-  const cName = customerName || customer.name || ""
-  const cPhone = customerPhone || customer.phone || ""
+  const cName = customerName || customer?.name || "গ্রাহক"
+  const cPhone = customerPhone || customer?.phone || ""
 
   const now = Date.now()
   const newApproval = db.addPendingApproval({
-    id: `pa_${now}_${Math.floor(Math.random() * 1000)}`,
-    merchantId,
+    id: generateSecureId("pa"),
+    merchantId: merchant.id,
     customerId,
     customerName: cName,
     customerPhone: cPhone,
@@ -142,18 +140,14 @@ router.post("/scan", (req, res) => {
   })
 })
 
-// List Pending Approvals for Merchant (PRD E2.3, E5.3)
-router.get("/", (req, res) => {
-  const { merchantId } = req.query
-  if (!merchantId || typeof merchantId !== "string") {
-    res.json(db.getPendingApprovals())
-    return
-  }
+// List Pending Approvals for Merchant (Gated by requireMerchantOwner)
+router.get("/", requireMerchantOwner("merchantId"), (req, res) => {
+  const merchantId = req.merchantId!
   const approvals = db.getPendingApprovals(merchantId)
   res.json(approvals)
 })
 
-// Check status of a single pending approval (for customer polling during scan flow)
+// Check status of a single pending approval (scoped to customer or merchant)
 router.get("/:id/status", (req, res) => {
   const approval = db.getPendingApprovalById(req.params.id)
   if (!approval) {
@@ -177,17 +171,42 @@ router.get("/:id/status", (req, res) => {
   })
 })
 
-// Resolve Pending Approval (Approve / Reject) (PRD E2.4)
+// Resolve Pending Approval (Approve / Reject) (Requires Merchant Owner OR valid Staff PIN)
 router.post("/:id/resolve", (req, res) => {
-  const { resolution, staffId } = req.body
+  const user = getAuthenticatedUser(req)
+  const { resolution, staffId, staffPin } = req.body
 
   if (!resolution || !["approved", "rejected"].includes(resolution)) {
     res.status(400).json({ error: "সঠিক রেজোলিউশন (approved/rejected) প্রদান করুন" })
     return
   }
 
-  const sId = staffId || "owner"
-  const result = db.resolvePendingApproval(req.params.id, resolution as "approved" | "rejected", sId)
+  const approval = db.getPendingApprovalById(req.params.id)
+  if (!approval) {
+    res.status(404).json({ error: "অনুমোদন পাওয়া যায়নি বা মেয়াদোত্তীর্ণ" })
+    return
+  }
+
+  let authorizedStaff = "owner"
+
+  // Check 1: Authenticated Merchant Owner / Admin
+  if (user && (user.role === "admin" || (user.role === "merchant" && db.isMerchantOwnedBy(approval.merchantId, user.phone || "")))) {
+    authorizedStaff = user.role === "admin" ? "admin" : (staffId || "owner")
+  } else if (staffPin) {
+    // Check 2: Valid Counter Staff PIN for this merchant
+    const staff = db.verifyStaffPin(approval.merchantId, String(staffPin))
+    if (!staff) {
+      res.status(403).json({ error: "অবৈধ স্টাফ পিন (Invalid Staff PIN)" })
+      return
+    }
+    authorizedStaff = staff.id
+  } else {
+    // Block unauthorized callers
+    res.status(401).json({ error: "অনুমোদন নিশ্চিত করতে মার্চেন্ট লগইন অথবা স্টাফ পিন প্রয়োজন" })
+    return
+  }
+
+  const result = db.resolvePendingApproval(req.params.id, resolution as "approved" | "rejected", authorizedStaff)
 
   if (!result) {
     res.status(404).json({ error: "মেয়াদোত্তীর্ণ বা অনির্দিষ্ট অনুমোদন" })

@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import { useLanguage } from "../../context/LanguageContext"
+import { useTheme } from "../../context/ThemeContext"
 import {
   LogOutIcon,
   ChevronRightIcon,
@@ -14,6 +15,8 @@ import {
   CheckIcon,
   RefreshIcon,
   XIcon,
+  SunIcon,
+  MoonIcon,
 } from "../../components/Icons"
 
 interface ProfilePageProps {
@@ -23,6 +26,7 @@ interface ProfilePageProps {
 export default function ProfilePage({ onBack }: ProfilePageProps) {
   const { user, profile, logout, updateSessionProfile } = useAuth()
   const { language, isBn, toggleLanguage, setLanguage } = useLanguage()
+  const { isDark, toggleTheme } = useTheme()
   const swipeHandlers = useSwipeBack(onBack)
   const lang = isBn ? "বাংলা" : "English"
 
@@ -96,7 +100,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         const ctx = canvas.getContext("2d")
         if (!ctx) return
 
-        ctx.fillStyle = "#071D13"
+        ctx.fillStyle = isDark ? "#071D13" : "#F6F9F7"
         ctx.fillRect(0, 0, targetSize, targetSize)
 
         const minDim = Math.min(img.width, img.height)
@@ -118,20 +122,17 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           photoURL: compressedDataUrl,
         }).catch(console.warn)
 
-        // 2. Update local session profile
-        updateSessionProfile({
-          avatarUrl: compressedDataUrl,
-          photoURL: compressedDataUrl,
-        })
+        // 2. Update local state
         setAvatarUrl(compressedDataUrl)
+        updateSessionProfile({ avatarUrl: compressedDataUrl })
         setRawImage(null)
         setSavingPhoto(false)
-        setPhotoToast(isBn ? "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে ✓" : "Profile photo updated successfully ✓")
-        setTimeout(() => setPhotoToast(null), 3000)
+        setPhotoToast(isBn ? "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!" : "Profile photo updated successfully!")
+        setTimeout(() => setPhotoToast(null), 3500)
       }
       img.src = rawImage
     } catch (err) {
-      console.error("Failed to save cropped photo:", err)
+      console.error("Failed to crop image:", err)
       setSavingPhoto(false)
     }
   }
@@ -139,13 +140,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   async function handleRemovePhoto() {
     if (!customerId) return
     setAvatarUrl("")
-    if (fileInputRef.current) fileInputRef.current.value = ""
     await firebaseService.updateCustomerProfile(customerId, {
       avatarUrl: "",
       photoURL: "",
     }).catch(console.warn)
-    updateSessionProfile({ avatarUrl: "", photoURL: "" })
-    setPhotoToast(isBn ? "প্রোফাইল ছবি মুছে ফেলা হয়েছে" : "Profile photo removed")
+    updateSessionProfile({ avatarUrl: "" })
+    setPhotoToast(isBn ? "ছবি মুছে ফেলা হয়েছে" : "Photo removed")
     setTimeout(() => setPhotoToast(null), 3000)
   }
 
@@ -174,7 +174,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent" {...swipeHandlers}>
+    <div className="flex flex-col h-full bg-transparent text-[#0F172A] dark:text-white transition-colors" {...swipeHandlers}>
       {/* Hidden File Input */}
       <input
         ref={fileInputRef}
@@ -186,23 +186,24 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
       <div className="px-3.5 pt-5 pb-3 w-full">
         {/* Top Navigation Row */}
-        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-200 dark:border-white/10">
           <button
             onClick={onBack}
             className="flex items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             title={isBn ? "হোমে ফিরুন" : "Back to Home"}
           >
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 p-1 flex items-center justify-center shadow-sm border border-emerald-500/30 flex-shrink-0">
-              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain" />
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 dark:bg-emerald-500/20 p-1 flex items-center justify-center shadow-xs border border-emerald-500/25 dark:border-emerald-500/30 flex-shrink-0">
+              <img src="/sealsela-logo-light.svg" alt="Sealsela" className="w-full h-full object-contain block dark:hidden" />
+              <img src="/sealsela-logo-dark.svg" alt="Sealsela" className="w-full h-full object-contain hidden dark:block" />
             </div>
-            <span className="font-display font-black text-white text-base tracking-wide group-hover:text-[#34D399] transition-colors">
+            <span className="font-display font-black text-[#0F172A] dark:text-white text-base tracking-wide group-hover:text-[#059669] dark:group-hover:text-[#34D399] transition-colors">
               Sealsela
             </span>
           </button>
 
           <button
             onClick={onBack}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-white/10"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-[#0F172A] dark:text-white text-xs font-semibold backdrop-blur-md transition-colors cursor-pointer border border-slate-200 dark:border-white/10"
           >
             <ChevronLeftIcon size={14} />
             <span>{isBn ? "হোমে ফিরুন" : "Home"}</span>
@@ -210,9 +211,9 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
 
         {/* Profile Card Header with 1:1 Avatar & Upload Button */}
-        <div className="flex items-center gap-3.5 bg-[#0E281C]/90 backdrop-blur-xl border border-emerald-500/25 p-3.5 rounded-3xl shadow-xl">
+        <div className="flex items-center gap-3.5 bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/25 p-3.5 rounded-3xl shadow-sm dark:shadow-xl">
           <div className="relative group flex-shrink-0">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-xl glow-emerald relative">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500/40 bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-md dark:shadow-xl dark:glow-emerald relative">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={customer.name} className="w-full h-full object-cover" />
               ) : (
@@ -223,7 +224,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <button
               onClick={() => fileInputRef.current?.click()}
               title={isBn ? "ছবি পরিবর্তন করুন" : "Change photo"}
-              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#F59E0B] text-[#0A2318] flex items-center justify-center shadow-lg border-2 border-white dark:border-[#0E281C] hover:scale-110 active:scale-95 transition-all cursor-pointer glow-amber"
             >
               <CameraIcon size={12} />
             </button>
@@ -231,16 +232,16 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <h1 className="font-display text-lg font-black text-white truncate">{customer.name}</h1>
-              <span className="text-[#34D399] text-xs font-bold bg-[#34D399]/20 px-1.5 py-0.5 rounded-md border border-[#34D399]/30">
+              <h1 className="font-display text-lg font-black text-[#0F172A] dark:text-white truncate">{customer.name}</h1>
+              <span className="text-[#059669] dark:text-[#34D399] text-xs font-bold bg-emerald-50 dark:bg-[#34D399]/20 px-1.5 py-0.5 rounded-md border border-emerald-200 dark:border-[#34D399]/30">
                 {isBn ? "গ্রাহক" : "Customer"}
               </span>
             </div>
-            <p className="text-white/60 font-mono text-xs mt-0.5">{customer.phone}</p>
+            <p className="text-slate-500 dark:text-white/60 font-mono text-xs mt-0.5">{customer.phone}</p>
             {avatarUrl && (
               <button
                 onClick={handleRemovePhoto}
-                className="mt-1 text-[11px] text-red-400 hover:text-red-300 font-semibold cursor-pointer underline transition-colors"
+                className="mt-1 text-[11px] text-red-500 dark:text-red-400 hover:text-red-600 font-semibold cursor-pointer underline transition-colors"
               >
                 {isBn ? "ছবি মুছুন" : "Remove photo"}
               </button>
@@ -250,7 +251,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
         {/* Toast notification */}
         {photoToast && (
-          <div className="mt-3 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in backdrop-blur-md">
+          <div className="mt-3 bg-emerald-50 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/40 text-[#059669] dark:text-[#34D399] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in backdrop-blur-md">
             <CheckIcon size={14} />
             <span>{photoToast}</span>
           </div>
@@ -259,13 +260,13 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-1 w-full">
         {/* PDPA 2026 Compliance Badge */}
-        <div className="bg-[#0E281C]/80 border border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-xl">
-          <ShieldCheckIcon size={22} className="text-[#34D399] flex-shrink-0" />
+        <div className="bg-white dark:bg-[#0E281C]/80 border border-slate-200/80 dark:border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-sm dark:shadow-xl">
+          <ShieldCheckIcon size={22} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
           <div>
-            <p className="text-[#34D399] font-bold text-xs">
+            <p className="text-[#059669] dark:text-[#34D399] font-bold text-xs">
               {isBn ? "বাংলাদেশ PDPA ২০২৬ সুরক্ষিত" : "Bangladesh PDPA 2026 Protected"}
             </p>
-            <p className="text-white/60 text-[11px] mt-0.5 leading-relaxed">
+            <p className="text-slate-500 dark:text-white/60 text-[11px] mt-0.5 leading-relaxed">
               {isBn
                 ? "আপনার ডেটা সম্পূর্ণ এনক্রিপ্ট করা ও আইনানুযায়ী যেকোনো সময় সম্পূর্ণ মুছে ফেলার অধিকার সংরক্ষিত।"
                 : "Your data is fully encrypted with guaranteed right to erasure under Bangladesh data law."}
@@ -273,67 +274,83 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
         </div>
 
-        <div className="bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden mb-4">
+        <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-2xl overflow-hidden mb-4">
+          {/* Theme Switcher Row */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+          >
+            <span className="text-xl w-8 flex-shrink-0">{isDark ? "🌙" : "☀️"}</span>
+            <p className="flex-1 text-left font-semibold text-sm text-[#0F172A] dark:text-white">
+              {isBn ? "থিম (Theme)" : "Theme (থিম)"}
+            </p>
+            <span className="text-xs bg-slate-100 dark:bg-[#34D399]/20 text-[#0F172A] dark:text-[#34D399] border border-slate-200 dark:border-[#34D399]/30 px-3 py-1 rounded-full font-bold flex items-center gap-1">
+              {isDark ? <MoonIcon size={12} /> : <SunIcon size={12} />}
+              <span>{isDark ? (isBn ? "ডার্ক মোড" : "Dark Mode") : (isBn ? "লাইট মোড" : "Light Mode")}</span>
+            </span>
+            <ChevronRightIcon size={16} className="text-slate-400 dark:text-white/40" />
+          </button>
+
           <button
             onClick={toggleLanguage}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <span className="text-xl w-8 flex-shrink-0">🌐</span>
-            <p className="flex-1 text-left font-semibold text-sm text-white">
+            <p className="flex-1 text-left font-semibold text-sm text-[#0F172A] dark:text-white">
               {isBn ? "ভাষা (Language)" : "Language (ভাষা)"}
             </p>
-            <span className="text-xs bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 px-3 py-1 rounded-full font-bold">
+            <span className="text-xs bg-emerald-50 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30 px-3 py-1 rounded-full font-bold">
               {lang}
             </span>
-            <ChevronRightIcon size={16} className="text-white/40" />
+            <ChevronRightIcon size={16} className="text-slate-400 dark:text-white/40" />
           </button>
 
           <button
             onClick={() => setNotifications((n) => !n)}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
-            <BellIcon size={18} className="text-[#34D399] flex-shrink-0" />
-            <p className="flex-1 text-left font-semibold text-sm text-white">
+            <BellIcon size={18} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
+            <p className="flex-1 text-left font-semibold text-sm text-[#0F172A] dark:text-white">
               {isBn ? "নোটিফিকেশন ও অ্যালার্ট" : "Notifications & Alerts"}
             </p>
             <span
               className={`text-xs px-3 py-1 rounded-full font-bold ${
                 notifications
-                  ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30"
-                  : "bg-white/10 text-white/50"
+                  ? "bg-emerald-50 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30"
+                  : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white/50"
               }`}
             >
               {notifications ? (isBn ? "চালু" : "ON") : isBn ? "বন্ধ" : "OFF"}
             </span>
-            <ChevronRightIcon size={16} className="text-white/40" />
+            <ChevronRightIcon size={16} className="text-slate-400 dark:text-white/40" />
           </button>
 
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-500/10 transition-colors text-red-400 cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-4 hover:bg-red-500/10 transition-colors text-red-500 cursor-pointer"
           >
-            <LogOutIcon size={18} className="text-red-400 flex-shrink-0" />
+            <LogOutIcon size={18} className="text-red-500 flex-shrink-0" />
             <div className="flex-1 text-left">
-              <p className="font-bold text-sm text-red-300">
+              <p className="font-bold text-sm text-red-600 dark:text-red-300">
                 {isBn ? "আমার ডেটা ও সিল মুছে ফেলুন" : "Delete My Data & Stamps"}
               </p>
-              <p className="text-[10px] text-red-400/70">
+              <p className="text-[10px] text-red-500/70 dark:text-red-400/70">
                 {isBn ? "Right to erasure (PDPA ২০২৬ ধারা ৬৩)" : "Right to erasure (PDPA 2026 Section 63)"}
               </p>
             </div>
-            <ChevronRightIcon size={16} className="text-red-400/50" />
+            <ChevronRightIcon size={16} className="text-red-500/50" />
           </button>
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 text-white/80 font-bold text-sm transition-all cursor-pointer backdrop-blur-md active:scale-95"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-slate-200 dark:border-white/15 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-white/80 font-bold text-sm transition-all cursor-pointer shadow-xs active:scale-95"
         >
           <LogOutIcon size={16} />
           {isBn ? "লগ আউট" : "Log Out"}
         </button>
 
-        <p className="text-center text-white/30 text-xs mt-6">Sealsela v1.0.0</p>
+        <p className="text-center text-slate-400 dark:text-white/30 text-xs mt-6">Sealsela v1.0.0</p>
       </div>
 
       {/* PDPA Erasure Modal */}

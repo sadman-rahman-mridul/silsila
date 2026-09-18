@@ -734,7 +734,16 @@ export const firebaseService = {
 
           // If voucher is ready, generate and save unique voucher code
           if (voucherReady) {
-            const randStr = Math.random().toString(36).substring(2, 6).toUpperCase()
+            const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+            const randomBytes = new Uint8Array(4)
+            if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+              crypto.getRandomValues(randomBytes)
+            } else {
+              for (let i = 0; i < 4; i++) randomBytes[i] = Math.floor(Math.random() * 256)
+            }
+            let randStr = ""
+            for (let i = 0; i < 4; i++) randStr += chars[randomBytes[i] % chars.length]
+
             const cleanSlug = (merchantData?.slug || merchantId).replace(/[^a-zA-Z0-9]/g, "").slice(0, 5).toUpperCase()
             const code = existingCard?.voucherCode || `SL-${cleanSlug || "M1"}-${randStr}`
             const vRef = doc(firestore, "vouchers", code)
@@ -766,7 +775,14 @@ export const firebaseService = {
           const snapAfter = await getDoc(approvalRef)
           const approvalData = snapAfter.data() as any
           if (approvalData) {
-            const stampLogId = `stamp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+            const randomBytes = new Uint8Array(4)
+            if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+              crypto.getRandomValues(randomBytes)
+            } else {
+              for (let i = 0; i < 4; i++) randomBytes[i] = Math.floor(Math.random() * 256)
+            }
+            const stampSuffix = Array.from(randomBytes).map((b) => b.toString(16).padStart(2, "0")).join("")
+            const stampLogId = `stamp_${Date.now()}_${stampSuffix}`
             await setDoc(doc(firestore, "stamps", stampLogId), {
               id: stampLogId,
               approvalId,
@@ -1291,6 +1307,104 @@ export const firebaseService = {
     } catch (err) {
       console.warn("Failed to get merchant stats from Firestore:", err)
       return defaultStats
+    }
+  },
+
+  // ----------------------------------------------------
+  // ADMIN DASHBOARD & MERCHANT APPROVAL METHODS
+  // ----------------------------------------------------
+
+  /** Subscribe to all merchants with pending approval */
+  subscribePendingMerchants(callback: (merchants: any[]) => void) {
+    const merchantsCol = collection(firestore, MERCHANTS)
+    return onSnapshot(merchantsCol, (snap) => {
+      const pending: any[] = []
+      snap.forEach((docSnap) => {
+        const data = docSnap.data()
+        if (data.approvalStatus === "pending_approval" || data.status === "pending") {
+          pending.push({ id: docSnap.id, ...data })
+        }
+      })
+      callback(pending)
+    }, (err) => {
+      console.warn("Error subscribing to pending merchants:", err)
+      callback([])
+    })
+  },
+
+  /** Fetch all registered merchants */
+  async fetchAllMerchants(): Promise<any[]> {
+    try {
+      const snap = await getDocs(collection(firestore, MERCHANTS))
+      const merchants: any[] = []
+      snap.forEach((docSnap) => {
+        merchants.push({ id: docSnap.id, ...docSnap.data() })
+      })
+      return merchants
+    } catch (err) {
+      console.error("Failed to fetch merchants from Firestore:", err)
+      return []
+    }
+  },
+
+  /** Fetch all registered customer users */
+  async fetchAllUsers(): Promise<any[]> {
+    try {
+      const snap = await getDocs(collection(firestore, USERS))
+      const users: any[] = []
+      snap.forEach((docSnap) => {
+        users.push({ id: docSnap.id, ...docSnap.data() })
+      })
+      return users
+    } catch (err) {
+      console.error("Failed to fetch users from Firestore:", err)
+      return []
+    }
+  },
+
+  /** Approve or Reject merchant */
+  async updateMerchantApproval(
+    merchantId: string,
+    approvalStatus: "approved" | "rejected",
+    extra?: { reason?: string }
+  ) {
+    const merchantRef = doc(firestore, MERCHANTS, merchantId)
+    const updateData: any = {
+      approvalStatus,
+      status: approvalStatus === "approved" ? "active" : "rejected",
+      verified: approvalStatus === "approved",
+      updatedAt: serverTimestamp(),
+    }
+    if (approvalStatus === "approved") {
+      updateData.approvedAt = serverTimestamp()
+    } else {
+      updateData.rejectedAt = serverTimestamp()
+      if (extra?.reason) updateData.rejectionReason = extra.reason
+    }
+
+    await updateDoc(merchantRef, updateData)
+
+    // Call backend to sync if available
+    try {
+      const { api } = await import("./api")
+      await api.performOpsAction(merchantId, approvalStatus === "approved" ? "approve" : "suspend").catch(() => {})
+    } catch {
+      // Ignored
+    }
+  },
+
+  /** Send Approval SMS notification via BulkSMS BD */
+  async sendApprovalSms(phone: string, merchantSlug?: string) {
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://sealsela.com"
+    const loginUrl = merchantSlug ? `${origin}/${merchantSlug}` : `${origin}/merchant`
+    const message = `Welcome to Sealsela Merchant account. Your verification is completed. Go to ${loginUrl} to sign in.`
+
+    try {
+      const { api } = await import("./api")
+      return await api.sendSms(phone, message)
+    } catch (err) {
+      console.error("Failed to send approval SMS:", err)
+      return { success: false, error: "SMS sending failed" }
     }
   },
 }

@@ -65,50 +65,50 @@ export default function RewardsPage() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-transparent w-full">
+    <div className="flex flex-col h-full bg-transparent w-full text-[#0F172A] dark:text-white transition-colors">
       <div className="px-3.5 pt-5 pb-3 w-full">
-        <h1 className="font-display text-xl font-black text-white mb-0.5 drop-shadow-sm">
+        <h1 className="font-display text-xl font-black text-[#0F172A] dark:text-white mb-0.5 drop-shadow-xs">
           {isBn ? "পুরস্কার" : "Rewards"}
         </h1>
-        <p className="text-[#34D399] text-xs font-semibold">
+        <p className="text-[#059669] dark:text-[#34D399] text-xs font-semibold">
           {isBn ? "আপনার অর্জিত সব উপহার ও ভাউচার" : "All your earned gifts and vouchers"}
         </p>
         <div className="mt-3.5 flex gap-2">
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-white text-xl leading-none">{vouchers.length}</p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "মোট অর্জিত" : "Total Earned"}</p>
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
+            <p className="font-display font-black text-[#0F172A] dark:text-white text-xl leading-none">{vouchers.length}</p>
+            <p className="text-slate-500 dark:text-white/60 text-[11px] mt-1 font-medium">{isBn ? "মোট অর্জিত" : "Total Earned"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-[#F59E0B] text-xl leading-none">{activeVouchers.length}</p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "দাবিযোগ্য" : "Claimable"}</p>
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
+            <p className="font-display font-black text-[#D97706] dark:text-[#F59E0B] text-xl leading-none">{activeVouchers.length}</p>
+            <p className="text-slate-500 dark:text-white/60 text-[11px] mt-1 font-medium">{isBn ? "দাবিযোগ্য" : "Claimable"}</p>
           </div>
-          <div className="flex-1 bg-[#0E281C]/80 backdrop-blur-xl border border-emerald-500/20 rounded-2xl p-3 text-center shadow-lg">
-            <p className="font-display font-black text-[#34D399] text-xl leading-none">{redeemedVouchers.length}</p>
-            <p className="text-white/60 text-[11px] mt-1 font-medium">{isBn ? "ব্যবহৃত" : "Redeemed"}</p>
+          <div className="flex-1 bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl border border-slate-200/80 dark:border-emerald-500/20 rounded-2xl p-3 text-center shadow-sm dark:shadow-lg">
+            <p className="font-display font-black text-[#059669] dark:text-[#34D399] text-xl leading-none">{redeemedVouchers.length}</p>
+            <p className="text-slate-500 dark:text-white/60 text-[11px] mt-1 font-medium">{isBn ? "ব্যবহৃত" : "Redeemed"}</p>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         {loading ? (
-          <div className="py-16 text-center text-white/70 text-sm">
+          <div className="py-16 text-center text-slate-500 dark:text-white/70 text-sm">
             <span className="inline-block animate-spin text-3xl mb-3">⏳</span>
-            <p className="font-bold text-white">{isBn ? "পুরস্কার লোড হচ্ছে..." : "Loading rewards..."}</p>
+            <p className="font-bold text-[#0F172A] dark:text-white">{isBn ? "পুরস্কার লোড হচ্ছে..." : "Loading rewards..."}</p>
           </div>
         ) : vouchers.length === 0 ? (
-          <div className="py-14 text-center bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl p-6 border border-emerald-500/20 shadow-2xl">
-            <div className="w-16 h-16 rounded-2xl bg-[#FEF3C7]/20 border border-[#FEF3C7]/30 text-[#F59E0B] flex items-center justify-center mx-auto mb-3 shadow-lg">
+          <div className="py-14 text-center bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 dark:border-emerald-500/20 shadow-sm dark:shadow-2xl">
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-[#FEF3C7]/20 border border-amber-200 dark:border-[#FEF3C7]/30 text-[#D97706] dark:text-[#F59E0B] flex items-center justify-center mx-auto mb-3 shadow-sm">
               <GiftIcon size={32} />
             </div>
-            <h2 className="font-display font-black text-white text-lg mb-1">
+            <h2 className="font-display font-black text-[#0F172A] dark:text-white text-lg mb-1">
               {isBn ? "এখনো কোনো পুরস্কার অর্জিত হয়নি" : "No rewards earned yet"}
             </h2>
-            <p className="text-white/60 text-xs max-w-xs mx-auto leading-relaxed mb-4">
+            <p className="text-slate-500 dark:text-white/60 text-xs max-w-xs mx-auto leading-relaxed mb-4">
               {isBn
                 ? "দোকানে সিল সম্পন্ন করে বিনামূল্যে উপহার ও ভাউচার আনলক করুন!"
                 : "Complete loyalty stamps at partner stores to unlock free vouchers!"}
             </p>
-            <div className="inline-flex items-center gap-1.5 bg-[#10B981]/20 border border-[#10B981]/40 text-[#34D399] text-xs px-3.5 py-1.5 rounded-full font-bold">
+            <div className="inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/40 text-[#059669] dark:text-[#34D399] text-xs px-3.5 py-1.5 rounded-full font-bold">
               <SparklesIcon size={14} />
               <span>{isBn ? "কার্ড সম্পন্ন করলেই ভাউচার কোড মিলবে" : "Complete cards to receive voucher codes"}</span>
             </div>
@@ -117,13 +117,13 @@ export default function RewardsPage() {
           <>
             {activeVouchers.length > 0 && (
               <div className="mb-6">
-                <h2 className="font-display font-bold text-white text-base mb-3 flex items-center gap-1.5 drop-shadow-xs">
-                  <GiftIcon size={16} className="text-[#F59E0B]" />
+                <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base mb-3 flex items-center gap-1.5 drop-shadow-xs">
+                  <GiftIcon size={16} className="text-[#D97706] dark:text-[#F59E0B]" />
                   <span>{isBn ? `দাবি করার অপেক্ষায় (${activeVouchers.length})` : `Ready to Claim (${activeVouchers.length})`}</span>
                 </h2>
                 <div className="space-y-3.5">
                   {activeVouchers.map((voucher) => (
-                    <div key={voucher.id} className="bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-emerald-500/25">
+                    <div key={voucher.id} className="bg-white dark:bg-[#0E281C]/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-sm dark:shadow-2xl border border-slate-200/80 dark:border-emerald-500/25">
                       <div className="bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] px-4 py-2 flex items-center justify-between text-[#0A2318] shadow-sm">
                         <div className="flex items-center gap-2">
                           <GiftIcon size={13} className="text-[#0A2318]" />
@@ -135,26 +135,26 @@ export default function RewardsPage() {
                       </div>
                       <div className="p-4">
                         <div className="mb-3">
-                          <p className="text-white font-display font-bold text-base">
+                          <p className="text-[#0F172A] dark:text-white font-display font-bold text-base">
                             {voucher.merchantName || (isBn ? "লয়্যালটি পুরস্কার" : "Loyalty Reward")}
                           </p>
-                          <p className="text-[#34D399] text-xs font-bold mt-0.5">{voucher.rewardText}</p>
+                          <p className="text-[#059669] dark:text-[#34D399] text-xs font-bold mt-0.5">{voucher.rewardText}</p>
                         </div>
-                        <div className="bg-[#071D13] border border-[#34D399]/30 rounded-2xl p-3.5 mb-3 flex items-center justify-between shadow-inner">
+                        <div className="bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-[#34D399]/30 rounded-2xl p-3.5 mb-3 flex items-center justify-between shadow-inner">
                           <div>
-                            <p className="text-white/50 text-[10px] mb-0.5 font-medium">{isBn ? "ভাউচার কোড" : "Voucher Code"}</p>
-                            <p className="font-display font-black text-[#F59E0B] text-xl tracking-widest">{voucher.code}</p>
+                            <p className="text-slate-400 dark:text-white/50 text-[10px] mb-0.5 font-medium">{isBn ? "ভাউচার কোড" : "Voucher Code"}</p>
+                            <p className="font-display font-black text-[#D97706] dark:text-[#F59E0B] text-xl tracking-widest">{voucher.code}</p>
                           </div>
                           <button
                             onClick={() => copyCode(voucher.code)}
-                            className="bg-[#34D399] text-[#0A2318] text-xs px-3.5 py-1.5 rounded-xl font-black shadow-sm active:scale-95 cursor-pointer"
+                            className="bg-[#059669] dark:bg-[#34D399] text-white dark:text-[#0A2318] text-xs px-3.5 py-1.5 rounded-xl font-black shadow-sm active:scale-95 cursor-pointer"
                           >
                             {copiedCode === voucher.code ? (isBn ? "কপি হয়েছে ✓" : "Copied ✓") : isBn ? "কপি" : "Copy"}
                           </button>
                         </div>
-                        <div className="flex items-center justify-between text-white/50 text-xs">
+                        <div className="flex items-center justify-between text-slate-400 dark:text-white/50 text-xs">
                           <div className="flex items-center gap-1">
-                            <ClockIcon size={11} className="text-[#F59E0B]" />
+                            <ClockIcon size={11} className="text-[#D97706] dark:text-[#F59E0B]" />
                             <span>{isBn ? "মেয়াদ: ৩০ দিন" : "Validity: 30 days"}</span>
                           </div>
                           <span className="text-[10px]">{isBn ? "কাউন্টারে স্টাফ পিন দিয়ে রিডিম হবে" : "Redeemable with staff PIN"}</span>
@@ -167,31 +167,31 @@ export default function RewardsPage() {
             )}
 
             <div>
-              <h2 className="font-display font-bold text-white text-base mb-3 drop-shadow-xs">
+              <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base mb-3 drop-shadow-xs">
                 {isBn ? "ইতিহাস (রিডিমকৃত)" : "Redemption History"}
               </h2>
               <div className="space-y-2.5">
                 {redeemedVouchers.length > 0 ? (
                   redeemedVouchers.map((item) => (
-                    <div key={item.id} className="bg-[#0E281C]/80 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-white/10 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30 flex items-center justify-center flex-shrink-0 font-bold">
+                    <div key={item.id} className="bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl rounded-2xl p-4 shadow-sm dark:shadow-xl border border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-emerald-200 dark:border-[#34D399]/30 flex items-center justify-center flex-shrink-0 font-bold">
                         ✓
                       </div>
                       <div className="flex-1">
-                        <p className="font-display font-bold text-white text-sm">{item.merchantName}</p>
-                        <p className="text-[#34D399] text-xs font-medium">{item.rewardText}</p>
-                        <p className="text-white/40 text-[11px] mt-0.5">
+                        <p className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{item.merchantName}</p>
+                        <p className="text-[#059669] dark:text-[#34D399] text-xs font-medium">{item.rewardText}</p>
+                        <p className="text-slate-400 dark:text-white/40 text-[11px] mt-0.5">
                           {isBn ? "রিডিম: " : "Redeemed: "}
                           {item.redeemedAt ? new Date(item.redeemedAt).toLocaleDateString(isBn ? "bn-BD" : "en-US") : (isBn ? "সম্পন্ন" : "Completed")}
                         </p>
                       </div>
-                      <span className="text-xs text-[#34D399] bg-[#34D399]/15 border border-[#34D399]/20 px-2.5 py-1 rounded-full font-bold">
+                      <span className="text-xs text-[#059669] dark:text-[#34D399] bg-emerald-50 dark:bg-[#34D399]/15 border border-emerald-200 dark:border-[#34D399]/20 px-2.5 py-1 rounded-full font-bold">
                         {isBn ? "ব্যবহৃত" : "Redeemed"}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-white/50 py-3 text-center bg-[#0E281C]/60 rounded-2xl border border-white/5">
+                  <p className="text-xs text-slate-400 dark:text-white/50 py-3 text-center bg-slate-50 dark:bg-[#0E281C]/60 rounded-2xl border border-slate-200/80 dark:border-white/5">
                     {isBn ? "কোনো অতীত রিডিম রেকর্ড নেই" : "No past redemption records"}
                   </p>
                 )}

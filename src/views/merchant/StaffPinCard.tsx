@@ -99,13 +99,13 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-3xl card-shadow p-5 border border-[#E9E5DC]">
-      <div className="flex items-start justify-between gap-3 mb-3 pb-2 border-b border-[#E9E5DC]">
+    <div className="bg-white dark:bg-[#0E281C] rounded-3xl card-shadow p-5 border border-slate-200 dark:border-white/10">
+      <div className="flex items-start justify-between gap-3 mb-3 pb-2 border-b border-slate-200 dark:border-white/10">
         <div>
-          <h2 className="font-display font-bold text-[#1A1916] text-base flex items-center gap-2">
+          <h2 className="font-display font-bold text-[#0F172A] dark:text-white text-base flex items-center gap-2">
             {isBn ? "স্টাফ মোড পিন" : "Staff Mode PIN"}
           </h2>
-          <p className="text-xs text-[#6B6158] mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-white/60 mt-0.5">
             {isBn
               ? "কাউন্টার স্টাফ এই ৪ সংখ্যার পিন দিয়ে অনুমোদন স্ক্রিন খুলবেন"
               : "Counter staff will use this 4-digit PIN to access approvals"}
@@ -113,7 +113,9 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
         </div>
         <span
           className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-            hasPin ? "text-[#1B4332] bg-[#D8EDDF]" : "text-[#B45309] bg-[#FEF3C7]"
+            hasPin
+              ? "text-emerald-800 dark:text-[#34D399] bg-emerald-100 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/30"
+              : "text-amber-800 dark:text-[#F59E0B] bg-amber-100 dark:bg-[#FEF3C7]/20 border border-amber-200 dark:border-[#FEF3C7]/30"
           }`}
         >
           {hasPin ? (isBn ? "সেট করা আছে" : "Active") : (isBn ? "সেট করা হয়নি" : "Not Set")}
@@ -121,13 +123,13 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       </div>
 
       {notice && (
-        <div className="mb-3 bg-[#D8EDDF] border border-[#52B788] text-[#1B4332] px-3.5 py-2.5 rounded-xl text-xs font-bold">
+        <div className="mb-3 bg-emerald-50 dark:bg-[#10B981]/20 border border-emerald-200 dark:border-[#10B981]/40 text-emerald-800 dark:text-[#34D399] px-3.5 py-2.5 rounded-xl text-xs font-bold">
           {notice}
         </div>
       )}
 
       {error && (
-        <div className="mb-3 bg-red-50 border border-red-200 text-red-600 px-3.5 py-2.5 rounded-xl text-xs font-medium">
+        <div className="mb-3 bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-400/40 text-red-600 dark:text-red-300 px-3.5 py-2.5 rounded-xl text-xs font-medium">
           ⚠️ {error}
         </div>
       )}
@@ -135,13 +137,13 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       {stage === "idle" && (
         <div className="space-y-3">
           {hasPin ? (
-            <p className="text-xs text-[#6B6158]">
+            <p className="text-xs text-slate-600 dark:text-white/60">
               {isBn
                 ? `পিন সক্রিয় আছে${updatedAt ? ` · সর্বশেষ পরিবর্তন ${new Date(updatedAt).toLocaleDateString("bn-BD")}` : ""}। নিরাপত্তার কারণে পিনটি কোথাও দেখানো হয় না।`
                 : `PIN is active${updatedAt ? ` · Last updated ${new Date(updatedAt).toLocaleDateString()}` : ""}. For security, the PIN is never displayed.`}
             </p>
           ) : (
-            <p className="text-xs text-[#6B6158]">
+            <p className="text-xs text-slate-600 dark:text-white/60">
               {isBn
                 ? "এখনো কোনো পিন সেট করা হয়নি। পিন সেট না করা পর্যন্ত স্টাফ মোড খোলা যাবে না।"
                 : "No PIN has been set yet. Staff mode cannot be accessed until a PIN is created."}
@@ -150,7 +152,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
 
           <button
             onClick={() => setStage("enter_pin")}
-            className="w-full py-3 rounded-xl bg-[#1B4332] hover:bg-[#143427] text-white font-bold text-xs transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full py-3 rounded-xl bg-[#064E3B] dark:bg-[#10B981] hover:bg-[#043d2e] dark:hover:bg-[#059669] text-white dark:text-[#0A2318] font-bold text-xs transition-all active:scale-[0.98] cursor-pointer shadow-md"
           >
             {hasPin ? (isBn ? "পিন পরিবর্তন করুন" : "Change PIN") : (isBn ? "নতুন পিন তৈরি করুন" : "Create New PIN")}
           </button>
@@ -160,7 +162,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       {stage === "enter_pin" && (
         <div className="space-y-3">
           <div>
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+            <label className="text-slate-600 dark:text-white/60 text-xs font-semibold block mb-1">
               {isBn ? "নতুন ৪ সংখ্যার পিন" : "New 4-digit PIN"}
             </label>
             <input
@@ -170,12 +172,12 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="••••"
-              className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-lg tracking-[0.4em] text-center font-bold text-[#1A1916] outline-none focus:border-[#1B4332]"
+              className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-lg tracking-[0.4em] text-center font-bold text-[#0F172A] dark:text-white outline-none focus:border-[#059669] dark:focus:border-[#34D399]"
             />
           </div>
 
           <div>
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+            <label className="text-slate-600 dark:text-white/60 text-xs font-semibold block mb-1">
               {isBn ? "পিন পুনরায় লিখুন" : "Re-enter PIN"}
             </label>
             <input
@@ -185,11 +187,11 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               value={confirmPin}
               onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
               placeholder="••••"
-              className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-lg tracking-[0.4em] text-center font-bold text-[#1A1916] outline-none focus:border-[#1B4332]"
+              className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-lg tracking-[0.4em] text-center font-bold text-[#0F172A] dark:text-white outline-none focus:border-[#059669] dark:focus:border-[#34D399]"
             />
           </div>
 
-          <p className="text-[11px] text-[#6B6158] bg-[#F0F7F2] border border-[#52B788]/30 rounded-xl px-3 py-2">
+          <p className="text-[11px] text-slate-600 dark:text-white/70 bg-emerald-50 dark:bg-[#0E281C] border border-emerald-200 dark:border-emerald-500/30 rounded-xl px-3 py-2">
             {isBn
               ? `নিশ্চিত করতে মালিকের নম্বরে${ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} একটি OTP পাঠানো হবে।`
               : `An OTP will be sent to the owner's phone${ownerPhoneMasked ? ` (${ownerPhoneMasked})` : ""} to confirm.`}
@@ -198,14 +200,14 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
           <div className="flex gap-2">
             <button
               onClick={resetFlow}
-              className="flex-1 py-3 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs cursor-pointer"
+              className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 font-bold text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5"
             >
               {isBn ? "বাতিল" : "Cancel"}
             </button>
             <button
               onClick={handleRequestOtp}
               disabled={busy}
-              className="flex-[2] py-3 rounded-xl bg-[#F59E0B] text-[#1B4332] font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="flex-[2] py-3 rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#0A2318] font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md"
             >
               {busy ? <RefreshIcon size={14} className="animate-spin" /> : null}
               {isBn ? "OTP পাঠান" : "Send OTP"}
@@ -217,7 +219,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
       {stage === "verify_otp" && (
         <div className="space-y-3">
           <div>
-            <label className="text-[#6B6158] text-xs font-semibold block mb-1">
+            <label className="text-slate-600 dark:text-white/60 text-xs font-semibold block mb-1">
               {isBn ? "মালিকের নম্বরে পাঠানো ৬ সংখ্যার OTP" : "6-digit OTP sent to owner's phone"}
             </label>
             <input
@@ -228,21 +230,21 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
               placeholder="------"
-              className="w-full bg-[#F7F5F0] border border-[#E9E5DC] rounded-xl px-3.5 py-2.5 text-lg tracking-[0.3em] text-center font-bold text-[#1A1916] outline-none focus:border-[#1B4332]"
+              className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-lg tracking-[0.3em] text-center font-bold text-[#0F172A] dark:text-white outline-none focus:border-[#059669] dark:focus:border-[#34D399]"
             />
           </div>
 
           <div className="flex gap-2">
             <button
               onClick={resetFlow}
-              className="flex-1 py-3 rounded-xl border border-[#E9E5DC] text-[#6B6158] font-bold text-xs cursor-pointer"
+              className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 font-bold text-xs cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5"
             >
               {isBn ? "বাতিল" : "Cancel"}
             </button>
             <button
               onClick={handleConfirm}
               disabled={busy}
-              className="flex-[2] py-3 rounded-xl bg-[#1B4332] text-white font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="flex-[2] py-3 rounded-xl bg-[#064E3B] dark:bg-[#10B981] text-white dark:text-[#0A2318] font-black text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-md"
             >
               {busy ? <RefreshIcon size={14} className="animate-spin" /> : <CheckIcon size={14} />}
               {isBn ? "পিন নিশ্চিত করুন" : "Confirm PIN"}
@@ -252,7 +254,7 @@ export default function StaffPinCard({ merchantId }: StaffPinCardProps) {
           <button
             onClick={handleRequestOtp}
             disabled={busy}
-            className="w-full py-2 text-[#6B6158] text-xs hover:text-[#1A1916] transition-colors cursor-pointer"
+            className="w-full py-2 text-slate-500 dark:text-white/60 text-xs hover:text-[#0F172A] dark:hover:text-white transition-colors cursor-pointer"
           >
             {isBn ? "আবার OTP পাঠান" : "Resend OTP"}
           </button>
