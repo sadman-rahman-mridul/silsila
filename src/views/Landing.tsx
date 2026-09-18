@@ -224,7 +224,7 @@ export default function Landing({
     }
   }
 
-  // STEP 3B: New User Registration -> Send OTP verification first
+  // STEP 3B: New User Registration -> Direct PIN Registration (bKash style, zero SMS gateway failure)
   async function handleNewUserRegisterSubmit(overridePin?: string) {
     const pinToSet = (overridePin || pin).trim()
     if (pinToSet.length !== 6 || !/^\d{6}$/.test(pinToSet)) {
@@ -232,13 +232,91 @@ export default function Landing({
       return
     }
 
+    setLoading(true)
     setError(null)
     setInfoMsg(null)
-    await handleSendOtp(
-      isBn
-        ? "নিবন্ধন যাচাই করতে আপনার ফোনে ৬-সংখ্যার OTP কোড পাঠানো হয়েছে।"
-        : "A 6-digit OTP code has been sent to verify your registration."
-    )
+
+    try {
+      const clean = phone.replace(/\D/g, "")
+      const digits10 = clean.slice(-10)
+
+      if (role === "customer") {
+        const accountId = `c_${digits10}`
+        const customerProfileData = {
+          id: accountId,
+          phone: `0${digits10}`,
+          name: modalName || "",
+          password: pinToSet,
+          pin: pinToSet,
+          role: "customer" as const,
+          stamps: 0,
+          totalVisits: 0,
+          createdAt: new Date().toISOString(),
+        }
+
+        // 1. Save directly to Cloud Firestore
+        await firebaseService.saveCustomerProfile(customerProfileData).catch(console.warn)
+
+        // 2. Register with backend API (non-blocking)
+        api.registerWithPassword(clean, pinToSet, modalName || "", "customer").catch(() => {})
+
+        // 3. Finalize Login and navigate
+        const resObj = {
+          success: true,
+          role: "customer",
+          token: `token_customer_${accountId}`,
+          customer: customerProfileData,
+        }
+        await finalizeLogin(resObj, modalName || (isBn ? "নতুন গ্রাহক" : "New Customer"))
+        return
+      } else {
+        // Merchant Registration
+        const csprngBytes = new Uint8Array(3)
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+          crypto.getRandomValues(csprngBytes)
+        } else {
+          for (let i = 0; i < 3; i++) csprngBytes[i] = Math.floor(Math.random() * 256)
+        }
+        const csprngHex = Array.from(csprngBytes).map((b) => b.toString(16).padStart(2, "0")).join("")
+        const accountId = `m_${Date.now()}_${csprngHex}`
+
+        const merchantData = {
+          id: accountId,
+          ownerPhone: clean,
+          ownerName: modalName || "",
+          name: "",
+          password: pinToSet,
+          pin: pinToSet,
+          onboarded: false,
+          createdAt: new Date().toISOString(),
+        }
+
+        await firebaseService.saveMerchantProfile(merchantData).catch(console.warn)
+        api.registerWithPassword(clean, pinToSet, modalName || "", "merchant").catch(() => {})
+
+        const profile: UserProfile = {
+          id: accountId,
+          phone: clean,
+          name: modalName || (isBn ? "মার্চেন্ট" : "Merchant"),
+          role: "merchant",
+          merchantId: accountId,
+          ownedMerchantIds: [accountId],
+          onboarded: false,
+          createdAt: new Date().toISOString(),
+        }
+        setSessionProfile(profile, `token_merchant_${accountId}`)
+        onEnter("merchant", { needsOnboarding: true })
+        return
+      }
+    } catch (err: any) {
+      console.error("Registration error:", err)
+      setError(
+        err?.message ||
+          (isBn ? "নিবন্ধন সম্পন্ন করা যায়নি। আবার চেষ্টা করুন。" : "Failed to complete registration. Please try again.")
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   // Send OTP
@@ -902,15 +980,15 @@ export default function Landing({
                 </p>
               </div>
 
-              {/* Button: Set PIN & Send OTP */}
+              {/* Button: Set PIN & Register */}
               <button
                 onClick={() => handleNewUserRegisterSubmit()}
                 disabled={loading || pin.length !== 6}
                 className="w-full py-3.5 rounded-xl font-display font-bold text-base bg-[#F59E0B] text-[#1B4332] transition-all active:scale-[0.98] disabled:opacity-40 shadow-lg cursor-pointer hover:brightness-105"
               >
                 {loading
-                  ? isBn ? "OTP পাঠানো হচ্ছে..." : "Sending OTP..."
-                  : isBn ? "OTP পাঠান ও এগিয়ে যান →" : "Send OTP & Proceed →"}
+                  ? isBn ? "নিবন্ধন হচ্ছে..." : "Registering..."
+                  : isBn ? "পিন সেট ও প্রবেশ করুন ✓" : "Set PIN & Register ✓"}
               </button>
             </div>
           </div>
@@ -997,13 +1075,26 @@ export default function Landing({
                   : isBn ? "যাচাই করে প্রবেশ করুন ✓" : "Verify & Sign In ✓"}
               </button>
 
-              <button
-                onClick={() => handleSendOtp()}
-                disabled={loading}
-                className="w-full mt-3 py-2 text-emerald-700 dark:text-white/70 text-xs hover:text-emerald-900 dark:hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
-              >
-                {isBn ? "পুনরায় OTP পাঠান" : "Resend OTP"}
-              </button>
+              <div className="flex items-center justify-between mt-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep(isExistingAccount ? "login_pin" : "register_pin")
+                    setError(null)
+                    setInfoMsg(null)
+                  }}
+                  className="text-xs font-semibold text-emerald-700 dark:text-[#52B788] hover:underline cursor-pointer"
+                >
+                  {isBn ? "🔑 পিন দিয়ে লগইন" : "🔑 Use PIN Instead"}
+                </button>
+                <button
+                  onClick={() => handleSendOtp()}
+                  disabled={loading}
+                  className="text-emerald-700 dark:text-white/70 text-xs hover:text-emerald-900 dark:hover:text-white underline underline-offset-4 transition-colors cursor-pointer"
+                >
+                  {isBn ? "পুনরায় OTP পাঠান" : "Resend OTP"}
+                </button>
+              </div>
             </div>
           </div>
         )}
