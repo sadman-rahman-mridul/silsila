@@ -266,14 +266,7 @@ export default function MarketingLanding() {
 
             <button
               onClick={() => goToAuth()}
-              className="px-4 py-2.5 rounded-xl bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 text-xs sm:text-sm font-bold text-[#0F172A] dark:text-white border border-slate-300 dark:border-white/15 cursor-pointer shadow-xs transition-all"
-            >
-              {isBn ? "লগইন" : "Sign In"}
-            </button>
-
-            <button
-              onClick={() => goToAuth()}
-              className="hidden sm:flex px-5 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-display font-black text-xs sm:text-sm shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95 transition-all items-center gap-1.5"
+              className="flex px-4 sm:px-5 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white font-display font-black text-xs sm:text-sm shadow-md shadow-emerald-500/20 cursor-pointer active:scale-95 transition-all items-center gap-1.5"
             >
               <span>{isBn ? "শুরু করুন" : "Get Started"}</span>
               <ChevronRightIcon size={15} />
