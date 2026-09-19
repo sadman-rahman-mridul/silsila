@@ -528,116 +528,126 @@ export default function MarketingLanding() {
             </p>
           </div>
 
-          {/* 5 Practical Industry Bento Cards with 3D Emojis */}
+          {/* 5 Practical Industry Bento Cards with Standard Clean Styling */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {/* 1. Cafe */}
-            <div className="anime-industry-card rounded-[28px] p-6 bg-white dark:bg-[#0E1F18] border-2 border-slate-200 dark:border-emerald-500/20 shadow-xs hover:border-[#10B981] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            <div className="anime-industry-card rounded-[24px] p-6 bg-white dark:bg-[#0E281C] border border-slate-200/90 dark:border-white/10 shadow-xs hover:border-slate-300 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
               <div>
-                <div className="w-13 h-13 rounded-2xl bg-amber-500/10 dark:bg-white/5 border border-amber-500/20 dark:border-white/10 flex items-center justify-center mb-4 shadow-xs group-hover:scale-110 transition-transform">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hot%20beverage/3D/hot_beverage_3d.png" alt="Cafe" className="w-8 h-8 object-contain" />
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Hot%20beverage/3D/hot_beverage_3d.png" alt="Cafe" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="font-display font-black text-lg text-[#0F172A] dark:text-white mb-1.5">
+                <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-1.5">
                   {isBn ? "ক্যাফে ও কফি শপ" : "Cafe & Coffee Shops"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-white/70 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-white/60 leading-relaxed">
                   {isBn
                     ? "দৈনিক কফি লাভারদের জন্য ডিজিটাল স্ট্যাম্প। কাউন্টারে ৩ সেকেন্ডে স্ক্যান করে সিল সংগ্রহ।"
                     : "Give regular commuters and coffee lovers an effortless way to collect stamps at the counter."}
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5">
-                <span className="inline-block px-3 py-1 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-mono font-bold">
-                  {isBn ? "৫টি কফি ➔ ১টি কফি ফ্রি" : "Buy 5 Coffees ➔ 1 Free Drink"}
-                </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+                  <span className="font-medium text-slate-700 dark:text-white/80">{isBn ? "৫টি কফি" : "Buy 5 Coffees"}</span>
+                  <span className="text-slate-400 dark:text-white/40">➔</span>
+                  <span className="font-semibold text-emerald-600 dark:text-[#34D399]">{isBn ? "১টি ফ্রি" : "1 Free Drink"}</span>
+                </div>
               </div>
             </div>
 
             {/* 2. Restaurant */}
-            <div className="anime-industry-card rounded-[28px] p-6 bg-white dark:bg-[#0E1F18] border-2 border-slate-200 dark:border-emerald-500/20 shadow-xs hover:border-[#10B981] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            <div className="anime-industry-card rounded-[24px] p-6 bg-white dark:bg-[#0E281C] border border-slate-200/90 dark:border-white/10 shadow-xs hover:border-slate-300 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
               <div>
-                <div className="w-13 h-13 rounded-2xl bg-rose-500/10 dark:bg-white/5 border border-rose-500/20 dark:border-white/10 flex items-center justify-center mb-4 shadow-xs group-hover:scale-110 transition-transform">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fork%20and%20knife%20with%20plate/3D/fork_and_knife_with_plate_3d.png" alt="Restaurant" className="w-8 h-8 object-contain" />
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fork%20and%20knife%20with%20plate/3D/fork_and_knife_with_plate_3d.png" alt="Restaurant" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="font-display font-black text-lg text-[#0F172A] dark:text-white mb-1.5">
+                <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-1.5">
                   {isBn ? "রেস্টুরেন্ট ও ফুড পয়েন্ট" : "Restaurants & Diners"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-white/70 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-white/60 leading-relaxed">
                   {isBn
                     ? "ডেলিভারি অ্যাপের অতিরিক্ত কমিশন ছাড়াই সরাসরি ডাইন-ইন ভিজিটরদের নিয়মিত কাস্টমার বানান।"
                     : "Encourage repeat dine-in visits directly without giving up high commission margins to delivery apps."}
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5">
-                <span className="inline-block px-3 py-1 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-xs font-mono font-bold">
-                  {isBn ? "৪ বার ডাইন-ইন ➔ ২০% ছাড়" : "4 Dine-in Visits ➔ 20% Off"}
-                </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+                  <span className="font-medium text-slate-700 dark:text-white/80">{isBn ? "৪ বার ডাইন-ইন" : "4 Dine-in Visits"}</span>
+                  <span className="text-slate-400 dark:text-white/40">➔</span>
+                  <span className="font-semibold text-emerald-600 dark:text-[#34D399]">{isBn ? "২০% ছাড়" : "20% Off"}</span>
+                </div>
               </div>
             </div>
 
             {/* 3. Salon */}
-            <div className="anime-industry-card rounded-[28px] p-6 bg-white dark:bg-[#0E1F18] border-2 border-slate-200 dark:border-emerald-500/20 shadow-xs hover:border-[#10B981] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            <div className="anime-industry-card rounded-[24px] p-6 bg-white dark:bg-[#0E281C] border border-slate-200/90 dark:border-white/10 shadow-xs hover:border-slate-300 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
               <div>
-                <div className="w-13 h-13 rounded-2xl bg-purple-500/10 dark:bg-white/5 border border-purple-500/20 dark:border-white/10 flex items-center justify-center mb-4 shadow-xs group-hover:scale-110 transition-transform">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Barber%20pole/3D/barber_pole_3d.png" alt="Salon" className="w-8 h-8 object-contain" />
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Barber%20pole/3D/barber_pole_3d.png" alt="Salon" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="font-display font-black text-lg text-[#0F172A] dark:text-white mb-1.5">
+                <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-1.5">
                   {isBn ? "স্যালুন ও পার্লার" : "Salons & Barbershops"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-white/70 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-white/60 leading-relaxed">
                   {isBn
                     ? "হেয়ারকাট, বিয়ার্ড ট্রিম ও গ্রুমিং কাস্টমারদের প্রতি মাসে বারবার ফিরিয়ে আনার সহজ কার্ড।"
                     : "Incentivize monthly haircuts, grooming, and styling appointments with progressive milestones."}
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5">
-                <span className="inline-block px-3 py-1 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-xs font-mono font-bold">
-                  {isBn ? "৩ বার হেয়ারকাট ➔ ১টি গ্রুমিং ফ্রি" : "3 Haircuts ➔ Free Styling"}
-                </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+                  <span className="font-medium text-slate-700 dark:text-white/80">{isBn ? "৩ বার হেয়ারকাট" : "3 Haircuts"}</span>
+                  <span className="text-slate-400 dark:text-white/40">➔</span>
+                  <span className="font-semibold text-emerald-600 dark:text-[#34D399]">{isBn ? "১টি গ্রুমিং ফ্রি" : "Free Styling"}</span>
+                </div>
               </div>
             </div>
 
             {/* 4. Spa */}
-            <div className="anime-industry-card rounded-[28px] p-6 bg-white dark:bg-[#0E1F18] border-2 border-slate-200 dark:border-emerald-500/20 shadow-xs hover:border-[#10B981] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            <div className="anime-industry-card rounded-[24px] p-6 bg-white dark:bg-[#0E281C] border border-slate-200/90 dark:border-white/10 shadow-xs hover:border-slate-300 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
               <div>
-                <div className="w-13 h-13 rounded-2xl bg-teal-500/10 dark:bg-white/5 border border-teal-500/20 dark:border-white/10 flex items-center justify-center mb-4 shadow-xs group-hover:scale-110 transition-transform">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Lotus/3D/lotus_3d.png" alt="Spa" className="w-8 h-8 object-contain" />
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Lotus/3D/lotus_3d.png" alt="Spa" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="font-display font-black text-lg text-[#0F172A] dark:text-white mb-1.5">
+                <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-1.5">
                   {isBn ? "স্পা ও ওয়েলনেস সেন্টার" : "Spas & Wellness"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-white/70 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-white/60 leading-relaxed">
                   {isBn
                     ? "বডি ম্যাসেজ, ফেসিয়াল ও থেরাপির মতো প্রিমিয়াম সার্ভিসের জন্য রিপিট বুকিং বৃদ্ধি করুন।"
                     : "Build high-value repeat booking habits for therapeutic sessions, facials, and premium care."}
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5">
-                <span className="inline-block px-3 py-1 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 text-xs font-mono font-bold">
-                  {isBn ? "৫টি সেশন ➔ ১টি থেরাপি ফ্রি" : "5 Sessions ➔ 1 Free Therapy"}
-                </span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+                  <span className="font-medium text-slate-700 dark:text-white/80">{isBn ? "৫টি সেশন" : "5 Sessions"}</span>
+                  <span className="text-slate-400 dark:text-white/40">➔</span>
+                  <span className="font-semibold text-emerald-600 dark:text-[#34D399]">{isBn ? "১টি থেরাপি ফ্রি" : "1 Free Therapy"}</span>
+                </div>
               </div>
             </div>
 
             {/* 5. Retail */}
-            <div className="anime-industry-card sm:col-span-2 lg:col-span-2 rounded-[28px] p-6 bg-white dark:bg-[#0E1F18] border-2 border-slate-200 dark:border-emerald-500/20 shadow-xs hover:border-[#10B981] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
+            <div className="anime-industry-card sm:col-span-2 lg:col-span-2 rounded-[24px] p-6 bg-white dark:bg-[#0E281C] border border-slate-200/90 dark:border-white/10 shadow-xs hover:border-slate-300 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col justify-between group">
               <div>
-                <div className="w-13 h-13 rounded-2xl bg-emerald-500/10 dark:bg-white/5 border border-emerald-500/20 dark:border-white/10 flex items-center justify-center mb-4 shadow-xs group-hover:scale-110 transition-transform">
-                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shopping%20bags/3D/shopping_bags_3d.png" alt="Retail" className="w-8 h-8 object-contain" />
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                  <img src="https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Shopping%20bags/3D/shopping_bags_3d.png" alt="Retail" className="w-7 h-7 object-contain" />
                 </div>
-                <h3 className="font-display font-black text-lg text-[#0F172A] dark:text-white mb-1.5">
+                <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-1.5">
                   {isBn ? "কনজিউমার রিটেইল স্টোর" : "Consumer Retail Stores"}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-white/70 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-white/60 leading-relaxed">
                   {isBn
                     ? "ক্লথিং বুটিক, জুয়েলারি, বুকস্টোর ও কসমেটিক্স শপ: ক্যাশ কাউন্টারে ৩ সেকেন্ডের স্ক্যানে রিটেনশন নিশ্চিত করুন।"
                     : "Boutiques, apparel, cosmetics, bookstores, and specialty retail shops driving repeat basket checkouts in 3 seconds."}
                 </p>
               </div>
               <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-                <span className="inline-block px-3 py-1 rounded-xl bg-emerald-500/10 text-[#059669] dark:text-[#34D399] border border-emerald-500/20 text-xs font-mono font-bold">
-                  {isBn ? "৫টি কেনাকাটা ➔ ৩০০ টাকার ভাউচার" : "5 Purchases ➔ ৳300 Gift Voucher"}
-                </span>
-                <span className="text-xs font-bold text-slate-500 dark:text-white/60">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+                  <span className="font-medium text-slate-700 dark:text-white/80">{isBn ? "৫টি কেনাকাটা" : "5 Purchases"}</span>
+                  <span className="text-slate-400 dark:text-white/40">➔</span>
+                  <span className="font-semibold text-emerald-600 dark:text-[#34D399]">{isBn ? "৩০০ টাকার ভাউচার" : "৳300 Gift Voucher"}</span>
+                </div>
+                <span className="text-xs font-semibold text-slate-400 dark:text-white/50">
                   {isBn ? "ইনস্ট্যান্ট কাউন্টার স্ক্যান" : "Instant Counter Scan"}
                 </span>
               </div>
