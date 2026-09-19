@@ -286,22 +286,22 @@ export default function MarketingLanding() {
           {/* Left Column: Punchy Value Proposition */}
           <div className="lg:col-span-7 text-center lg:text-left space-y-6">
             {/* Main H1 Headline */}
-            <h1 className="anime-hero-item text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.12] text-[#0F172A] dark:text-white">
+            <h1 className="anime-hero-item text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.18] sm:leading-[1.12] text-[#0F172A] dark:text-white [text-wrap:balance]">
               {isBn ? (
                 <>
-                  ভিজিটরদের বানান <br />
+                  ভিজিটরদের বানান <br className="hidden sm:inline" />
                   <span className="text-[#059669] dark:text-[#34D399]">লয়্যাল কাস্টমার!</span>
                 </>
               ) : (
                 <>
-                  Turn your visitors <br />
-                  into <span className="text-[#059669] dark:text-[#34D399]">loyal customer!</span>
+                  Turn your visitors into <br className="hidden sm:inline" />
+                  <span className="text-[#059669] dark:text-[#34D399]">loyal customers!</span>
                 </>
               )}
             </h1>
 
             {/* Subtitle Value Statement */}
-            <p className="anime-hero-item text-base sm:text-lg text-slate-600 dark:text-white/80 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+            <p className="anime-hero-item text-sm sm:text-base lg:text-lg text-slate-600 dark:text-white/80 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal [text-wrap:balance]">
               {isBn
                 ? "কাউন্টার QR স্ক্যান করে সরাসরি মোবাইলের ব্রাউজারেই সিল সংগ্রহ ও রিওয়ার্ড রিডিম। কোনো অ্যাপ ডাউনলোড করার ঝামেলা নেই।"
                 : "QR-powered digital stamp cards for repeat-visit businesses. No app download required: customers scan, collect stamps, and unlock rewards directly in their mobile browser."}
