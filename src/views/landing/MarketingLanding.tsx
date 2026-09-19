@@ -285,13 +285,6 @@ export default function MarketingLanding() {
           
           {/* Left Column: Punchy Value Proposition */}
           <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-            
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[#059669] dark:text-[#34D399] text-xs font-bold shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-              <span>{isBn ? "নো-অ্যাপ ডিজিটাল লয়্যালটি কার্ড প্ল্যাটফর্ম" : "No-App QR Loyalty Cards for Bangladesh"}</span>
-            </div>
-
             {/* Main H1 Headline */}
             <h1 className="anime-hero-item text-3xl sm:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.12] text-[#0F172A] dark:text-white">
               {isBn ? (
@@ -525,9 +518,6 @@ export default function MarketingLanding() {
         {/* ========================================================================= */}
         <section className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 dark:border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12 space-y-2.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-[#10B981]/30 text-[#059669] dark:text-[#34D399] text-xs font-mono font-bold tracking-wide">
-              <span>{isBn ? "বিজনেস সলিউশন" : "Business Solutions"}</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
               {isBn ? "আপনার ব্যবসার জন্য উপযুক্ত সমাধান" : "Built for Your Business Type"}
             </h2>
@@ -660,9 +650,6 @@ export default function MarketingLanding() {
         {/* ========================================================================= */}
         <section className="mt-16 sm:mt-24">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12 space-y-2.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-xs font-mono font-bold tracking-wide">
-              <span>{isBn ? "কাস্টমার ড্রপ-অফ তুলনা" : "Why Businesses Lose Customers"}</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
               {isBn ? "সিলসিলা ছাড়া বনাম সিলসিলার সাথে ৩ গুণ রিটেনশন" : "Without Loyalty System vs Sealsela 3x Retention"}
             </h2>
@@ -795,10 +782,6 @@ export default function MarketingLanding() {
             {/* Right Column: Walkthrough Video Steps */}
             <div className="lg:col-span-5 flex flex-col justify-center space-y-5 text-center lg:text-left">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-[#10B981]/30 text-[#059669] dark:text-[#34D399] text-xs font-mono font-bold tracking-wide mb-2.5">
-                  <SparklesIcon size={13} className="text-[#F59E0B]" />
-                  <span>{isBn ? "ভিডিও ওয়াকথ্রু" : "Walkthrough Video"}</span>
-                </div>
                 <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white leading-tight">
                   {isBn ? "সিলসিলা কীভাবে ব্যবহার করবেন" : "How to use Sealsela"}
                 </h2>
@@ -872,9 +855,6 @@ export default function MarketingLanding() {
         {/* ========================================================================= */}
         <section className="mt-16 sm:mt-24 pt-8 border-t border-slate-200 dark:border-white/10">
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-[#F59E0B] text-xs font-mono font-bold tracking-wide">
-              <span>{isBn ? "স্বচ্ছ ও সাশ্রয়ী প্যাকেজ" : "Simple, Transparent Pricing"}</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-[#0F172A] dark:text-white">
               {isBn ? "আপনার ব্যবসার জন্য সেরা প্ল্যান বেছে নিন" : "Pick the Perfect Plan for Your Brand"}
             </h2>
@@ -1050,11 +1030,6 @@ export default function MarketingLanding() {
             />
 
             <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[#34D399] text-xs font-mono font-bold tracking-wide">
-                <SparklesIcon size={13} className="text-[#F59E0B]" />
-                <span>{isBn ? "আজই যুক্ত হোন" : "Join Sealsela Today"}</span>
-              </div>
-
               <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white leading-tight">
                 {isBn ? (
                   <>
