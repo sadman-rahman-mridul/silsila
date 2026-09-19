@@ -372,9 +372,9 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
                     </div>
 
                     <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-[#071D13] border border-slate-200/80 dark:border-emerald-500/20 mb-3">
-                      <StampGrid filled={card.stamps} total={target} size="sm" variant="coffee" />
+                      <StampGrid filled={card.stamps} total={target} size="sm" variant="fire" />
                       <span className="text-[11px] font-black text-[#059669] dark:text-[#34D399] font-mono whitespace-nowrap">
-                        {card.stamps}/{target} ☕
+                        {card.stamps}/{target} 🔥
                       </span>
                     </div>
 
@@ -423,7 +423,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
             <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-6 shadow-sm dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
               <CompassIcon size={32} className="text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
               <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg drop-shadow-xs">
-                {isBn ? "উপলব্ধ ক্যাফে ও রেস্তোরাঁ" : "Available Cafes & Stores"}
+                {isBn ? "উপলব্ধ দোকান ও আউটলেট" : "Available Stores & Outlets"}
               </p>
               <p className="text-slate-500 dark:text-white/60 text-xs leading-relaxed mt-1">
                 {isBn

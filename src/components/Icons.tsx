@@ -358,3 +358,65 @@ export function MoonIcon({ size = 24, ...p }: IconProps) {
     </svg>
   )
 }
+
+export function UtensilsIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2" />
+      <path d="M15 2v20" />
+      <path d="M5 2v8a4 4 0 0 0 4 4v8" />
+      <path d="M9 2v4" />
+    </svg>
+  )
+}
+
+export function ScissorsIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <line x1="20" y1="4" x2="8.12" y2="15.88" />
+      <line x1="14.47" y1="14.48" x2="20" y2="20" />
+      <line x1="8.12" y1="8.12" x2="12" y2="12" />
+    </svg>
+  )
+}
+
+export function ShoppingBagIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  )
+}
+
+export function CheckCircle2Icon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  )
+}
+
+export function XCircleIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="15" y1="9" x2="9" y2="15" />
+      <line x1="9" y1="9" x2="15" y2="15" />
+    </svg>
+  )
+}
+
+export function ArrowRightIcon({ size = 24, ...p }: IconProps) {
+  return (
+    <svg {...base(size)} {...p}>
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  )
+}
+

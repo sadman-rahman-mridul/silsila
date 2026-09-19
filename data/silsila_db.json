@@ -160,6 +160,18 @@
       "timestamp": "2026-08-26T04:10:50.859Z",
       "resolvedBy": "counter_staff",
       "resolvedAt": "2026-08-26T04:10:50.860Z"
+    },
+    {
+      "id": "pa_1789778994393_98bf0d14c66ef60f",
+      "merchantId": "m_1787630193213_8qg2",
+      "customerId": "c_1681742043",
+      "customerName": "Sadman",
+      "customerPhone": "1681742043",
+      "distanceMeters": -1,
+      "createdAt": "2026-09-19T00:49:54.389Z",
+      "createdTimestamp": 1789778994389,
+      "expiresAt": "2026-09-19T01:19:54.389Z",
+      "resolution": "pending"
     }
   ],
   "stamps": [

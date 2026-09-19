@@ -417,13 +417,13 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
       )}
 
-      {/* Interactive 1:1 Circular Profile Picture Cropper Modal with Coffee Themed Sliders */}
+      {/* Interactive 1:1 Circular Profile Picture Cropper Modal */}
       {rawImage && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-[#0A2318] border border-emerald-500/30 rounded-3xl p-5 max-w-sm w-full shadow-2xl animate-scale-up text-white">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-lg">☕</span>
+                <span className="text-lg">🔥</span>
                 <h3 className="font-display font-black text-lg text-white">Set Profile Photo</h3>
               </div>
               <button
@@ -438,7 +438,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               Crop and adjust your photo to fit the frame
             </p>
 
-            {/* 1:1 Viewport Container with Coffee Frame Ring */}
+            {/* 1:1 Viewport Container with Emerald Frame Ring */}
             <div className="relative w-52 h-52 mx-auto rounded-full overflow-hidden border-4 border-[#34D399] shadow-2xl bg-black/40 flex items-center justify-center mb-5 glow-emerald">
               <div
                 className="w-full h-full relative"
@@ -455,7 +455,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               </div>
             </div>
 
-            {/* Coffee Themed Adjustment Sliders */}
+            {/* Adjustment Sliders */}
             <div className="space-y-4 mb-5 px-1">
               {/* Zoom Slider */}
               <div className="bg-[#0E281C]/90 border border-emerald-500/20 p-3 rounded-2xl">
@@ -479,7 +479,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                       className="w-full accent-[#34D399] cursor-pointer h-2 bg-[#071D13] rounded-lg"
                     />
                   </div>
-                  <span className="text-sm text-[#F59E0B]" title="Coffee Zoom">☕</span>
+                  <span className="text-sm text-[#F59E0B]" title="Zoom Level">🔥</span>
                 </div>
               </div>
 
@@ -505,7 +505,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                       className="w-full accent-[#34D399] cursor-pointer h-2 bg-[#071D13] rounded-lg"
                     />
                   </div>
-                  <span className="text-sm text-[#F59E0B]" title="Coffee Position">☕</span>
+                  <span className="text-sm text-[#F59E0B]" title="Vertical Position">🔥</span>
                 </div>
               </div>
             </div>

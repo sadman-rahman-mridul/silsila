@@ -272,7 +272,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                               <span className="text-emerald-700 dark:text-[#34D399] font-bold text-[10px]">{isBn ? "অগ্রগতি" : "Progress"}</span>
                               <span className="text-slate-400 dark:text-white/40 text-[10px]">{customer.lastVisit}</span>
                             </div>
-                            {/* Coffee Cup Progress Animation */}
+                            {/* Stamp Progress Animation */}
                             <div className="flex items-center gap-1 bg-slate-50 dark:bg-[#071D13] px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-emerald-500/20">
                               {Array.from({ length: totalCups }).map((_, i) => {
                                 const isFilled = i < customer.stamps
@@ -284,9 +284,9 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                                         ? "opacity-100 scale-110 drop-shadow-xs"
                                         : "opacity-25 grayscale"
                                     }`}
-                                    title={`Cup ${i + 1}`}
+                                    title={`Stamp ${i + 1}`}
                                   >
-                                    ☕
+                                    🔥
                                   </span>
                                 )
                               })}
@@ -376,12 +376,12 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
               </div>
             </div>
 
-            {/* Coffee Cups Progress in Modal */}
+            {/* Stamp Progress in Modal */}
             <div className="bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-3.5 mb-4 text-center">
               <p className="text-xs font-bold text-emerald-700 dark:text-[#34D399] mb-2">
                 {isBn
-                  ? `কফি কাপ অগ্রগতি (${selectedCustomer.stamps}/${target || 5} কাপ সম্পন্ন)`
-                  : `Coffee Cup Progress (${selectedCustomer.stamps}/${target || 5} cups completed)`}
+                  ? `সিল অগ্রগতি (${selectedCustomer.stamps}/${target || 5}টি সম্পন্ন)`
+                  : `Stamp Progress (${selectedCustomer.stamps}/${target || 5} stamps completed)`}
               </p>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {Array.from({ length: target || 5 }).map((_, i) => {
@@ -395,7 +395,7 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
                           : "bg-slate-200/60 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 opacity-40 grayscale"
                       }`}
                     >
-                      ☕
+                      🔥
                     </div>
                   )
                 })}

@@ -352,7 +352,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 type="text"
                 value={editingProgram.rewardText}
                 onChange={(e) => setEditingProgram({ ...editingProgram, rewardText: e.target.value })}
-                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
+                placeholder={isBn ? "যেমন: ২০% ছাড় বা ১টি বিশেষ উপহার" : "e.g. 20% Off or 1 Special Gift"}
                 className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-3 text-slate-900 dark:text-white text-sm outline-none focus:border-emerald-500 font-medium"
               />
             </div>
@@ -388,7 +388,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                       </p>
                     </div>
                   </div>
-                  <StampGrid filled={0} total={editingProgram.target} size="sm" variant="coffee" />
+                  <StampGrid filled={0} total={editingProgram.target} size="sm" variant="fire" />
                   <p className="text-[#34D399] font-bold text-xs mt-2">
                     {editingProgram.rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
                   </p>
@@ -470,7 +470,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                 type="text"
                 value={rewardText}
                 onChange={(e) => setRewardText(e.target.value)}
-                placeholder={isBn ? "যেমন: ১টি স্পেশাল হট কফি ফ্রি" : "e.g. 1 Free Specialty Coffee"}
+                placeholder={isBn ? "যেমন: ২০% ছাড় বা ১টি বিশেষ উপহার" : "e.g. 20% Off or 1 Special Gift"}
                 className="w-full bg-slate-50 dark:bg-[#071D13] border border-slate-200 dark:border-emerald-500/20 rounded-2xl px-4 py-3 text-slate-900 dark:text-white text-sm outline-none focus:border-emerald-500 font-medium"
               />
             </div>
@@ -506,7 +506,7 @@ export default function RewardsManager({ merchantId: propId, merchantName: propN
                       </p>
                     </div>
                   </div>
-                  <StampGrid filled={0} total={previewStamps} size="sm" variant="coffee" />
+                  <StampGrid filled={0} total={previewStamps} size="sm" variant="fire" />
                   <p className="text-[#34D399] font-bold text-xs mt-2">
                     {rewardText || (isBn ? "পুরস্কারের বিবরণ লিখুন" : "Enter reward description")}
                   </p>

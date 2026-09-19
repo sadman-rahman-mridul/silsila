@@ -5,6 +5,7 @@ import { api, type Merchant, type PendingApproval } from "../../services/api"
 import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
+import { playTactileStampSound, playCelebrationChime } from "../../utils/audioFx"
 import StampGrid from "../../components/StampGrid"
 import {
   CameraIcon,
@@ -432,12 +433,18 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         ) {
           const mId = firestoreApproval.merchantId || selectedMerchantId
           const card = await firebaseService.getCustomerCard(customerId || "", mId).catch(() => null)
+          const newStamps = card?.stamps ?? firestoreApproval.stamps ?? 1
+          const targetStamps = card?.target ?? 5
           setStampsData({
-            stamps: card?.stamps ?? firestoreApproval.stamps ?? 1,
-            target: card?.target ?? 5,
+            stamps: newStamps,
+            target: targetStamps,
             cardId: card?.id,
           })
           setStep("confirmed")
+          playTactileStampSound()
+          if (newStamps >= targetStamps) {
+            setTimeout(playCelebrationChime, 300)
+          }
           try {
             confetti({ particleCount: 80, spread: 90, origin: { y: 0.6 } })
           } catch {}
@@ -455,15 +462,21 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
       try {
         const res = await api.checkApprovalStatus(pendingApproval.id)
         if (res.status === "approved") {
+          const s = res.card?.stamps ?? 1
+          const t = res.card?.target ?? 5
           setStampsData({
-            stamps: res.card?.stamps ?? 0,
-            target: res.card?.target ?? 0,
+            stamps: s,
+            target: t,
             cardId: res.card?.id,
           })
           if (res.card) {
             firebaseService.syncCardToFirestore(res.card)
           }
           setStep("confirmed")
+          playTactileStampSound()
+          if (s >= t) {
+            setTimeout(playCelebrationChime, 300)
+          }
           try {
             confetti({ particleCount: 80, spread: 90, origin: { y: 0.6 } })
           } catch {}
@@ -653,9 +666,13 @@ export default function ScanFlow({ onNavigateToCard, onNavigateHome }: ScanFlowP
         {step === "confirmed" && (
           <div className="w-full max-w-sm text-center animate-slide-up py-4">
             <div className="relative mx-auto w-24 h-24 mb-4">
-              <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 scale-110" />
-              <div className="relative w-24 h-24 rounded-full bg-[#064E3B] dark:bg-[#10B981] flex items-center justify-center shadow-lg text-white dark:text-[#0A2318] text-4xl">
+              <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-[#10B981]/20 scale-110 animate-ping opacity-40" />
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#10B981] to-[#047857] flex items-center justify-center shadow-xl text-white text-4xl transform scale-100 animate-bounce">
                 ✓
+              </div>
+              {/* Gamified Rubber Ink Stamp Overlay */}
+              <div className="absolute -bottom-2 -right-4 bg-amber-400 border-2 border-[#071D13] text-[#071D13] font-mono text-[9px] font-black uppercase px-2 py-0.5 rounded-full shadow-md rotate-[-8deg]">
+                ★ STAMPED ★
               </div>
             </div>
 

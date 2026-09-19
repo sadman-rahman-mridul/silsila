@@ -3,7 +3,7 @@ interface StampGridProps {
   total: number
   size?: "sm" | "md" | "lg"
   showNumbers?: boolean
-  variant?: "coffee" | "stamp"
+  variant?: "fire" | "coffee" | "stamp"
 }
 
 export default function StampGrid({
@@ -11,7 +11,7 @@ export default function StampGrid({
   total,
   size = "md",
   showNumbers = false,
-  variant = "coffee",
+  variant = "fire",
 }: StampGridProps) {
   const stamps = Array.from({ length: total }, (_, i) => i)
   const isLast = (i: number) => i === total - 1
@@ -50,9 +50,7 @@ export default function StampGrid({
                 🎁
               </span>
             ) : isFilled ? (
-              variant === "coffee" ? (
-                <span className="text-sm drop-shadow-sm animate-fade-in">☕</span>
-              ) : (
+              variant === "stamp" ? (
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -64,12 +62,16 @@ export default function StampGrid({
                 >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
+              ) : (
+                <span className="text-sm drop-shadow-sm animate-fade-in">🔥</span>
               )
-            ) : variant === "coffee" ? (
-              <span className="text-sm opacity-25 grayscale select-none">☕</span>
-            ) : showNumbers ? (
-              <span className="text-white/40 font-display font-bold text-xs">{i + 1}</span>
-            ) : null}
+            ) : variant === "stamp" ? (
+              showNumbers ? (
+                <span className="text-white/40 font-display font-bold text-xs">{i + 1}</span>
+              ) : null
+            ) : (
+              <span className="text-sm opacity-25 grayscale select-none">🔥</span>
+            )}
 
             {isFilled && (
               <span className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 hover:opacity-100 transition-opacity" />

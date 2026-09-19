@@ -18,6 +18,7 @@ import {
   PhoneIcon,
   SparklesIcon,
 } from "../../components/Icons"
+import { categoryLabel } from "../../constants/categories"
 
 type AdminTab = "approvals" | "merchants" | "users"
 
@@ -444,7 +445,7 @@ export default function AdminDashboard() {
                           {m.name}
                         </h3>
                         <p className="text-xs text-[#059669] dark:text-[#34D399] font-bold mt-0.5">
-                          {m.category || "General Business"} • {m.area || "Dhaka"}
+                          {categoryLabel(m.category, isBn) || (isBn ? "ব্যবসা" : "Business")} • {m.area || (isBn ? "ঢাকা" : "Dhaka")}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-white/60 mt-1">
                           👤 {m.ownerName || "Owner"} ({m.ownerPhone || m.phone})
@@ -576,7 +577,7 @@ export default function AdminDashboard() {
                               )}
                             </div>
                             <span className="text-[10px] font-normal text-slate-500 dark:text-white/50">
-                              {m.category} • {m.area}
+                              {categoryLabel(m.category, isBn)} • {m.area || (isBn ? "ঢাকা" : "Dhaka")}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 text-slate-700 dark:text-white/80">

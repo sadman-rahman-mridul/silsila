@@ -23,6 +23,7 @@ import {
   ShieldIcon,
 } from "../../components/Icons"
 import StampGrid from "../../components/StampGrid"
+import { BUSINESS_CATEGORIES } from "../../constants/categories"
 
 interface MerchantSettingsProps {
   onBack?: () => void
@@ -30,9 +31,6 @@ interface MerchantSettingsProps {
   activeMerchantId?: string
   onMerchantUpdated?: (updated: Merchant) => void
 }
-
-// Updated category list as requested
-const categories = ["ক্যাফে", "সেলুন", "রেস্তোরাঁ", "স্পা", "অন্যান্য"]
 
 // PIN setup step type
 type PinStep = "idle" | "sending_otp" | "enter_otp_and_pin" | "saving" | "done"
@@ -677,19 +675,29 @@ export default function MerchantSettings({
                 {isBn ? "ক্যাটাগরি" : "Category"}
               </label>
               <div className="flex flex-wrap gap-1.5">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      category === cat
-                        ? "bg-[#34D399] text-[#0A2318] shadow-xs glow-emerald"
-                        : "bg-slate-50 dark:bg-[#071D13] text-slate-700 dark:text-white/70 border border-slate-200 dark:border-white/10"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+                {BUSINESS_CATEGORIES.map((cat) => {
+                  const isSelected =
+                    category === cat.label ||
+                    category === cat.value ||
+                    category === cat.labelEn ||
+                    (category === "রেস্তোরাঁ" && cat.value === "restaurant") ||
+                    (category === "সেলুন" && cat.value === "salon") ||
+                    (category === "অন্যান্য" && cat.value === "retail")
+                  return (
+                    <button
+                      key={cat.value}
+                      onClick={() => setCategory(isBn ? cat.label : cat.labelEn)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        isSelected
+                          ? "bg-[#34D399] text-[#0A2318] shadow-xs glow-emerald"
+                          : "bg-slate-50 dark:bg-[#071D13] text-slate-700 dark:text-white/70 border border-slate-200 dark:border-white/10"
+                      }`}
+                    >
+                      <span>{cat.emoji}</span>
+                      <span>{isBn ? cat.label : cat.labelEn}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 

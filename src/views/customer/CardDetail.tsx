@@ -603,9 +603,9 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
                 </div>
               </div>
 
-              {/* Coffee / Stamp Grid */}
+              {/* Fire / Stamp Grid */}
               <div className="bg-[#071D13] p-4 sm:p-5 rounded-2xl border border-emerald-500/20 mb-3 shadow-inner">
-                <StampGrid filled={card.stamps} total={target} size="md" variant="coffee" />
+                <StampGrid filled={card.stamps} total={target} size="md" variant="fire" />
               </div>
 
               {/* Progress Bar */}

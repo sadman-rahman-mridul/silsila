@@ -5,3 +5,4 @@ Disallow: /admin
 Disallow: /api/
 
 Sitemap: https://sealsela.com/sitemap.xml
+
