@@ -27,6 +27,7 @@ export default function BlogHub() {
     { value: "Restaurant Growth", label: isBn ? "রেস্টুরেন্ট গ্রোথ" : "Restaurant Growth" },
     { value: "Customer Retention", label: isBn ? "কাস্টমার রিটেনশন" : "Customer Retention" },
     { value: "Loyalty Strategy", label: isBn ? "লয়্যালটি স্ট্র্যাটেজি" : "Loyalty Strategy" },
+    { value: "Product Guide", label: isBn ? "প্রোডাক্ট গাইড" : "Product Guide" },
   ]
 
   const filteredPosts = useMemo(() => {

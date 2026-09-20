@@ -27,6 +27,10 @@ export default function BlogPostDetail() {
 
   const post = BLOG_POSTS.find((p) => p.slug === slug) || BLOG_POSTS[0]
 
+  const relatedPosts = (post?.relatedSlugs || [])
+    .map((s) => BLOG_POSTS.find((p) => p.slug === s))
+    .filter((p): p is BlogPost => !!p)
+
   // Dynamic SEO JSON-LD injection
   useEffect(() => {
     if (!post) return
@@ -365,6 +369,29 @@ export default function BlogPostDetail() {
           </div>
         </article>
 
+        {/* Video Walkthrough Player Section */}
+        {post.videoEmbedUrl && (
+          <section className="rounded-3xl overflow-hidden border-2 border-emerald-500/30 dark:border-white/15 bg-black p-4 sm:p-6 space-y-4 shadow-2xl">
+            <div className="space-y-1 text-left">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#34D399] font-bold">
+                ★ VIDEO WALKTHROUGH
+              </span>
+              <h3 className="text-lg sm:text-xl font-display font-black text-white">
+                {post.videoTitle || (isBn ? "ভিডিও টিউটোরিয়াল: কীভাবে Sealsela ব্যবহার করবেন" : "Video Guide: How to Use Sealsela")}
+              </h3>
+            </div>
+            <div className="relative rounded-2xl overflow-hidden aspect-video bg-black shadow-inner">
+              <iframe
+                className="w-full h-full"
+                src={post.videoEmbedUrl}
+                title={post.videoTitle || "Sealsela Video Guide"}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
+
         {/* Structured FAQ Accordion Section (For SEO & Google Rich Snippets) */}
         <section className="pt-8 border-t border-slate-200 dark:border-white/10 space-y-4">
           <div className="space-y-1">
@@ -401,6 +428,42 @@ export default function BlogPostDetail() {
             })}
           </div>
         </section>
+
+        {/* Related Guides / Internal Linking */}
+        {relatedPosts.length > 0 && (
+          <section className="pt-8 border-t border-slate-200 dark:border-white/10 space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-xl font-display font-black text-[#0F172A] dark:text-white">
+                {isBn ? "সম্পর্কিত অন্যান্য গাইড ও আর্টিকেল" : "Related Guides & Insights"}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-white/60">
+                {isBn ? "কাস্টমার রিটেনশন ও রেস্টুরেন্ট গ্রোথের আরও কৌশল জানুন" : "Explore more on retention and customer loyalty"}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              {relatedPosts.map((rel) => (
+                <Link
+                  key={rel.slug}
+                  to={`/blog/${rel.slug}`}
+                  className="p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0E281C] hover:border-emerald-500/50 shadow-xs hover:shadow-md transition-all group flex flex-col justify-between"
+                >
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-emerald-600 dark:text-[#34D399] bg-emerald-500/10 px-2 py-0.5 rounded">
+                      {rel.categoryBn}
+                    </span>
+                    <h4 className="font-display font-bold text-xs text-[#0F172A] dark:text-white group-hover:text-emerald-600 dark:group-hover:text-[#34D399] transition-colors line-clamp-2">
+                      {rel.title}
+                    </h4>
+                  </div>
+                  <div className="pt-3 flex items-center gap-1 text-[11px] font-semibold text-slate-400 group-hover:text-emerald-500 transition-colors">
+                    <span>{isBn ? "পড়ুন" : "Read"}</span>
+                    <ArrowRightIcon size={12} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Bottom CTA Card */}
         <section className="rounded-3xl p-8 sm:p-10 bg-[#10B981] text-white text-center space-y-4 shadow-xl">
