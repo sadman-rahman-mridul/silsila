@@ -158,6 +158,9 @@ export default function BlogHub() {
                 <img
                   src={featuredPost.coverImage}
                   alt={featuredPost.title}
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=1200&auto=format&fit=crop&q=80"
+                  }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute top-4 left-4 bg-[#10B981] text-white text-xs font-black uppercase px-3 py-1 rounded-lg shadow-md">
@@ -206,6 +209,9 @@ export default function BlogHub() {
                   <img
                     src={post.coverImage}
                     alt={post.title}
+                    onError={(e) => {
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=1200&auto=format&fit=crop&q=80"
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <span className="absolute bottom-3 left-3 bg-white/90 dark:bg-[#071D13]/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-700 dark:text-white/90 border border-slate-200/60 dark:border-white/10">

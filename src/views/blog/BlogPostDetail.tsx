@@ -228,7 +228,14 @@ export default function BlogPostDetail() {
 
         {/* Featured Cover Image */}
         <div className="rounded-3xl overflow-hidden border border-slate-200/90 dark:border-white/10 shadow-md">
-          <img src={post.coverImage} alt={post.title} className="w-full h-64 sm:h-96 object-cover" />
+          <img
+            src={post.coverImage}
+            alt={post.title}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=1200&auto=format&fit=crop&q=80"
+            }}
+            className="w-full h-64 sm:h-96 object-cover"
+          />
         </div>
 
         {/* ⚡ AI QUICK SUMMARY / KEY TAKEAWAYS (GEO & LLM Optimized Snippet Box with Website Link) */}
