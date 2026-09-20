@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { BLOG_POSTS, type BlogPost } from "../../data/blogPosts"
 import { useLanguage } from "../../context/LanguageContext"
 import { useTheme } from "../../context/ThemeContext"
+import { updatePageSeo } from "../../utils/seo"
 import {
   SearchIcon,
   ChevronRightIcon,
@@ -44,6 +45,16 @@ export default function BlogHub() {
   }, [search, selectedCategory])
 
   const featuredPost = BLOG_POSTS[0]
+
+  useEffect(() => {
+    updatePageSeo({
+      title: isBn ? "ব্লগ ও আর্টিকেলস — কাস্টমার রিটেনশন ও গ্রোথ" : "Blog & Insights — Customer Retention & Loyalty Growth",
+      description:
+        "রেস্টুরেন্ট, ক্যাফে, স্যালুন ও রিটেইল শপের প্রফিট বাড়ানো, রিপিট ভিজিট বৃদ্ধি এবং লয়্যালটি সিস্টেমের আধুনিক স্ট্র্যাটেজি।",
+      image: "/retention-hero.png",
+      url: "https://sealsela.com/blog",
+    })
+  }, [isBn])
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#071D13] text-[#0F172A] dark:text-white font-sans antialiased flex flex-col justify-between transition-colors duration-200">

@@ -34,6 +34,51 @@ import crmRoutes from "./server/routes/crm.js"
 import analyticsRoutes from "./server/routes/analytics.js"
 import opsRoutes from "./server/routes/ops.js"
 import privacyRoutes from "./server/routes/privacy.js"
+import { BLOG_POSTS } from "./src/data/blogPosts.js"
+
+// Helper to inject SEO metadata into HTML shell for social preview unfurlers (WhatsApp, Facebook, Twitter, LinkedIn)
+function injectSeoMeta(html: string, reqPath: string): string {
+  if (reqPath.startsWith("/blog/")) {
+    const slug = reqPath.replace("/blog/", "").split("?")[0].replace(/\/$/, "")
+    const post = BLOG_POSTS.find((p) => p.slug === slug)
+    if (post) {
+      const title = `${post.title} | Sealsela`
+      const desc = post.metaDescription || post.excerpt
+      const img = post.coverImage.startsWith("http")
+        ? post.coverImage
+        : `https://sealsela.com${post.coverImage.startsWith("/") ? "" : "/"}${post.coverImage}`
+      const url = `https://sealsela.com/blog/${post.slug}`
+
+      return html
+        .replace(/<title>.*?<\/title>/i, `<title>${title}</title>`)
+        .replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${title}" />`)
+        .replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${desc}" />`)
+        .replace(/<meta property="og:image" content=".*?" \/>/i, `<meta property="og:image" content="${img}" />`)
+        .replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${url}" />`)
+        .replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${title}" />`)
+        .replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${desc}" />`)
+        .replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="${img}" />`)
+        .replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${url}" />`)
+    }
+  } else if (reqPath === "/blog" || reqPath === "/blog/") {
+    const title = "Blog & Insights — Customer Retention & Loyalty Growth | Sealsela"
+    const desc = "Practical guides on customer loyalty, CAC vs LTV restaurant economics, and digital retention strategies for modern businesses."
+    const url = "https://sealsela.com/blog"
+    const img = "https://sealsela.com/retention-hero.png"
+
+    return html
+      .replace(/<title>.*?<\/title>/i, `<title>${title}</title>`)
+      .replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${title}" />`)
+      .replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${desc}" />`)
+      .replace(/<meta property="og:image" content=".*?" \/>/i, `<meta property="og:image" content="${img}" />`)
+      .replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${url}" />`)
+      .replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${title}" />`)
+      .replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${desc}" />`)
+      .replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="${img}" />`)
+      .replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${url}" />`)
+  }
+  return html
+}
 
 async function startServer() {
   const app = express()
@@ -82,12 +127,36 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: "spa",
     })
+    app.use(async (req, res, next) => {
+      if (req.method !== "GET") return next()
+      const url = req.originalUrl
+      if (url.startsWith("/api/")) return next()
+
+      // If accessing an HTML route, inject meta tags
+      if (!url.includes(".") || url.endsWith(".html") || url.startsWith("/blog")) {
+        try {
+          const indexPath = path.resolve(process.cwd(), "index.html")
+          let template = fs.readFileSync(indexPath, "utf-8")
+          template = injectSeoMeta(template, url)
+          const html = await vite.transformIndexHtml(url, template)
+          return res.status(200).set({ "Content-Type": "text/html" }).end(html)
+        } catch (e) {
+          vite.ssrFixStacktrace(e as Error)
+          next(e)
+        }
+      } else {
+        next()
+      }
+    })
     app.use(vite.middlewares)
   } else {
     const distPath = path.join(process.cwd(), "dist")
+    const indexHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8")
     app.use(express.static(distPath))
-    app.use((_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"))
+    app.use((req, res) => {
+      const rendered = injectSeoMeta(indexHtml, req.path)
+      res.setHeader("Content-Type", "text/html")
+      res.send(rendered)
     })
   }
 

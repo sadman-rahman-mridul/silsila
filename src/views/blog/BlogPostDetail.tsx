@@ -17,6 +17,7 @@ import {
   UsersIcon,
   TrendingUpIcon,
 } from "../../components/Icons"
+import { updatePageSeo } from "../../utils/seo"
 
 export default function BlogPostDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -31,9 +32,19 @@ export default function BlogPostDetail() {
     .map((s) => BLOG_POSTS.find((p) => p.slug === s))
     .filter((p): p is BlogPost => !!p)
 
-  // Dynamic SEO JSON-LD injection
+  // Dynamic SEO Title, OpenGraph & JSON-LD injection
   useEffect(() => {
     if (!post) return
+
+    updatePageSeo({
+      title: post.title,
+      description: post.metaDescription || post.excerpt,
+      image: post.coverImage,
+      url: `https://sealsela.com/blog/${post.slug}`,
+      type: "article",
+      author: post.author.name,
+      tags: post.tags,
+    })
     const schema = {
       "@context": "https://schema.org",
       "@graph": [
