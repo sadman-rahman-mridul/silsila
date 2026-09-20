@@ -20,6 +20,7 @@ import {
   SearchIcon,
   SparklesIcon,
 } from "../../components/Icons"
+import MerchantDashboardSkeleton from "../../components/skeletons/MerchantDashboardSkeleton"
 
 interface MerchantDashboardProps {
   merchantId: string
@@ -282,6 +283,10 @@ export default function MerchantDashboard({
       (a.customerPhone || "").includes(q)
     return nameMatch || phoneMatch
   })
+
+  if (loading && !activeMerchant) {
+    return <MerchantDashboardSkeleton />
+  }
 
   return (
     <div className="flex flex-col h-full bg-transparent w-full text-[#0F172A] dark:text-white transition-colors">

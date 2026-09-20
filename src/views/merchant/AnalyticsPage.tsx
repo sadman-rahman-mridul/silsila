@@ -156,9 +156,20 @@ export default function AnalyticsPage({ activeMerchantId }: AnalyticsPageProps) 
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 space-y-4 w-full">
         {loading && (
-          <div className="py-6 text-center text-xs text-slate-500 dark:text-white/70 flex items-center justify-center gap-2">
-            <RefreshIcon size={16} className="animate-spin text-emerald-600 dark:text-[#34D399]" />
-            <span>{isBn ? "ডেটা লোড হচ্ছে..." : "Loading data..."}</span>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white dark:bg-[#0E281C]/80 rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 space-y-2.5 shimmer">
+                  <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-16 animate-pulse" />
+                  <div className="h-6 bg-slate-200 dark:bg-white/10 rounded-md w-20 animate-pulse" />
+                  <div className="h-2.5 bg-slate-200 dark:bg-white/5 rounded w-24 animate-pulse" />
+                </div>
+              ))}
+            </div>
+            <div className="h-44 bg-white dark:bg-[#0E281C]/80 rounded-3xl p-5 border border-slate-200/80 dark:border-white/10 shimmer">
+              <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-1/3 mb-4 animate-pulse" />
+              <div className="h-28 bg-slate-100 dark:bg-white/5 rounded-2xl animate-pulse" />
+            </div>
           </div>
         )}
 

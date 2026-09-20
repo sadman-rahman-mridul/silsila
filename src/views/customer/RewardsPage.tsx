@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext"
 import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import { GiftIcon, ClockIcon, SparklesIcon } from "../../components/Icons"
+import RewardsSkeleton from "../../components/skeletons/RewardsSkeleton"
 
 export default function RewardsPage() {
   const { user, profile } = useAuth()
@@ -91,10 +92,7 @@ export default function RewardsPage() {
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-2 w-full">
         {loading ? (
-          <div className="py-16 text-center text-slate-500 dark:text-white/70 text-sm">
-            <span className="inline-block animate-spin text-3xl mb-3">⏳</span>
-            <p className="font-bold text-[#0F172A] dark:text-white">{isBn ? "পুরস্কার লোড হচ্ছে..." : "Loading rewards..."}</p>
-          </div>
+          <RewardsSkeleton />
         ) : vouchers.length === 0 ? (
           <div className="py-14 text-center bg-white dark:bg-[#0E281C]/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 dark:border-emerald-500/20 shadow-sm dark:shadow-2xl">
             <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-[#FEF3C7]/20 border border-amber-200 dark:border-[#FEF3C7]/30 text-[#D97706] dark:text-[#F59E0B] flex items-center justify-center mx-auto mb-3 shadow-sm">

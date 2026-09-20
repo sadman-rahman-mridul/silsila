@@ -7,6 +7,7 @@ import { useTheme } from "../../context/ThemeContext"
 import { firebaseService } from "../../services/firebaseService"
 import { useSwipeBack } from "../../hooks/useSwipeBack"
 import StampGrid from "../../components/StampGrid"
+import CardDetailSkeleton from "../../components/skeletons/CardDetailSkeleton"
 import {
   ChevronLeftIcon,
   MapPinIcon,
@@ -354,19 +355,7 @@ export default function CardDetail({ merchantId, onBack, onRequireAuth }: CardDe
   }
 
   if (loading) {
-    return (
-      <div className="flex flex-col h-full min-h-[70vh] items-center justify-center bg-transparent text-[#0F172A] dark:text-white">
-        <div className="w-14 h-14 rounded-2xl bg-white/10 dark:bg-white/10 flex items-center justify-center text-3xl animate-spin mb-3 shadow-xl backdrop-blur-md">
-          ⏳
-        </div>
-        <p className="font-display font-bold text-sm">
-          {isBn ? "কার্ডের তথ্য লোড হচ্ছে..." : "Loading card details..."}
-        </p>
-        <p className="text-slate-500 dark:text-white/60 text-xs mt-1">
-          {isBn ? "অনুগ্রহ করে একটু অপেক্ষা করুন" : "Please wait a moment"}
-        </p>
-      </div>
-    )
+    return <CardDetailSkeleton />
   }
 
   if (!data) {

@@ -247,6 +247,13 @@ export default function MarketingLanding() {
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
+              onClick={() => navigate("/blog")}
+              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-xs font-bold text-slate-700 dark:text-white/80 hover:text-[#059669] dark:hover:text-[#34D399] flex items-center gap-1 border border-slate-200 dark:border-white/10 cursor-pointer transition-all active:scale-95"
+            >
+              <span>{isBn ? "ব্লগ" : "Blog"}</span>
+            </button>
+
+            <button
               onClick={toggleTheme}
               className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-[#0F172A] dark:text-[#34D399] border border-slate-200 dark:border-white/10 cursor-pointer transition-all active:scale-95"
               title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}

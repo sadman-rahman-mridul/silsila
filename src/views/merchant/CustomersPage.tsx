@@ -211,9 +211,26 @@ export default function CustomersPage({ merchantId: propId }: CustomersPageProps
           </p>
 
           {loading ? (
-            <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
-              <span className="inline-block animate-spin text-2xl mb-2">⏳</span>
-              <p>{isBn ? "কাস্টমার তালিকা প্রস্তুত হচ্ছে..." : "Preparing customer list..."}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-[#0E281C]/85 rounded-3xl p-4 shadow-sm border border-slate-200/80 dark:border-white/10 space-y-3 shimmer"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-slate-200 dark:bg-white/10 animate-pulse shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-3/4 animate-pulse" />
+                      <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-1/2 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="h-2 bg-slate-200 dark:bg-white/10 rounded-full w-full animate-pulse" />
+                  <div className="flex justify-between items-center pt-1">
+                    <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-20 animate-pulse" />
+                    <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-16 animate-pulse" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : customers.length === 0 ? (
             <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-md dark:shadow-2xl text-center border border-slate-200/80 dark:border-emerald-500/20">

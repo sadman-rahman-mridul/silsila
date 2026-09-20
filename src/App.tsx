@@ -1,4 +1,4 @@
-import React, { Component, type ErrorInfo, type ReactNode } from "react"
+import React, { Component, Suspense, lazy, type ErrorInfo, type ReactNode } from "react"
 import {
   BrowserRouter,
   Routes,
@@ -8,18 +8,23 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom"
-import Landing from "./views/Landing"
-import MarketingLanding from "./views/landing/MarketingLanding"
-import CustomerApp from "./views/customer/CustomerApp"
-import CardDetail from "./views/customer/CardDetail"
-import MerchantApp from "./views/merchant/MerchantApp"
-import OnboardingWizard from "./views/merchant/OnboardingWizard"
-import OpsConsole from "./views/ops/OpsConsole"
-import AdminDashboard from "./views/admin/AdminDashboard"
 import { AuthProvider, useAuth } from "./context/AuthContext"
 import { LanguageProvider, useLanguage } from "./context/LanguageContext"
 import { ThemeProvider, useTheme } from "./context/ThemeContext"
 import CustomerBottomNav from "./components/CustomerBottomNav"
+import PageSkeleton from "./components/skeletons/PageSkeleton"
+
+// Lazy loaded views for instant initial bundle delivery
+const Landing = lazy(() => import("./views/Landing"))
+const MarketingLanding = lazy(() => import("./views/landing/MarketingLanding"))
+const CustomerApp = lazy(() => import("./views/customer/CustomerApp"))
+const CardDetail = lazy(() => import("./views/customer/CardDetail"))
+const MerchantApp = lazy(() => import("./views/merchant/MerchantApp"))
+const OnboardingWizard = lazy(() => import("./views/merchant/OnboardingWizard"))
+const OpsConsole = lazy(() => import("./views/ops/OpsConsole"))
+const AdminDashboard = lazy(() => import("./views/admin/AdminDashboard"))
+const BlogHub = lazy(() => import("./views/blog/BlogHub"))
+const BlogPostDetail = lazy(() => import("./views/blog/BlogPostDetail"))
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -91,6 +96,7 @@ function PublicMerchantRoute() {
     "profile",
     "merchant",
     "customer",
+    "blog",
     "favicon.ico",
   ]
 
@@ -277,6 +283,10 @@ function AppRoutes() {
         }
       />
 
+      {/* Blog Routes */}
+      <Route path="/blog" element={<BlogHub />} />
+      <Route path="/blog/:slug" element={<BlogPostDetail />} />
+
       {/* Dynamic Merchant Slugs (e.g. /cafeb, /north-end, etc.) */}
       <Route path="/:slug" element={<PublicMerchantRoute />} />
 
@@ -293,7 +303,9 @@ export default function App() {
         <LanguageProvider>
           <AuthProvider>
             <BrowserRouter>
-              <AppRoutes />
+              <Suspense fallback={<PageSkeleton />}>
+                <AppRoutes />
+              </Suspense>
             </BrowserRouter>
           </AuthProvider>
         </LanguageProvider>

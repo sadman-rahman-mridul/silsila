@@ -4,6 +4,7 @@ import { useLanguage } from "../../context/LanguageContext"
 import { firebaseService } from "../../services/firebaseService"
 import { BUSINESS_CATEGORIES, categoryLabel } from "../../constants/categories"
 import { MapPinIcon, SearchIcon, ShieldCheckIcon, RefreshIcon } from "../../components/Icons"
+import ExploreSkeleton from "../../components/skeletons/ExploreSkeleton"
 
 interface ExplorePageProps {
   onSelectMerchant?: (merchantId: string) => void
@@ -138,10 +139,7 @@ export default function ExplorePage({ onSelectMerchant }: ExplorePageProps) {
         )}
 
         {loading ? (
-          <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
-            <RefreshIcon size={24} className="animate-spin text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
-            <p>{isBn ? "দোকানের তালিকা লোড হচ্ছে..." : "Loading stores..."}</p>
-          </div>
+          <ExploreSkeleton />
         ) : merchants.length === 0 ? (
           <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl p-8 shadow-sm dark:shadow-2xl text-center border border-slate-200 dark:border-emerald-500/20 text-[#0F172A] dark:text-white">
             <SearchIcon size={32} className="text-[#059669] dark:text-[#34D399] mx-auto mb-2" />

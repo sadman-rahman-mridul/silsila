@@ -8,6 +8,7 @@ import { useLanguage } from "../../context/LanguageContext"
 import { useTheme } from "../../context/ThemeContext"
 import { firebaseService } from "../../services/firebaseService"
 import StampGrid from "../../components/StampGrid"
+import CardSkeleton from "../../components/skeletons/CardSkeleton"
 import { FireIcon, GiftIcon, LogOutIcon, CompassIcon, RefreshIcon, SunIcon, MoonIcon, GlobeIcon } from "../../components/Icons"
 
 interface WalletHomeProps {
@@ -262,10 +263,7 @@ export default function WalletHome({ onSelectCard, onExploreClick, onLogout }: W
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-slate-500 dark:text-white/70 text-sm">
-            <RefreshIcon size={24} className="animate-spin text-[#059669] dark:text-[#34D399] mx-auto mb-2" />
-            <p>{isBn ? "কার্ড লোড হচ্ছে..." : "Loading cards..."}</p>
-          </div>
+          <CardSkeleton count={2} />
         ) : filteredCards.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {filteredCards.map((card) => {
