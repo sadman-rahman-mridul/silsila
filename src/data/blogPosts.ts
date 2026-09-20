@@ -511,7 +511,7 @@ export const BLOG_POSTS: BlogPost[] = [
     },
     publishedAt: "২৩ মার্চ, ২০২৬",
     readTime: "৪ মিনিট পাঠ",
-    coverImage: "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=1200&auto=format&fit=crop&q=80",
+    coverImage: "/blog-what-is-sealsela.png",
     tags: ["Sealsela Guide", "Digital Loyalty Platform", "QR Code Stamp Card", "Restaurant Tech", "How Sealsela Works"],
     metaDescription:
       "Sealsela কী এবং কীভাবে কাজ করে? রেস্টুরেন্ট ও ক্যাফের জন্য ব্রাউজার-ভিত্তিক ডিজিটাল লয়্যালটি কার্ড, ৪টি সহজ স্টেপ এবং লাইভ ভিডিও ডেমো সহ সম্পূর্ণ গাইড।",
