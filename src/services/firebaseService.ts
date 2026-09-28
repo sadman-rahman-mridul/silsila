@@ -9,6 +9,7 @@ import {
   getDoc,
   setDoc,
   getDocs,
+  deleteDoc,
   onSnapshot,
   query,
   where,
@@ -1408,4 +1409,45 @@ export const firebaseService = {
       return { success: false, error: err?.message || "SMS sending failed" }
     }
   },
+
+  /** Delete a customer user account and associated cards/data from Firestore */
+  async deleteUserAccount(userId: string) {
+    if (!userId) return
+    try {
+      // 1. Delete user document from `users`
+      await deleteDoc(doc(firestore, USERS, userId)).catch(() => {})
+
+      // Try normalized variations if id starts with or lacks "c_"
+      if (userId.startsWith("c_")) {
+        const rawPhone = userId.slice(2)
+        if (rawPhone) {
+          await deleteDoc(doc(firestore, USERS, rawPhone)).catch(() => {})
+        }
+      } else {
+        await deleteDoc(doc(firestore, USERS, `c_${userId}`)).catch(() => {})
+      }
+
+      // 2. Query and delete all cards belonging to this customer
+      try {
+        const cardsQuery = query(collection(firestore, "cards"), where("customerId", "==", userId))
+        const cardsSnap = await getDocs(cardsQuery)
+        const deletePromises = cardsSnap.docs.map((d) => deleteDoc(d.ref))
+        await Promise.all(deletePromises)
+      } catch (cardErr) {
+        console.warn("Error deleting associated cards for user:", cardErr)
+      }
+
+      // 3. Call backend data wipe deletion API if available
+      try {
+        const { api } = await import("./api")
+        await api.deleteCustomerData(userId).catch(() => {})
+      } catch {
+        // backend call optional
+      }
+    } catch (err) {
+      console.error("Failed to delete user account from Firestore:", err)
+      throw err
+    }
+  },
 }
+

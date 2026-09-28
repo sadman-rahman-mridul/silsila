@@ -52,7 +52,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
     return true
   }
 
-  const packagePrice = selectedPackage === "6_months" ? 5000 : 8000
+  const packagePrice = selectedPackage === "6_months" ? 1500 : 2500
   const bkashNumber = "01681742043"
 
   function copyBkashNumber() {
@@ -437,10 +437,10 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
                   </div>
                 </div>
                 <p className="text-2xl font-black font-display text-[#064E3B] dark:text-[#34D399]">
-                  ৳৫,০০০
+                  ৳১,৫০০
                 </p>
                 <p className="text-[10px] text-slate-500 dark:text-white/50 mt-0.5">
-                  (5K / 6 Months)
+                  (1.5K / 6 Months)
                 </p>
               </div>
 
@@ -465,10 +465,10 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
                   </div>
                 </div>
                 <p className="text-2xl font-black font-display text-[#F59E0B]">
-                  ৳৮,০০০
+                  ৳২,৫০০
                 </p>
                 <p className="text-[10px] text-slate-500 dark:text-white/50 mt-0.5">
-                  (8K / 12 Months)
+                  (2.5K / 12 Months)
                 </p>
               </div>
             </div>
@@ -608,7 +608,7 @@ export default function OnboardingWizard({ onComplete, onBack }: OnboardingWizar
               <div className="flex justify-between">
                 <span>{isBn ? "প্যাকেজ:" : "Package:"}</span>
                 <span className="font-bold text-[#059669] dark:text-[#34D399]">
-                  {selectedPackage === "6_months" ? "6 Months (৳5,000)" : "12 Months (৳8,000)"}
+                  {selectedPackage === "6_months" ? "6 Months (৳1,500)" : "12 Months (৳2,500)"}
                 </span>
               </div>
               <div className="flex justify-between">

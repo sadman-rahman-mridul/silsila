@@ -585,7 +585,7 @@ export const api = {
     }
   },
 
-  // ----- Privacy & PDPA -----
+  // ----- Privacy & Data Deletion -----
   async deleteCustomerData(customerId: string) {
     return fetchJson(`${API_BASE}/privacy/delete-my-data`, {
       method: "POST",

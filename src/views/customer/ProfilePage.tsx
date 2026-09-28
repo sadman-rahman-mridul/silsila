@@ -259,21 +259,6 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto px-3.5 pb-20 pt-1 w-full">
-        {/* PDPA 2026 Compliance Badge */}
-        <div className="bg-white dark:bg-[#0E281C]/80 border border-slate-200/80 dark:border-emerald-500/20 backdrop-blur-xl rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-sm dark:shadow-xl">
-          <ShieldCheckIcon size={22} className="text-[#059669] dark:text-[#34D399] flex-shrink-0" />
-          <div>
-            <p className="text-[#059669] dark:text-[#34D399] font-bold text-xs">
-              {isBn ? "বাংলাদেশ PDPA ২০২৬ সুরক্ষিত" : "Bangladesh PDPA 2026 Protected"}
-            </p>
-            <p className="text-slate-500 dark:text-white/60 text-[11px] mt-0.5 leading-relaxed">
-              {isBn
-                ? "আপনার ডেটা সম্পূর্ণ এনক্রিপ্ট করা ও আইনানুযায়ী যেকোনো সময় সম্পূর্ণ মুছে ফেলার অধিকার সংরক্ষিত।"
-                : "Your data is fully encrypted with guaranteed right to erasure under Bangladesh data law."}
-            </p>
-          </div>
-        </div>
-
         <div className="bg-white dark:bg-[#0E281C]/85 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-2xl overflow-hidden mb-4">
           {/* Theme Switcher Row */}
           <button
@@ -335,7 +320,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 {isBn ? "আমার ডেটা ও সিল মুছে ফেলুন" : "Delete My Data & Stamps"}
               </p>
               <p className="text-[10px] text-red-500/70 dark:text-red-400/70">
-                {isBn ? "Right to erasure (PDPA ২০২৬ ধারা ৬৩)" : "Right to erasure (PDPA 2026 Section 63)"}
+                {isBn ? "স্থায়ীভাবে অ্যাকাউন্ট ও স্ট্যাম্প মুছে ফেলুন" : "Permanently delete your account & stamps"}
               </p>
             </div>
             <ChevronRightIcon size={16} className="text-red-500/50" />
@@ -353,7 +338,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         <p className="text-center text-slate-400 dark:text-white/30 text-xs mt-6">Sealsela v1.0.0</p>
       </div>
 
-      {/* PDPA Erasure Modal */}
+      {/* Erasure Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full card-shadow-md animate-slide-up">
@@ -365,8 +350,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </h3>
             <p className="text-xs text-[#6B6158] text-center mb-4 leading-relaxed">
               {isBn
-                ? "বাংলাদেশ ব্যক্তিগত তথ্য সুরক্ষা আইন ২০২৬ অনুসারে আপনার সব স্ট্যাম্প, রিডিম ইতিহাস ও প্রোফাইল অবিলম্বে মুছে ফেলা হবে। এটি ফেরানো সম্ভব নয়।"
-                : "Under Bangladesh Data Protection Act 2026, all your stamps, history, and profile will be permanently deleted. This cannot be undone."}
+                ? "আপনার সব স্ট্যাম্প, রিডিম ইতিহাস ও প্রোফাইল অবিলম্বে স্থায়ীভাবে মুছে ফেলা হবে। এটি ফেরানো সম্ভব নয়।"
+                : "All your stamps, reward history, and profile will be permanently deleted. This action cannot be undone."}
             </p>
 
             {deleteSuccess ? (

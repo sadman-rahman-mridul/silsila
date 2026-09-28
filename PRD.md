@@ -2,7 +2,7 @@
 **Version:** 2.0  
 **Status:** Active / Production-Ready  
 **Target Audience:** Stakeholders, Product Managers, UI/UX Designers, Frontend/Backend Developers, and QA Engineers  
-**Live Production URL:** [silsilaqr.vercel.app](https://silsilaqr.vercel.app)  
+**Live Production URL:** [silsilaqr.vercel.app](https://silsilaqr.vercel.app)  (https://sealsela.com)
 
 ---
 

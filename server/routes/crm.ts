@@ -84,15 +84,15 @@ router.get("/customers", requireMerchantOwner("merchantId"), (req, res) => {
   res.json(filtered)
 })
 
-// PDPA 2026 Compliant CSV Export (PRD E6.4 & §12.1)
+// Customer CSV Export (PRD E6.4)
 router.post("/export-csv", requireMerchantOwner("merchantId"), (req, res) => {
   const { consentAcknowledged } = req.body
   const merchantId = req.merchantId!
 
-  // Gated behind explicit PDPA purpose acknowledgement (PRD §12.1)
+  // Gated behind explicit purpose acknowledgement
   if (!consentAcknowledged) {
     res.status(403).json({
-      error: "বাংলাদেশ ডেটা সুরক্ষা আইন ২০২৬ (PDPA) অনুযায়ী ডেটা কন্ট্রোলার সম্মতি বাধ্যতামূলক।",
+      error: "ডেটা সুরক্ষা ও গোপনীয়তা নীতিতে সম্মতি প্রদান বাধ্যতামূলক।",
       requiresAcknowledgement: true,
     })
     return

@@ -27,6 +27,7 @@
     "serverless-http": "^4.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/canvas-confetti": "^1.9.0",
     "@types/cors": "^2.8.19",

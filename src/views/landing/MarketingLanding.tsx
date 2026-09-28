@@ -759,7 +759,7 @@ export default function MarketingLanding() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-[#34D399] font-bold">✓</span>
-                    <span>{isBn ? "জিরো কমিশন: মাত্র ৫,০০০ টাকায় ৬ মাসের পূর্ণ সেবা" : "Zero commission fees: pure profit retention"}</span>
+                    <span>{isBn ? "জিরো কমিশন: মাত্র ১,৫০০ টাকায় ৬ মাসের পূর্ণ সেবা" : "Zero commission fees: pure profit retention (only ৳1,500 for 6 months)"}</span>
                   </li>
                 </ul>
               </div>
@@ -899,14 +899,14 @@ export default function MarketingLanding() {
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-4xl sm:text-5xl font-display font-black text-[#0F172A] dark:text-white">
-                      5,000
+                      1,500
                     </span>
                     <span className="text-lg sm:text-xl font-bold text-[#059669] dark:text-[#34D399]">
                       BDT
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-white/60 mt-1 font-medium">
-                    {isBn ? "৬ মাসের পূর্ণ সেবা (মাত্র ~৮৩৩ টাকা/মাস)" : "Full access for 6 months (~833 BDT/mo)"}
+                    {isBn ? "৬ মাসের পূর্ণ সেবা (মাত্র ২৫০ টাকা/মাস)" : "Full access for 6 months (250 BDT/mo)"}
                   </p>
                 </div>
 
@@ -957,7 +957,7 @@ export default function MarketingLanding() {
             <div className="anime-pricing-card rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-[#064E3B] to-[#0D3824] dark:bg-none dark:bg-[#092217] border-2 border-[#F59E0B] shadow-2xl flex flex-col justify-between relative backdrop-blur-xl text-white glow-amber hover:scale-[1.01] transition-transform duration-300">
               {/* Popular Badge */}
               <div className="absolute -top-3.5 right-6 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-[#071D13] font-display font-black text-[11px] uppercase tracking-wider px-3.5 py-1 rounded-full shadow-lg">
-                {isBn ? "সেরা অফার • ২০০০ টাকা সাশ্রয়" : "BEST VALUE • SAVE 2,000 BDT"}
+                {isBn ? "সেরা অফার • ৫০০ টাকা সাশ্রয়" : "BEST VALUE • SAVE 500 BDT"}
               </div>
 
               <div>
@@ -973,14 +973,14 @@ export default function MarketingLanding() {
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-4xl sm:text-5xl font-display font-black text-white">
-                      8,000
+                      2,500
                     </span>
                     <span className="text-lg sm:text-xl font-bold text-[#34D399]">
                       BDT
                     </span>
                   </div>
                   <p className="text-xs text-[#34D399] mt-1 font-semibold">
-                    {isBn ? "১২ মাসের পূর্ণ সেবা (মাত্র ~৬৬৬ টাকা/মাস)" : "Full access for 12 months (~666 BDT/mo)"}
+                    {isBn ? "১২ মাসের পূর্ণ সেবা (মাত্র ~২০৮ টাকা/মাস)" : "Full access for 12 months (~208 BDT/mo)"}
                   </p>
                 </div>
 

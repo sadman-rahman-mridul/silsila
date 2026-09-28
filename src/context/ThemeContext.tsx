@@ -16,9 +16,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("sealsela_theme") as Theme
       if (saved === "light" || saved === "dark") return saved
-      return "dark" // Default to dark emerald mode
+      return "light" // Default to light mode
     }
-    return "dark"
+    return "light"
   })
 
   useEffect(() => {

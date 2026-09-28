@@ -737,7 +737,7 @@ export default function Landing({
                 </div>
               </div>
 
-              {/* PDPA Consent Checkbox */}
+              {/* Data Consent Checkbox */}
               <label className="flex items-start gap-2 mb-5 cursor-pointer text-xs text-slate-600 dark:text-white/70">
                 <input
                   type="checkbox"
@@ -747,8 +747,8 @@ export default function Landing({
                 />
                 <span className="text-[11px] leading-tight">
                   {isBn
-                    ? "বাংলাদেশ ব্যক্তিগত ডেটা সুরক্ষা আইন ২০২৬ অনুযায়ী আমার লয়্যালটি স্ট্যাম্প সংরক্ষণে সম্মতি প্রদান করছি।"
-                    : "I consent to the collection and storage of my loyalty stamps under PDPA 2026."}
+                    ? "আমি আমার লয়্যালটি স্ট্যাম্প ও অ্যাকাউন্ট তথ্য সংরক্ষণে সম্মতি প্রদান করছি।"
+                    : "I consent to the collection and storage of my loyalty stamps."}
                 </span>
               </label>
 
@@ -1149,12 +1149,12 @@ export default function Landing({
           {isBn ? (
             <>
               Sealsela প্ল্যাটফর্ম ব্যবহার করে আপনি আমাদের{" "}
-              <span className="underline text-slate-700 dark:text-white/60">গোপনীয়তা নীতি (PDPA ২০২৬)</span> মেনে নিচ্ছেন।
+              <span className="underline text-slate-700 dark:text-white/60">গোপনীয়তা নীতি</span> মেনে নিচ্ছেন।
             </>
           ) : (
             <>
               By accessing the Sealsela platform, you agree to our{" "}
-              <span className="underline text-slate-700 dark:text-white/60">Privacy Policy (PDPA 2026)</span>.
+              <span className="underline text-slate-700 dark:text-white/60">Privacy Policy</span>.
             </>
           )}
         </p>
