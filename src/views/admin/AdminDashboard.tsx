@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                             {isBn ? "নির্বাচিত প্যাকেজ:" : "Package:"}
                           </span>
                           <span className="font-bold text-[#059669] dark:text-[#34D399] bg-emerald-500/10 px-2 py-0.5 rounded-md">
-                            {m.paymentPackage === "6_months" ? "6 Months (৳1,500)" : m.paymentPackage === "12_months" ? "12 Months (৳2,500)" : "Standard Plan"}
+                            {m.paymentPackage === "6_months" ? "6 Months (৳2,500)" : m.paymentPackage === "12_months" ? "12 Months (৳4,000)" : "Standard Plan"}
                           </span>
                         </div>
 
@@ -622,7 +622,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="py-3.5 px-4">
                             <span className="font-semibold text-slate-900 dark:text-white">
-                              {m.paymentPackage === "6_months" ? "6 Mo (1.5K)" : m.paymentPackage === "12_months" ? "12 Mo (2.5K)" : "Standard"}
+                              {m.paymentPackage === "6_months" ? "6 Mo (2.5K)" : m.paymentPackage === "12_months" ? "12 Mo (4K)" : "Standard"}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono text-[11px]">

@@ -154,7 +154,7 @@ export default function MerchantApp({ onBack, initialTab }: MerchantAppProps) {
             <div className="flex justify-between">
               <span>{isBn ? "প্যাকেজ:" : "Package:"}</span>
               <span className="font-bold text-[#059669] dark:text-[#34D399]">
-                {activeMerchant.paymentPackage === "6_months" ? "6 Months (৳1,500)" : activeMerchant.paymentPackage === "12_months" ? "12 Months (৳2,500)" : "Standard Plan"}
+                {activeMerchant.paymentPackage === "6_months" ? "6 Months (৳2,500)" : activeMerchant.paymentPackage === "12_months" ? "12 Months (৳4,000)" : "Standard Plan"}
               </span>
             </div>
             {activeMerchant.senderBkashNumber && (
